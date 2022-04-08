@@ -35,7 +35,7 @@ cpdef integrate_cy(
     earth_pos,
     earth_vel,
     sat_pos,
-	sat_vel
+    sat_vel
 ):
 
     cdef double[:, ::1] sun_pos_view = sun_pos
@@ -121,14 +121,14 @@ cpdef integrate_cy(
 @cython.cdivision(True)
 cdef void calc_acceleration(
     const double[::1] sun_pos,
-	const double[::1] earth_pos,
-	const double[::1] sat_pos,
+    const double[::1] earth_pos,
+    const double[::1] sat_pos,
     double[::1] r_earth_to_sun,
     double[::1] r_sat_to_sun,
     double[::1] r_sat_to_earth,
     double[::1] sun_accel,
-	double[::1] earth_accel,
-	double[::1] sat_accel
+    double[::1] earth_accel,
+    double[::1] sat_accel
 ):
 
     cdef size_t j
