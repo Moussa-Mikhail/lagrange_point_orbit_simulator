@@ -44,6 +44,9 @@ vel_angle_high = vel_angle_avg + vel_angle_range
 @time_func
 def main(num_years=100, num_steps=10**6, num_samples=100):
 
+    # this function will take 26 seconds when called with default arguments
+    # the time taken is linear in both num_steps and num_samples
+
     df = pd.DataFrame()
 
     # this line initializes the num_years column and sets the number of rows to num_samples
