@@ -423,7 +423,7 @@ def update_idx(num_steps):
 
     # maximum rate of plot update is too slow
     # so instead step through arrays at a step of rate
-    # TODO: replace '50' with some function of num_step and time_step
+    # TODO: replace '5' with some function of num_step and time_step
     # so that animation is always at correct speed regardless of num_step or time_step
     rate = 5
 
@@ -438,6 +438,38 @@ def update_idx(num_steps):
 
 
 timer_rotating = QTimer()
+
+
+def transform_to_corotating(times, pos, CM_pos):
+    # it is necessary to transform our coordinate system to one which
+    # rotates with the system
+    # we can do this by linearly transforming each position vector by
+    # the inverse of the coordinate transform
+    # the coordinate transform is ( unit(x), unit(y) )-> R(w*t) * ( unit(x), unit(y) )
+    # where R(w*t) is the rotation matrix with angle w*t about the z axis
+    # the inverse is R(-w*t)
+    # at each time t we multiply the position vectors by the matrix R(-w*t)
+
+    # first transform our coordinate system so that the Center of Mass
+    # is the origin
+
+    pos_trans = pos - CM_pos
+
+    for i, t in enumerate(times):
+
+        angle = -angular_speed * t
+
+        rotation_matrix = np.array(
+            (
+                (np.cos(angle), -np.sin(angle), 0),
+                (np.sin(angle), np.cos(angle), 0),
+                (0, 0, 1),
+            )
+        )
+
+        pos_trans[i] = rotation_matrix.dot(pos_trans[i])
+
+    return pos_trans
 
 
 def plot_corotating_orbit(default_pos, sun_pos_trans, earth_pos_trans, sat_pos_trans):
@@ -527,38 +559,6 @@ def plot_corotating_orbit(default_pos, sun_pos_trans, earth_pos_trans, sat_pos_t
 
     timer_rotating.timeout.connect(update_trans)
     timer_rotating.start(period)
-
-
-def transform_to_corotating(times, pos, CM_pos):
-    # it is necessary to transform our coordinate system to one which
-    # rotates with the system
-    # we can do this by linearly transforming each position vector by
-    # the inverse of the coordinate transform
-    # the coordinate transform is ( unit(x), unit(y) )-> R(w*t) * ( unit(x), unit(y) )
-    # where R(w*t) is the rotation matrix with angle w*t about the z axis
-    # the inverse is R(-w*t)
-    # at each time t we multiply the position vectors by the matrix R(-w*t)
-
-    # first transform our coordinate system so that the Center of Mass
-    # is the origin
-
-    pos_trans = pos - CM_pos
-
-    for i, t in enumerate(times):
-
-        angle = -angular_speed * t
-
-        rotation_matrix = np.array(
-            (
-                (np.cos(angle), -np.sin(angle), 0),
-                (np.sin(angle), np.cos(angle), 0),
-                (0, 0, 1),
-            )
-        )
-
-        pos_trans[i] = rotation_matrix.dot(pos_trans[i])
-
-    return pos_trans
 
 
 def conservation_calculations(sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel):
