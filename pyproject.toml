@@ -11,6 +11,7 @@ numpy = "^1.22.3"
 pandas = "^1.4.2"
 pyqtgraph = "^0.12.4"
 Cython = "^0.29.28"
+PyQt5 = "^5.15.6"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.942"
