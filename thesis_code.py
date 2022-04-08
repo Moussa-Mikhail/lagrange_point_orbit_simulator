@@ -96,7 +96,7 @@ def main(
     integrate=integrate_cy,
 ):
 
-    # this computation will take ~3.5 seconds per 10**5 steps
+    # this function will take ~3.5 seconds per 10**5 steps
     # the time may vary depending on your hardware
 
     default_pertubation_angle = np.arctan2(default_pos[1], default_pos[0])
