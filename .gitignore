@@ -130,5 +130,4 @@ dmypy.json
 3 body notes.txt
 .vscode/settings.json
 data.csv
-cy_code.html
-cy_code.c
+integrate_cy.c

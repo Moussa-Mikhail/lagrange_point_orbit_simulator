@@ -16,7 +16,7 @@ from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
 
 # cythonized version of integrate_py
 # roughly 270x times faster
-from cy_code import integrate_cy  # pylint: disable=no-name-in-module
+from integrate_cy import integrate_cy  # pylint: disable=no-name-in-module
 
 pi = np.pi
 
@@ -63,7 +63,7 @@ L3 = -1 * AU * np.array((1, 0, 0)) - np.array((L3_dist, 0, 0))
 # It forms a 60 degree=pi/3 radians angle with the positive x-axis.
 L4 = 1 * AU * np.array((np.cos(pi / 3), np.sin(pi / 3), 0))
 
-# Position of L4 Lagrange point.
+# Position of L5 Lagrange point.
 # It is 1 AU from both Sun and Earth.
 # It forms a 60 degree=pi/3 radians angle with the positive x-axis.
 L5 = 1 * AU * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
@@ -95,6 +95,27 @@ def main(
     plot_conserved=False,
     integrate=integrate_cy,
 ):
+    """Main function simulates and creates plots of orbit in inertial and corotating frames
+
+    takes the following parameters:
+
+    num_years: number of years to simulate
+    num_steps: number of steps to simulate
+
+    perturbation_size: size of perturbation in AU
+    perturbation_angle: angle of perturbation relative to positive x axis in degrees
+
+    speed: initial speed of satellite as a factor of Earth's speed
+    i.e. speed = 1 -> satellite has the same speed as Earth
+    vel_angle: angle of satellite's initial velocity relative to positive x axis in degrees
+
+    default_pos: non perturbed position of satellite. default is L4 but L1, L2, L3, L5 can be used
+
+    plot_conserved: if true, plots the conserved quantities: energy, angular momentum, linear momentum
+
+    integrate: function to use for integration. default is integrate_cy.
+    integrate_py can used if integrate_cy is not available.
+    """
 
     # this function will take ~3.5 seconds per 10**5 steps
     # the time may vary depending on your hardware
@@ -139,7 +160,9 @@ def main(
 
     sat_pos_trans = transform_to_corotating(times, sat_pos, CM_pos)
 
-    plot_corotating_orbit(default_pos, sun_pos_trans, earth_pos_trans, sat_pos_trans)
+    plot_corotating_orbit(
+        num_years, default_pos, sun_pos_trans, earth_pos_trans, sat_pos_trans
+    )
 
     if plot_conserved:
         (
@@ -231,7 +254,18 @@ def initialization(
     # earth starts 1 AU from the sun (and origin) and lies on the positive x-axis
     earth_pos[0] = np.array((1 * AU, 0, 0))
 
-    sat_pos[0] = default_pos
+    # Perturbation #
+
+    perturbation_size = perturbation_size * AU
+
+    perturbation_angle = np.radians(perturbation_angle)
+
+    perturbation = perturbation_size * np.array(
+        (np.cos(perturbation_angle), np.sin(perturbation_angle), 0)
+    )
+
+    # perturbing the initial position of the satellite
+    sat_pos[0] = default_pos + perturbation
 
     # all 3 masses orbit about the Center of Mass at an angular_speed = 1 orbit/year =
     # 2 pi radians/year
@@ -243,31 +277,20 @@ def initialization(
     # angular velocity is in the positive z direction
     angular_vel = np.array((0, 0, angular_speed))
 
+    speed = speed * norm(np.cross(angular_vel, earth_pos[0] - init_CM_pos))
+
+    vel_angle = np.radians(vel_angle)
+
+    sat_vel[0] = speed * np.array((np.cos(vel_angle), np.sin(vel_angle), 0))
+
+    # End Perturbation #
+
     # for a circular orbit velocity = cross_product(angular velocity, position)
     # where vec(position) is the position relative to the point being orbited
     # in this case the Center of Mass
     sun_vel[0] = np.cross(angular_vel, sun_pos[0] - init_CM_pos)
 
     earth_vel[0] = np.cross(angular_vel, earth_pos[0] - init_CM_pos)
-
-    #    Perturbation    #
-
-    perturbation_size = perturbation_size * AU
-
-    perturbation_angle = np.radians(perturbation_angle)
-
-    perturbation = perturbation_size * np.array(
-        (np.cos(perturbation_angle), np.sin(perturbation_angle), 0)
-    )
-
-    speed = speed * norm(np.cross(angular_vel, sat_pos[0] - init_CM_pos))
-
-    vel_angle = np.radians(vel_angle)
-
-    sat_vel[0] = speed * np.array((np.cos(vel_angle), np.sin(vel_angle), 0))
-
-    # perturbing the initial position of the satellite
-    sat_pos[0] = sat_pos[0] + perturbation
 
     return sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
 
@@ -280,15 +303,15 @@ def integrate_py(
     for k in range(1, num_steps + 1):
 
         # intermediate position calculation
-        intermediate_sun_pos = sun_pos[k - 1] + 0.5 * sun_vel[k - 1] * time_step
+        sun_intermediate_pos = sun_pos[k - 1] + 0.5 * sun_vel[k - 1] * time_step
 
-        intermediate_earth_pos = earth_pos[k - 1] + 0.5 * earth_vel[k - 1] * time_step
+        earth_intermediate_pos = earth_pos[k - 1] + 0.5 * earth_vel[k - 1] * time_step
 
-        intermediate_sat_pos = sat_pos[k - 1] + 0.5 * sat_vel[k - 1] * time_step
+        sat_intermediate_pos = sat_pos[k - 1] + 0.5 * sat_vel[k - 1] * time_step
 
         # acceleration calculation
         sun_accel, earth_accel, sat_accel = calc_acceleration(
-            intermediate_sun_pos, intermediate_earth_pos, intermediate_sat_pos
+            sun_intermediate_pos, earth_intermediate_pos, sat_intermediate_pos
         )
 
         # velocity update
@@ -299,11 +322,11 @@ def integrate_py(
         sat_vel[k] = sat_vel[k - 1] + sat_accel * time_step
 
         # position update
-        sun_pos[k] = intermediate_sun_pos + 0.5 * sun_vel[k] * time_step
+        sun_pos[k] = sun_intermediate_pos + 0.5 * sun_vel[k] * time_step
 
-        earth_pos[k] = intermediate_earth_pos + 0.5 * earth_vel[k] * time_step
+        earth_pos[k] = earth_intermediate_pos + 0.5 * earth_vel[k] * time_step
 
-        sat_pos[k] = intermediate_sat_pos + 0.5 * sat_vel[k] * time_step
+        sat_pos[k] = sat_intermediate_pos + 0.5 * sat_vel[k] * time_step
 
     return sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
 
@@ -362,11 +385,8 @@ def plot_orbit(sun_pos, earth_pos, sat_pos):
     # zoom into the sun until the axes are on the scale of a few micro-AU to see sun's orbit
     orbit_plot.plot(sun_pos[:, 0] / AU, sun_pos[:, 1] / AU, pen="y", name="Sun")
 
-    orbit_plot.plot(
-        earth_pos[:, 0] / AU, earth_pos[:, 1] / AU, pen=(50, 147, 168), name="Earth"
-    )
+    orbit_plot.plot(earth_pos[:, 0] / AU, earth_pos[:, 1] / AU, pen="b", name="Earth")
 
-    # overlaps with earth's orbit, cant be seen clearly
     orbit_plot.plot(sat_pos[:, 0] / AU, sat_pos[:, 1] / AU, pen="g", name="Satellite")
 
     anim_plot = pg.ScatterPlotItem()
@@ -395,7 +415,7 @@ def plot_orbit(sun_pos, earth_pos, sat_pos):
             [earth_pos[i, 1] / AU],
             pen="b",
             brush="b",
-            size=7,
+            size=10,
             name="Earth",
         )
 
@@ -404,7 +424,7 @@ def plot_orbit(sun_pos, earth_pos, sat_pos):
             [sat_pos[i, 1] / AU],
             pen="g",
             brush="g",
-            size=7,
+            size=10,
             name="Satellite",
         )
 
@@ -417,15 +437,15 @@ def plot_orbit(sun_pos, earth_pos, sat_pos):
 
 
 def update_idx(num_steps):
-    """This function is used to"""
+    """This function is used to update the index of the orbit plot"""
 
     i = 0
 
     # maximum rate of plot update is too slow
     # so instead step through arrays at a step of rate
-    # TODO: replace '5' with some function of num_step and time_step
+    # TODO: replace rate with some function of num_step and time_step
     # so that animation is always at correct speed regardless of num_step or time_step
-    rate = 5
+    rate = 150
 
     while True:
 
@@ -472,7 +492,9 @@ def transform_to_corotating(times, pos, CM_pos):
     return pos_trans
 
 
-def plot_corotating_orbit(default_pos, sun_pos_trans, earth_pos_trans, sat_pos_trans):
+def plot_corotating_orbit(
+    num_years, default_pos, sun_pos_trans, earth_pos_trans, sat_pos_trans
+):
 
     # Animated plot of satellites orbit in co-rotating frame.
     transform_plot = pg.plot(title="Orbits in Co-Rotating Coordinate System")
@@ -480,8 +502,8 @@ def plot_corotating_orbit(default_pos, sun_pos_trans, earth_pos_trans, sat_pos_t
     transform_plot.setLabel("left", "y", units="AU")
     transform_plot.addLegend()
 
-    transform_plot.setXRange(-1.5, 1.5)
-    transform_plot.setYRange(-1.5, 1.5)
+    transform_plot.setXRange(-0.2, 1.2)
+    transform_plot.setYRange(-0.2, 1.2)
     transform_plot.setAspectLocked(True)
 
     anim_trans_plot = pg.ScatterPlotItem()
@@ -491,8 +513,39 @@ def plot_corotating_orbit(default_pos, sun_pos_trans, earth_pos_trans, sat_pos_t
     transform_plot.plot(
         sat_pos_trans[:, 0] / AU,
         sat_pos_trans[:, 1] / AU,
-        pen=(66, 245, 105),
         name="Satellite orbit",
+        pen="g",
+    )
+
+    # The only purpose of this is to add the bodies to the plot legend
+    transform_plot.plot(
+        [sun_pos_trans[0, 0] / AU],
+        [sun_pos_trans[0, 1] / AU],
+        name="Sun",
+        pen="k",
+        symbol="o",
+        symbolPen="y",
+        symbolBrush="y",
+    )
+
+    transform_plot.plot(
+        [earth_pos_trans[0, 0] / AU],
+        [earth_pos_trans[0, 1] / AU],
+        name="Earth",
+        pen="k",
+        symbol="o",
+        symbolPen="b",
+        symbolBrush="b",
+    )
+
+    transform_plot.plot(
+        [default_pos[0] / AU],
+        [default_pos[1] / AU],
+        name="Lagrange Point L4",
+        pen="k",
+        symbol="o",
+        symbolPen="w",
+        symbolBrush="w",
     )
 
     num_steps = sun_pos_trans.shape[0] - 1
@@ -505,14 +558,12 @@ def plot_corotating_orbit(default_pos, sun_pos_trans, earth_pos_trans, sat_pos_t
 
         anim_trans_plot.clear()
 
-        steps_per_year = int(num_steps / 10)
-
         anim_trans_plot.addPoints(
             [default_pos[0] / AU],
             [default_pos[1] / AU],
             pen="w",
             brush="w",
-            size=5,
+            size=10,
             name="initial position",
         )
 
@@ -530,7 +581,7 @@ def plot_corotating_orbit(default_pos, sun_pos_trans, earth_pos_trans, sat_pos_t
             [earth_pos_trans[j, 1] / AU],
             pen="b",
             brush="b",
-            size=7,
+            size=10,
             name="Earth",
         )
 
@@ -539,19 +590,21 @@ def plot_corotating_orbit(default_pos, sun_pos_trans, earth_pos_trans, sat_pos_t
             [sat_pos_trans[j, 1] / AU],
             pen="g",
             brush="g",
-            size=7,
+            size=10,
             name="Satellite",
         )
 
+        # steps_per_year = int(num_steps / num_years)
+
         # plots where the satellite is after 1 year
-        anim_trans_plot.addPoints(
-            [sat_pos_trans[steps_per_year, 0] / AU],
-            [sat_pos_trans[steps_per_year, 1] / AU],
-            pen="g",
-            brush="w",
-            size=7,
-            name="Satellite 1 yr",
-        )
+        # anim_trans_plot.addPoints(
+        #     [sat_pos_trans[steps_per_year, 0] / AU],
+        #     [sat_pos_trans[steps_per_year, 1] / AU],
+        #     pen="g",
+        #     brush="w",
+        #     size=10,
+        #     name="Satellite 1 yr",
+        # )
 
     # time in milliseconds between plot updates
     # making it small (=1) and having 2 animated plots leads to crashes

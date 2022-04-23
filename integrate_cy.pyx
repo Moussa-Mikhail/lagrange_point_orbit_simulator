@@ -51,23 +51,23 @@ cpdef integrate_cy(
     cdef double[:, ::1] sat_vel_view = sat_vel
 
 
-    cdef double[::1] intermediate_sun_pos = np.empty(3, dtype=np.double)
+    cdef double[::1] sun_intermediate_pos = np.empty(3, dtype=np.double)
 
-    cdef double[::1] intermediate_earth_pos = np.empty_like(intermediate_sun_pos)
+    cdef double[::1] earth_intermediate_pos = np.empty_like(sun_intermediate_pos)
 
-    cdef double[::1] intermediate_sat_pos = np.empty_like(intermediate_sun_pos)
+    cdef double[::1] sat_intermediate_pos = np.empty_like(sun_intermediate_pos)
 
-    cdef double[::1] r_earth_to_sun = np.empty_like(intermediate_sun_pos)
+    cdef double[::1] r_earth_to_sun = np.empty_like(sun_intermediate_pos)
 
-    cdef double[::1] r_sat_to_sun = np.empty_like(intermediate_sun_pos)
+    cdef double[::1] r_sat_to_sun = np.empty_like(sun_intermediate_pos)
 
-    cdef double[::1] r_sat_to_earth = np.empty_like(intermediate_sun_pos)
+    cdef double[::1] r_sat_to_earth = np.empty_like(sun_intermediate_pos)
 
-    cdef double[::1] sun_accel = np.empty_like(intermediate_sun_pos)
+    cdef double[::1] sun_accel = np.empty_like(sun_intermediate_pos)
 
-    cdef double[::1] earth_accel = np.empty_like(intermediate_sun_pos)
+    cdef double[::1] earth_accel = np.empty_like(sun_intermediate_pos)
 
-    cdef double[::1] sat_accel = np.empty_like(intermediate_sun_pos)
+    cdef double[::1] sat_accel = np.empty_like(sun_intermediate_pos)
 
     cdef size_t k
 
@@ -78,17 +78,17 @@ cpdef integrate_cy(
         for j in range(3):
 
             # intermediate position calculation
-            intermediate_sun_pos[j] = sun_pos_view[k - 1, j] + 0.5 * sun_vel_view[k - 1, j] * time_step
+            sun_intermediate_pos[j] = sun_pos_view[k - 1, j] + 0.5 * sun_vel_view[k - 1, j] * time_step
 
-            intermediate_earth_pos[j] = earth_pos_view[k - 1, j] + 0.5 * earth_vel_view[k - 1, j] * time_step
+            earth_intermediate_pos[j] = earth_pos_view[k - 1, j] + 0.5 * earth_vel_view[k - 1, j] * time_step
 
-            intermediate_sat_pos[j] = sat_pos_view[k - 1, j] + 0.5 * sat_vel_view[k - 1, j] * time_step
+            sat_intermediate_pos[j] = sat_pos_view[k - 1, j] + 0.5 * sat_vel_view[k - 1, j] * time_step
 
         # acceleration calculation
         calc_acceleration(
-            intermediate_sun_pos,
-            intermediate_earth_pos,
-            intermediate_sat_pos,
+            sun_intermediate_pos,
+            earth_intermediate_pos,
+            sat_intermediate_pos,
             r_earth_to_sun,
             r_sat_to_sun,
             r_sat_to_earth,
@@ -107,11 +107,11 @@ cpdef integrate_cy(
             sat_vel_view[k, j] = sat_vel_view[k - 1, j] + sat_accel[j] * time_step
 
             # position update
-            sun_pos_view[k, j] = intermediate_sun_pos[j] + 0.5 * sun_vel_view[k, j] * time_step
+            sun_pos_view[k, j] = sun_intermediate_pos[j] + 0.5 * sun_vel_view[k, j] * time_step
 
-            earth_pos_view[k, j] = intermediate_earth_pos[j] + 0.5 * earth_vel_view[k, j] * time_step
+            earth_pos_view[k, j] = earth_intermediate_pos[j] + 0.5 * earth_vel_view[k, j] * time_step
 
-            sat_pos_view[k, j] = intermediate_sat_pos[j] + 0.5 * sat_vel_view[k, j] * time_step
+            sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step
 
     return sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
 
