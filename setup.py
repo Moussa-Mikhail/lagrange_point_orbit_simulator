@@ -1,5 +1,5 @@
 # pylint: disable=missing-docstring
-from distutils.core import setup
+from distutils.core import setup  # type: ignore
 from Cython.Build import cythonize  # type: ignore
 import numpy
 

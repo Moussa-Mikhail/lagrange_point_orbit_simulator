@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, missing-function-docstring
 """Investigating L4 Lagrange Point
 using the position Verlet algorithm"""
 
@@ -13,10 +13,6 @@ import numpy as np
 import pyqtgraph as pg  # type: ignore
 from numpy.linalg import norm
 from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
-
-# cythonized version of integrate_py
-# roughly 270x times faster
-from integrate_cy import integrate_cy  # pylint: disable=no-name-in-module
 
 pi = np.pi
 
@@ -68,6 +64,19 @@ L4 = 1 * AU * np.array((np.cos(pi / 3), np.sin(pi / 3), 0))
 # It forms a 60 degree=pi/3 radians angle with the positive x-axis.
 L5 = 1 * AU * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
 
+try:
+    # cythonized version of integrate_py
+    # roughly 270x times faster
+    from integrate_cy import integrate_cy  # pylint: disable=no-name-in-module
+
+    integrate_default = integrate_cy
+
+except ImportError:
+
+    from integrate_py import integrate_py
+
+    integrate_default = integrate_py
+
 
 def time_func(func):
     """Measures the time taken by a function"""
@@ -93,9 +102,9 @@ def main(
     vel_angle=None,
     default_pos=L4,
     plot_conserved=False,
-    integrate=integrate_cy,
+    integrate=integrate_default,
 ):
-    """Main function simulates and creates plots of orbit in inertial and corotating frames
+    """main simulates and creates plots of satellite's orbit in inertial and corotating frames
 
     takes the following parameters:
 
@@ -111,10 +120,10 @@ def main(
 
     default_pos: non perturbed position of satellite. default is L4 but L1, L2, L3, L5 can be used
 
-    plot_conserved: if true, plots the conserved quantities: energy, angular momentum, linear momentum
+    plot_conserved: if True, plots the conserved quantities:energy, angular momentum, linear momentum
 
     integrate: function to use for integration. default is integrate_cy.
-    integrate_py can used if integrate_cy is not available.
+    integrate_py is used if integrate_cy is not available.
     """
 
     # this function will take ~3.5 seconds per 10**5 steps
@@ -188,7 +197,7 @@ def calc_orbit(
     speed=1,
     vel_angle=None,
     default_pos=L4,
-    integrate=integrate_cy,
+    integrate=integrate_default,
 ):
     default_pertubation_angle = np.arctan2(default_pos[1], default_pos[0])
 
@@ -293,72 +302,6 @@ def initialization(
     earth_vel[0] = np.cross(angular_vel, earth_pos[0] - init_CM_pos)
 
     return sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
-
-
-# pure python version of integrate function
-def integrate_py(
-    time_step, num_steps, sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
-):
-
-    for k in range(1, num_steps + 1):
-
-        # intermediate position calculation
-        sun_intermediate_pos = sun_pos[k - 1] + 0.5 * sun_vel[k - 1] * time_step
-
-        earth_intermediate_pos = earth_pos[k - 1] + 0.5 * earth_vel[k - 1] * time_step
-
-        sat_intermediate_pos = sat_pos[k - 1] + 0.5 * sat_vel[k - 1] * time_step
-
-        # acceleration calculation
-        sun_accel, earth_accel, sat_accel = calc_acceleration(
-            sun_intermediate_pos, earth_intermediate_pos, sat_intermediate_pos
-        )
-
-        # velocity update
-        sun_vel[k] = sun_vel[k - 1] + sun_accel * time_step
-
-        earth_vel[k] = earth_vel[k - 1] + earth_accel * time_step
-
-        sat_vel[k] = sat_vel[k - 1] + sat_accel * time_step
-
-        # position update
-        sun_pos[k] = sun_intermediate_pos + 0.5 * sun_vel[k] * time_step
-
-        earth_pos[k] = earth_intermediate_pos + 0.5 * earth_vel[k] * time_step
-
-        sat_pos[k] = sat_intermediate_pos + 0.5 * sat_vel[k] * time_step
-
-    return sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
-
-
-def calc_acceleration(sun_pos, earth_pos, sat_pos):
-
-    # vector from earth to sun
-    r_earth_to_sun = sun_pos - earth_pos
-
-    # distance between earth and sun
-    d_sun_to_earth = norm(r_earth_to_sun)
-
-    # gravity of satellite can be ignored
-    sun_accel = -G * earth_mass * r_earth_to_sun / d_sun_to_earth**3
-
-    # note the lack of negative sign in the following line
-    earth_accel = G * sun_mass * r_earth_to_sun / d_sun_to_earth**3
-
-    r_sun_to_sat = sat_pos - sun_pos
-
-    d_sun_to_sat = norm(r_sun_to_sat)
-
-    r_earth_to_sat = sat_pos - earth_pos
-
-    d_earth_to_sat = norm(r_earth_to_sat)
-
-    sat_accel = (
-        -G * sun_mass * r_sun_to_sat / d_sun_to_sat**3
-        + -G * earth_mass * r_earth_to_sat / d_earth_to_sat**3
-    )
-
-    return sun_accel, earth_accel, sat_accel
 
 
 def calc_center_of_mass(sun_pos, earth_pos, sat_pos):
