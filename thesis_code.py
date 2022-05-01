@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name, missing-function-docstring
+# pylint: disable=invalid-name, missing-docstring
 """Investigating L4 Lagrange Point
 using the position Verlet algorithm"""
 
@@ -52,6 +52,7 @@ L2 = 1 * AU * np.array((1, 0, 0)) + np.array((hill_radius, 0, 0))
 L3_dist = 1 * AU * 7 / 12 * earth_mass / sun_mass
 
 # Position of L3
+# Located opposite of the Earth and slightly further away from the
 L3 = -1 * AU * np.array((1, 0, 0)) - np.array((L3_dist, 0, 0))
 
 # Position of L4 Lagrange point.
@@ -67,15 +68,21 @@ L5 = 1 * AU * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
 try:
     # cythonized version of integrate_py
     # roughly 270x times faster
-    from integrate_cy import integrate_cy  # pylint: disable=no-name-in-module
-
-    integrate_default = integrate_cy
+    from integrate_cy import integrate  # type: ignore
 
 except ImportError:
 
-    from integrate_py import integrate_py
+    from integrate_py import integrate
 
-    integrate_default = integrate_py
+try:
+
+    # cythonized version of transform_to_corotating
+    # roughly 100x times faster
+    from transform_cy import transform_to_corotating  # type: ignore
+
+except ImportError:
+
+    from transform_py import transform_to_corotating
 
 
 def time_func(func):
@@ -102,7 +109,6 @@ def main(
     vel_angle=None,
     default_pos=L4,
     plot_conserved=False,
-    integrate=integrate_default,
 ):
     """main simulates and creates plots of satellite's orbit in inertial and corotating frames
 
@@ -120,13 +126,14 @@ def main(
 
     default_pos: non perturbed position of satellite. default is L4 but L1, L2, L3, L5 can be used
 
-    plot_conserved: if True, plots the conserved quantities:energy, angular momentum, linear momentum
+    plot_conserved: if True, plots the conserved quantities:
+    energy, angular momentum, linear momentum
 
     integrate: function to use for integration. default is integrate_cy.
     integrate_py is used if integrate_cy is not available.
     """
 
-    # this function will take ~3.5 seconds per 10**5 steps
+    # this function will take ~0.15 seconds per 10**5 steps
     # the time may vary depending on your hardware
 
     default_pertubation_angle = np.arctan2(default_pos[1], default_pos[0])
@@ -149,7 +156,6 @@ def main(
         speed,
         vel_angle,
         default_pos,
-        integrate,
     )
 
     # position of Center of Mass at each timestep
@@ -170,7 +176,7 @@ def main(
     sat_pos_trans = transform_to_corotating(times, sat_pos, CM_pos)
 
     plot_corotating_orbit(
-        num_years, default_pos, sun_pos_trans, earth_pos_trans, sat_pos_trans
+        default_pos, sun_pos_trans, earth_pos_trans, sat_pos_trans, num_years
     )
 
     if plot_conserved:
@@ -197,7 +203,6 @@ def calc_orbit(
     speed=1,
     vel_angle=None,
     default_pos=L4,
-    integrate=integrate_default,
 ):
     default_pertubation_angle = np.arctan2(default_pos[1], default_pos[0])
 
@@ -403,40 +408,8 @@ def update_idx(num_steps):
 timer_rotating = QTimer()
 
 
-def transform_to_corotating(times, pos, CM_pos):
-    # it is necessary to transform our coordinate system to one which
-    # rotates with the system
-    # we can do this by linearly transforming each position vector by
-    # the inverse of the coordinate transform
-    # the coordinate transform is ( unit(x), unit(y) )-> R(w*t) * ( unit(x), unit(y) )
-    # where R(w*t) is the rotation matrix with angle w*t about the z axis
-    # the inverse is R(-w*t)
-    # at each time t we multiply the position vectors by the matrix R(-w*t)
-
-    # first transform our coordinate system so that the Center of Mass
-    # is the origin
-
-    pos_trans = pos - CM_pos
-
-    for i, t in enumerate(times):
-
-        angle = -angular_speed * t
-
-        rotation_matrix = np.array(
-            (
-                (np.cos(angle), -np.sin(angle), 0),
-                (np.sin(angle), np.cos(angle), 0),
-                (0, 0, 1),
-            )
-        )
-
-        pos_trans[i] = rotation_matrix.dot(pos_trans[i])
-
-    return pos_trans
-
-
 def plot_corotating_orbit(
-    num_years, default_pos, sun_pos_trans, earth_pos_trans, sat_pos_trans
+    default_pos, sun_pos_trans, earth_pos_trans, sat_pos_trans, num_years
 ):
 
     # Animated plot of satellites orbit in co-rotating frame.
@@ -674,42 +647,45 @@ def plot_conserved_func(
     energy_plot.plot(times_in_years, total_energy / total_energy[0] - 1)
 
 
-def calc_period(
+def calc_period_from_initial_conditions(
     perturbation_size, perturbation_angle, speed, vel_angle, default_pos=L4
 ):
 
-    sat_pos, sat_vel = get_sat_initial_conditions(
+    sat_pos, sat_vel, CM_pos = get_sat_initial_conditions(
         perturbation_size, perturbation_angle, speed, vel_angle, default_pos
     )
 
-    semi_major_axis = calc_semi_major_axis(sat_pos, sat_vel)
+    semi_major_axis = calc_semi_major_axis_from_initial_conditions(
+        sat_pos, sat_vel, CM_pos
+    )
 
-    period_squared = 4 * pi**2 * semi_major_axis**3 / (G * sun_mass)
-
-    return np.sqrt(period_squared)
+    return calc_period_from_semi_major_axis(semi_major_axis)
 
 
 def get_sat_initial_conditions(
     perturbation_size, perturbation_angle, speed, vel_angle, default_pos=L4
 ):
-    # pylint: disable=unused-variable
-    *others, sat_pos, sat_vel = initialization(
+
+    sun_pos, _, earth_pos, _, sat_pos, sat_vel = initialization(
         0, perturbation_size, perturbation_angle, speed, vel_angle, default_pos
     )
 
+    init_CM_pos = calc_center_of_mass(sun_pos, earth_pos, sat_pos)[0]
+
     init_sat_pos, init_sat_vel = sat_pos[0], sat_vel[0]
 
-    return init_sat_pos, init_sat_vel
+    return init_sat_pos, init_sat_vel, init_CM_pos
 
 
-def calc_semi_major_axis(sat_pos, sat_vel):
-    # sourcery skip: inline-immediately-returned-variable
+def calc_semi_major_axis_from_initial_conditions(sat_pos, sat_vel, CM_pos):
 
-    # Treating the influence of earth on satellite as negligible
+    # Treating the influence of earth on the satellite as negligible
     # Therefore we can apply the solution to the 2-body problem to the satellite
 
     # See "2 body analytic.docx" and "solve for orbital parameters.docx" for a derivation
     # of the following procedure
+
+    sat_pos = sat_pos - CM_pos
 
     unit_pos = sat_pos / norm(sat_pos)
 
@@ -747,8 +723,33 @@ def calc_semi_major_axis(sat_pos, sat_vel):
 
     reduced_mass = sun_mass * sat_mass / (sun_mass + sat_mass)
 
-    semi_major_axis = angular_momentum**2 / (
+    return angular_momentum**2 / (
         gravitational_coefficient * reduced_mass * (1 - eccentricity_squared)
     )
 
-    return semi_major_axis
+
+def calc_period_from_semi_major_axis(semi_major_axis):
+
+    period_squared = 4 * pi**2 * semi_major_axis**3 / (G * sun_mass)
+
+    return np.sqrt(period_squared)
+
+
+def calc_period_from_position_data(sat_pos, CM_pos):
+
+    semi_major_axis = calc_semi_major_axis_from_position_data(sat_pos, CM_pos)
+
+    return calc_period_from_semi_major_axis(semi_major_axis)
+
+
+def calc_semi_major_axis_from_position_data(sat_pos, CM_pos):
+
+    sat_pos = sat_pos - CM_pos
+
+    distances = norm(sat_pos, axis=1)
+
+    perihelion = min(distances)
+
+    aphelion = max(distances)
+
+    return (perihelion + aphelion) / 2
