@@ -4,6 +4,7 @@ using the position Verlet algorithm"""
 
 # to measure time taken in computing. for testing purposes only.
 from functools import wraps
+from math import ceil
 from time import perf_counter
 
 # numpy allows us to compute common math functions and work with arrays.
@@ -161,13 +162,15 @@ def main(
     # position of Center of Mass at each timestep
     CM_pos = calc_center_of_mass(sun_pos, earth_pos, sat_pos)
 
-    plot_orbit(sun_pos, earth_pos, sat_pos)
-
     # converting num_years to seconds
-    time_stop = num_years * years
+    sim_stop = num_years * years
 
-    # array of num_steps+1 time points evenly spaced between 0 and time_stop
-    times = np.linspace(0, time_stop, num_steps + 1)
+    time_step = sim_stop / num_steps
+
+    plot_orbit(sun_pos, earth_pos, sat_pos, time_step)
+
+    # array of num_steps+1 time points evenly spaced between 0 and sim_stop
+    times = np.linspace(0, sim_stop, num_steps + 1)
 
     sun_pos_trans = transform_to_corotating(times, sun_pos, CM_pos)
 
@@ -176,7 +179,7 @@ def main(
     sat_pos_trans = transform_to_corotating(times, sat_pos, CM_pos)
 
     plot_corotating_orbit(
-        default_pos, sun_pos_trans, earth_pos_trans, sat_pos_trans, num_years
+        sun_pos_trans, earth_pos_trans, sat_pos_trans, default_pos, num_years, time_step
     )
 
     if plot_conserved:
@@ -221,9 +224,9 @@ def calc_orbit(
     )
 
     # converting num_years to seconds
-    time_stop = num_years * years
+    sim_stop = num_years * years
 
-    time_step = time_stop / num_steps
+    time_step = sim_stop / num_steps
 
     return integrate(
         time_step, num_steps, sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
@@ -250,16 +253,12 @@ def initialization(
     # array of velocity vectors for sun
     sun_vel = np.empty_like(sun_pos)
 
-    # array of position vectors for earth
     earth_pos = np.empty_like(sun_pos)
 
-    # array of velocity vectors for earth
     earth_vel = np.empty_like(sun_pos)
 
-    # array of position vectors for satellite
     sat_pos = np.empty_like(sun_pos)
 
-    # array of velocity vectors for satellite
     sat_vel = np.empty_like(sun_pos)
 
     # sun is initially at origin but its position is not fixed
@@ -319,7 +318,7 @@ def calc_center_of_mass(sun_pos, earth_pos, sat_pos):
 timer = QTimer()
 
 
-def plot_orbit(sun_pos, earth_pos, sat_pos):
+def plot_orbit(sun_pos, earth_pos, sat_pos, time_step):
 
     orbit_plot = pg.plot(title="Orbits of Masses")
     orbit_plot.setLabel("bottom", "x", units="AU")
@@ -341,7 +340,7 @@ def plot_orbit(sun_pos, earth_pos, sat_pos):
 
     orbit_plot.addItem(anim_plot)
 
-    idx = update_idx(sun_pos.shape[0])
+    idx = update_idx(time_step, sun_pos.shape[0] - 1)
 
     def update_plot():
 
@@ -384,16 +383,19 @@ def plot_orbit(sun_pos, earth_pos, sat_pos):
     timer.start(period)
 
 
-def update_idx(num_steps):
+def update_idx(time_step, num_steps):
     """This function is used to update the index of the orbit plot"""
 
     i = 0
 
+    time_step_default = 10 * years / 10**5
+
     # maximum rate of plot update is too slow
     # so instead step through arrays at a step of rate
-    # TODO: replace rate with some function of num_step and time_step
-    # so that animation is always at correct speed regardless of num_step or time_step
-    rate = 150
+    # inversely proportional to time_step so that
+    # animated motion is the same regardless of
+    # num_steps or num_years
+    rate = 50 * ceil(time_step_default / time_step)
 
     while True:
 
@@ -409,7 +411,7 @@ timer_rotating = QTimer()
 
 
 def plot_corotating_orbit(
-    default_pos, sun_pos_trans, earth_pos_trans, sat_pos_trans, num_years
+    sun_pos_trans, earth_pos_trans, sat_pos_trans, default_pos, num_years, time_step
 ):
 
     # Animated plot of satellites orbit in co-rotating frame.
@@ -466,7 +468,7 @@ def plot_corotating_orbit(
 
     num_steps = sun_pos_trans.shape[0] - 1
 
-    idx = update_idx(num_steps)
+    idx = update_idx(time_step, num_steps)
 
     def update_trans():
 
