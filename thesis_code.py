@@ -329,12 +329,26 @@ def plot_orbit(sun_pos, earth_pos, sat_pos, time_step):
     orbit_plot.setYRange(-1.2, 1.2)
     orbit_plot.setAspectLocked(True)
 
+    arr_slice = plot_slice(sun_pos.shape[0])
+
     # zoom into the sun until the axes are on the scale of a few micro-AU to see sun's orbit
-    orbit_plot.plot(sun_pos[:, 0] / AU, sun_pos[:, 1] / AU, pen="y", name="Sun")
+    orbit_plot.plot(
+        sun_pos[arr_slice, 0] / AU, sun_pos[arr_slice, 1] / AU, pen="y", name="Sun"
+    )
 
-    orbit_plot.plot(earth_pos[:, 0] / AU, earth_pos[:, 1] / AU, pen="b", name="Earth")
+    orbit_plot.plot(
+        earth_pos[arr_slice, 0] / AU,
+        earth_pos[arr_slice, 1] / AU,
+        pen="b",
+        name="Earth",
+    )
 
-    orbit_plot.plot(sat_pos[:, 0] / AU, sat_pos[:, 1] / AU, pen="g", name="Satellite")
+    orbit_plot.plot(
+        sat_pos[arr_slice, 0] / AU,
+        sat_pos[arr_slice, 1] / AU,
+        pen="g",
+        name="Satellite",
+    )
 
     anim_plot = pg.ScatterPlotItem()
 
@@ -383,6 +397,18 @@ def plot_orbit(sun_pos, earth_pos, sat_pos, time_step):
     timer.start(period)
 
 
+def plot_slice(num_points):
+
+    # no need to plot all num_step+1 points
+    # number of points to be plotted
+    num_points_plotted = 10**5
+
+    # step size when plotting i.e. plot every points_plotted_step point
+    points_plotted_step = int(num_points / num_points_plotted)
+
+    return slice(0, -1, points_plotted_step)
+
+
 def update_idx(time_step, num_steps):
     """This function is used to update the index of the orbit plot"""
 
@@ -428,9 +454,11 @@ def plot_corotating_orbit(
 
     transform_plot.addItem(anim_trans_plot)
 
+    arr_slice = plot_slice(sun_pos_trans.shape[0])
+
     transform_plot.plot(
-        sat_pos_trans[:, 0] / AU,
-        sat_pos_trans[:, 1] / AU,
+        sat_pos_trans[arr_slice, 0] / AU,
+        sat_pos_trans[arr_slice, 1] / AU,
         name="Satellite orbit",
         pen="g",
     )
