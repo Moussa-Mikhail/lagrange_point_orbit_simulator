@@ -47,8 +47,16 @@ vel_angle_high = vel_angle_avg + vel_angle_range
 
 @time_func
 def main(num_years=100, num_steps=10**6, num_samples=100):
+    """main creates a number of random inital conditions, simulates them and collects data from them
+    has the following parameters
+
+    num_years: number of years to simulate
+    num_steps: number of steps to simulate
+    num_samples: number of samples to generate"""
 
     # this function will take 80 seconds when called with default arguments
+    # assuming the cythonized functions are available.
+    # it is not recommended to call this function with default arguments if they are not
     # the time taken is linear in both num_steps and num_samples
 
     df = pd.DataFrame()

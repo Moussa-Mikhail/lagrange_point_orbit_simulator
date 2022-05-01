@@ -112,7 +112,7 @@ def main(
 ):
     """main simulates and creates plots of satellite's orbit in inertial and corotating frames
 
-    takes the following parameters:
+    has the following parameters:
 
     num_years: number of years to simulate
     num_steps: number of steps to simulate
