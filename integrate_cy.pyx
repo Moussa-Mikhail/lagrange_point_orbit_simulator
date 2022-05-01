@@ -8,26 +8,21 @@ from libc.math cimport sqrt
 
 import numpy as np
 
-cimport numpy as np
+cdef double sun_mass
 
-# mass of sun in kilograms
-cdef double sun_mass = 1.98847 * 10**30
+cdef double earth_mass
 
-# mass of earth in kilograms
-cdef double earth_mass = 5.9722 * 10**24
+cdef double sat_mass
 
-# mass of satellite near in kilograms
-# negligible compared to other masses
-cdef double sat_mass = 1.0
+cdef double G
 
-# universal gravitational constant in meters^3*1/kilograms*1/seconds^2
-cdef double G = 6.67430 * pow(10, -11)
+from thesis_code import sun_mass, earth_mass, sat_mass, G
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
-cpdef integrate_cy(
+def integrate(
     const double time_step,
     const long num_steps,
     sun_pos,
@@ -69,9 +64,9 @@ cpdef integrate_cy(
 
     cdef double[::1] sat_accel = np.empty_like(sun_intermediate_pos)
 
-    cdef size_t k
+    cdef Py_ssize_t k
 
-    cdef size_t j
+    cdef Py_ssize_t j
 
     for k in range(1, num_steps + 1):
 
@@ -131,7 +126,7 @@ cdef void calc_acceleration(
     double[::1] sat_accel
 ):
 
-    cdef size_t j
+    cdef Py_ssize_t j
     
     for j in range(3):
 

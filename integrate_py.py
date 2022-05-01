@@ -3,7 +3,7 @@ from thesis_code import G, sun_mass, earth_mass, norm
 
 
 # pure python version of integrate function
-def integrate_py(
+def integrate(
     time_step, num_steps, sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
 ):
 

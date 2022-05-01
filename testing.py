@@ -1,13 +1,17 @@
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, missing-docstring
 import numpy as np
 import pandas as pd  # type: ignore
 from numpy.linalg import norm
 
 from thesis_code import (
     AU,
+    L4,
+    calc_center_of_mass,
     calc_orbit,
-    calc_period,
+    calc_period_from_initial_conditions,
+    calc_period_from_position_data,
     time_func,
+    transform_to_corotating,
     years,
 )
 
@@ -15,7 +19,7 @@ from thesis_code import (
 # in A.U.
 perturbation_size_low = 0
 
-perturbation_size_high = 0.01
+perturbation_size_high = 0.05
 
 # in degrees
 perturbation_angle_low = 0
@@ -25,7 +29,7 @@ perturbation_angle_high = 360
 # in factors of Earth's speed
 speed_avg = 1.0
 
-speed_range = 0.01
+speed_range = 0.05
 
 speed_low = speed_avg - speed_range
 
@@ -44,7 +48,7 @@ vel_angle_high = vel_angle_avg + vel_angle_range
 @time_func
 def main(num_years=100, num_steps=10**6, num_samples=100):
 
-    # this function will take 26 seconds when called with default arguments
+    # this function will take 80 seconds when called with default arguments
     # the time taken is linear in both num_steps and num_samples
 
     df = pd.DataFrame()
@@ -83,49 +87,60 @@ def collect_data(df):
 
     num_samples = len(df)
 
+    num_steps = df["num_steps"][0]
+
     num_years = df["num_years"][0]
 
-    df["period"] = None
+    # converting num_years to seconds
+    time_stop = num_years * years
 
-    df["period_diff"] = None
+    # array of num_steps+1 time points evenly spaced between 0 and time_stop
+    times = np.linspace(0, time_stop, num_steps + 1)
 
-    df["variation"] = None
+    df["predicted_period"] = None
 
-    orbit_params = [
-        "num_years",
-        "num_steps",
+    df["actual_period"] = None
+
+    df["inconsistency"] = None
+
+    df["instability"] = None
+
+    params = [
         "perturbation_size",
         "perturbation_angle",
         "speed",
         "vel_angle",
     ]
 
-    period_params = ["perturbation_size", "perturbation_angle", "speed", "vel_angle"]
-
     for i in range(num_samples):
 
-        inputs = df.loc[i, orbit_params]
+        inputs = df.loc[i, params]
 
         inputs = dict(inputs)
 
-        # before this line this value was a float, now it's an int
-        inputs["num_steps"] = int(inputs["num_steps"])
+        sun_pos, _, earth_pos, _, sat_pos, _ = calc_orbit(
+            num_years, num_steps, **inputs
+        )
 
-        *_, sat_pos, _ = calc_orbit(**inputs)
+        df.loc[i, "inconsistency"] = measure_inconsistency(sat_pos, num_years) / AU
 
-        df.loc[i, "variation"] = measure_variation(sat_pos, num_years) / AU
+        df.loc[i, "predicted_period"] = (
+            calc_period_from_initial_conditions(**inputs) / years
+        )
 
-        period_inputs = df.loc[i, period_params]
+        CM_pos = calc_center_of_mass(sun_pos, earth_pos, sat_pos)
 
-        period_inputs = dict(period_inputs)
+        df.loc[i, "actual_period"] = (
+            calc_period_from_position_data(sat_pos, CM_pos) / years
+        )
 
-        df.loc[i, "period"] = calc_period(**period_inputs) / years
+        df.loc[i, "instability"] = measure_instability(times, sat_pos, CM_pos)
 
     # absolute difference from 1 year
-    df["period_diff"] = np.abs(df["period"] - 1)
+    df["period_diff"] = np.abs(df["actual_period"] - 1)
 
 
-def measure_variation(sat_pos, num_years):
+def measure_inconsistency(sat_pos, num_years):
 
     # This is meant to measure distance between points
     # in the satellites orbit in the corotating frame
@@ -142,3 +157,18 @@ def measure_variation(sat_pos, num_years):
 
     # distance between its position after a year and its position at the beginning
     return norm(sat_pos_init - sat_pos_1yr)
+
+
+def measure_instability(times, sat_pos, CM_pos):
+
+    sat_pos_trans = transform_to_corotating(times, sat_pos, CM_pos)
+
+    distances_from_L4 = norm(sat_pos_trans - L4, axis=1)
+
+    max_distance = max(distances_from_L4)
+
+    min_distance = min(distances_from_L4)
+
+    init_distance = distances_from_L4[0]
+
+    return (max_distance - min_distance) / init_distance
