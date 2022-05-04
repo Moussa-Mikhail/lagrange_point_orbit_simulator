@@ -130,7 +130,6 @@ dmypy.json
 3 body notes.txt
 .vscode/settings.json
 data.csv
-integrate_cy.c
-transform_cy.html
-integrate_cy.html
-transform_cy.c
+*.c
+*.html
+.VSCodeCounter

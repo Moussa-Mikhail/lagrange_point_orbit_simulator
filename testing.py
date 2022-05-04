@@ -6,18 +6,20 @@ from numpy.linalg import norm
 from thesis_code import (
     AU,
     L4,
+    G,
     calc_center_of_mass,
     calc_orbit,
-    calc_period_from_initial_conditions,
-    calc_period_from_position_data,
+    initialization,
+    pi,
+    sat_mass,
+    sun_mass,
     time_func,
     transform_to_corotating,
     years,
 )
 
-
 # in A.U.
-perturbation_size_low = 0
+perturbation_size_low = 0.02
 
 perturbation_size_high = 0.05
 
@@ -38,7 +40,7 @@ speed_high = speed_avg + speed_range
 # in degrees
 vel_angle_avg = 150
 
-vel_angle_range = 20
+vel_angle_range = 10
 
 vel_angle_low = vel_angle_avg - vel_angle_range
 
@@ -46,18 +48,23 @@ vel_angle_high = vel_angle_avg + vel_angle_range
 
 
 @time_func
-def main(num_years=100, num_steps=10**6, num_samples=100):
-    """main creates a number of random inital conditions, simulates them and collects data from them
-    has the following parameters
+def main(num_years=20, num_steps=10**6, num_samples=500):
+    """main creates samples of random inital conditions,\n
+    simulates the corresponding orbits and collects data from them
+
+    it has the following parameters
 
     num_years: number of years to simulate
     num_steps: number of steps to simulate
-    num_samples: number of samples to generate"""
+    num_samples: number of samples to generate
 
-    # this function will take 80 seconds when called with default arguments
-    # assuming the cythonized functions are available.
-    # it is not recommended to call this function with default arguments if they are not
-    # the time taken is linear in both num_steps and num_samples
+    this function will take 260 seconds when called with default arguments\n
+    assuming the cythonized functions are available.
+
+    it is not recommended to call this function with default arguments if they are not
+
+    the time taken is linear in both num_steps and num_samples
+    """
 
     df = pd.DataFrame()
 
@@ -70,6 +77,8 @@ def main(num_years=100, num_steps=10**6, num_samples=100):
     generate_inputs(df)
 
     collect_data(df)
+
+    remove_invalid_data(df)
 
     df.to_csv("data.csv")
 
@@ -92,6 +101,7 @@ def generate_inputs(df):
 
 
 def collect_data(df):
+    # sourcery skip: hoist-statement-from-loop, use-assigned-variable
 
     num_samples = len(df)
 
@@ -105,9 +115,12 @@ def collect_data(df):
     # array of num_steps+1 time points evenly spaced between 0 and time_stop
     times = np.linspace(0, time_stop, num_steps + 1)
 
-    df["predicted_period"] = None
+    df["predicted period"] = None
 
-    df["actual_period"] = None
+    df["actual period"] = None
+
+    # absolute difference between actual period and 1 year (period of earth's orbit)
+    df["absolute period difference"] = None
 
     df["inconsistency"] = None
 
@@ -120,9 +133,9 @@ def collect_data(df):
         "vel_angle",
     ]
 
-    for i in range(num_samples):
+    for idx in range(num_samples):
 
-        inputs = df.loc[i, params]
+        inputs = df.loc[idx, params]
 
         inputs = dict(inputs)
 
@@ -130,22 +143,37 @@ def collect_data(df):
             num_years, num_steps, **inputs
         )
 
-        df.loc[i, "inconsistency"] = measure_inconsistency(sat_pos, num_years) / AU
+        if not is_valid_orbit(earth_pos, sat_pos):
 
-        df.loc[i, "predicted_period"] = (
+            continue
+
+        df.loc[idx, "inconsistency"] = measure_inconsistency(sat_pos, num_years) / AU
+
+        df.loc[idx, "predicted period"] = (
             calc_period_from_initial_conditions(**inputs) / years
         )
 
         CM_pos = calc_center_of_mass(sun_pos, earth_pos, sat_pos)
 
-        df.loc[i, "actual_period"] = (
+        df.loc[idx, "actual period"] = (
             calc_period_from_position_data(sat_pos, CM_pos) / years
         )
 
-        df.loc[i, "instability"] = measure_instability(times, sat_pos, CM_pos)
+        df.loc[idx, "instability"] = measure_instability(times, sat_pos, CM_pos)
 
     # absolute difference from 1 year
-    df["period_diff"] = np.abs(df["actual_period"] - 1)
+    df["absolute period difference"] = np.abs(df["actual period"] - 1)
+
+
+def is_valid_orbit(earth_pos, sat_pos):
+
+    # this function checks if the orbit is valid
+    # if the distance between the earth and the satellite
+    # is ever less than 1/ 50 AU, the orbit is invalid
+
+    distances = norm(earth_pos - sat_pos, axis=1)
+
+    return min(distances) > 1 / 50 * AU
 
 
 def measure_inconsistency(sat_pos, num_years):
@@ -167,6 +195,114 @@ def measure_inconsistency(sat_pos, num_years):
     return norm(sat_pos_init - sat_pos_1yr)
 
 
+def calc_period_from_initial_conditions(
+    perturbation_size, perturbation_angle, speed, vel_angle, default_pos=L4
+):
+
+    sat_pos, sat_vel, CM_pos = get_sat_initial_conditions(
+        perturbation_size, perturbation_angle, speed, vel_angle, default_pos
+    )
+
+    semi_major_axis = calc_semi_major_axis_from_initial_conditions(
+        sat_pos, sat_vel, CM_pos
+    )
+
+    return calc_period_from_semi_major_axis(semi_major_axis)
+
+
+def get_sat_initial_conditions(
+    perturbation_size, perturbation_angle, speed, vel_angle, default_pos=L4
+):
+
+    sun_pos, _, earth_pos, _, sat_pos, sat_vel = initialization(
+        0, perturbation_size, perturbation_angle, speed, vel_angle, default_pos
+    )
+
+    init_CM_pos = calc_center_of_mass(sun_pos, earth_pos, sat_pos)[0]
+
+    init_sat_pos, init_sat_vel = sat_pos[0], sat_vel[0]
+
+    return init_sat_pos, init_sat_vel, init_CM_pos
+
+
+def calc_semi_major_axis_from_initial_conditions(sat_pos, sat_vel, CM_pos):
+
+    # Assuming the influence of earth on the satellite as negligible
+    # Therefore we can apply the solution to the 2-body problem to the satellite
+
+    # See "solve for orbital parameters.docx" for a derivation
+    # of the following procedure
+
+    sat_pos = sat_pos - CM_pos
+
+    unit_pos = sat_pos / norm(sat_pos)
+
+    # 90 degrees
+    angle = pi / 2
+
+    # rotates by 90 degrees counter-clockwise
+    rotation_matrix = np.array(
+        (
+            (np.cos(angle), -np.sin(angle), 0),
+            (np.sin(angle), np.cos(angle), 0),
+            (0, 0, 1),
+        )
+    )
+
+    unit_angular = rotation_matrix.dot(unit_pos)
+
+    radial_vel = np.dot(sat_vel, unit_pos)
+
+    transverse_vel = np.dot(sat_vel, unit_angular)
+
+    angular_momentum = np.cross(sat_pos, sat_mass * sat_vel)
+
+    angular_momentum = norm(angular_momentum)
+
+    gravitational_coefficient = G * sun_mass * sat_mass
+
+    transverse_vel_prime = -(
+        transverse_vel - gravitational_coefficient / angular_momentum
+    )
+
+    eccentricity_squared = (
+        -angular_momentum / gravitational_coefficient * radial_vel
+    ) ** 2 + (angular_momentum / gravitational_coefficient * transverse_vel_prime) ** 2
+
+    reduced_mass = sun_mass * sat_mass / (sun_mass + sat_mass)
+
+    return angular_momentum**2 / (
+        gravitational_coefficient * reduced_mass * (1 - eccentricity_squared)
+    )
+
+
+def calc_period_from_semi_major_axis(semi_major_axis):
+
+    period_squared = 4 * pi**2 * semi_major_axis**3 / (G * sun_mass)
+
+    return np.sqrt(period_squared)
+
+
+def calc_period_from_position_data(sat_pos, CM_pos):
+
+    semi_major_axis = calc_semi_major_axis_from_position_data(sat_pos, CM_pos)
+
+    return calc_period_from_semi_major_axis(semi_major_axis)
+
+
+def calc_semi_major_axis_from_position_data(sat_pos, CM_pos):
+
+    sat_pos = sat_pos - CM_pos
+
+    distances = norm(sat_pos, axis=1)
+
+    perihelion = min(distances)
+
+    aphelion = max(distances)
+
+    return (perihelion + aphelion) / 2
+
+
 def measure_instability(times, sat_pos, CM_pos):
 
     sat_pos_trans = transform_to_corotating(times, sat_pos, CM_pos)
@@ -175,8 +311,15 @@ def measure_instability(times, sat_pos, CM_pos):
 
     max_distance = max(distances_from_L4)
 
-    min_distance = min(distances_from_L4)
+    return max_distance / AU
 
-    init_distance = distances_from_L4[0]
 
-    return (max_distance - min_distance) / init_distance
+def remove_invalid_data(df):
+
+    num_samples = len(df)
+
+    for idx in range(num_samples):
+
+        if df.loc[idx, "predicted period"] is None:
+
+            df.drop(idx, inplace=True)

@@ -130,12 +130,9 @@ def main(
     plot_conserved: if True, plots the conserved quantities:
     energy, angular momentum, linear momentum
 
-    integrate: function to use for integration. default is integrate_cy.
-    integrate_py is used if integrate_cy is not available.
+    this function will take ~0.15 seconds per 10**5 steps\n
+    the time may vary depending on your hardware
     """
-
-    # this function will take ~0.15 seconds per 10**5 steps
-    # the time may vary depending on your hardware
 
     default_pertubation_angle = np.arctan2(default_pos[1], default_pos[0])
 
@@ -437,7 +434,12 @@ timer_rotating = QTimer()
 
 
 def plot_corotating_orbit(
-    sun_pos_trans, earth_pos_trans, sat_pos_trans, default_pos, num_years, time_step
+    sun_pos_trans,
+    earth_pos_trans,
+    sat_pos_trans,
+    default_pos,
+    num_years,  # pylint: disable=unused-argument
+    time_step,
 ):
 
     # Animated plot of satellites orbit in co-rotating frame.
@@ -675,111 +677,3 @@ def plot_conserved_func(
     energy_plot.setLabel("left", "Normalized Energy")
 
     energy_plot.plot(times_in_years, total_energy / total_energy[0] - 1)
-
-
-def calc_period_from_initial_conditions(
-    perturbation_size, perturbation_angle, speed, vel_angle, default_pos=L4
-):
-
-    sat_pos, sat_vel, CM_pos = get_sat_initial_conditions(
-        perturbation_size, perturbation_angle, speed, vel_angle, default_pos
-    )
-
-    semi_major_axis = calc_semi_major_axis_from_initial_conditions(
-        sat_pos, sat_vel, CM_pos
-    )
-
-    return calc_period_from_semi_major_axis(semi_major_axis)
-
-
-def get_sat_initial_conditions(
-    perturbation_size, perturbation_angle, speed, vel_angle, default_pos=L4
-):
-
-    sun_pos, _, earth_pos, _, sat_pos, sat_vel = initialization(
-        0, perturbation_size, perturbation_angle, speed, vel_angle, default_pos
-    )
-
-    init_CM_pos = calc_center_of_mass(sun_pos, earth_pos, sat_pos)[0]
-
-    init_sat_pos, init_sat_vel = sat_pos[0], sat_vel[0]
-
-    return init_sat_pos, init_sat_vel, init_CM_pos
-
-
-def calc_semi_major_axis_from_initial_conditions(sat_pos, sat_vel, CM_pos):
-
-    # Treating the influence of earth on the satellite as negligible
-    # Therefore we can apply the solution to the 2-body problem to the satellite
-
-    # See "2 body analytic.docx" and "solve for orbital parameters.docx" for a derivation
-    # of the following procedure
-
-    sat_pos = sat_pos - CM_pos
-
-    unit_pos = sat_pos / norm(sat_pos)
-
-    # 90 degrees
-    angle = pi / 2
-
-    # rotates by 90 degrees counter-clockwise
-    rotation_matrix = np.array(
-        (
-            (np.cos(angle), -np.sin(angle), 0),
-            (np.sin(angle), np.cos(angle), 0),
-            (0, 0, 1),
-        )
-    )
-
-    unit_angular = rotation_matrix.dot(unit_pos)
-
-    radial_vel = np.dot(sat_vel, unit_pos)
-
-    transverse_vel = np.dot(sat_vel, unit_angular)
-
-    angular_momentum = np.cross(sat_pos, sat_mass * sat_vel)
-
-    angular_momentum = norm(angular_momentum)
-
-    gravitational_coefficient = G * sun_mass * sat_mass
-
-    transverse_vel_prime = -(
-        transverse_vel - gravitational_coefficient / angular_momentum
-    )
-
-    eccentricity_squared = (
-        -angular_momentum / gravitational_coefficient * radial_vel
-    ) ** 2 + (angular_momentum / gravitational_coefficient * transverse_vel_prime) ** 2
-
-    reduced_mass = sun_mass * sat_mass / (sun_mass + sat_mass)
-
-    return angular_momentum**2 / (
-        gravitational_coefficient * reduced_mass * (1 - eccentricity_squared)
-    )
-
-
-def calc_period_from_semi_major_axis(semi_major_axis):
-
-    period_squared = 4 * pi**2 * semi_major_axis**3 / (G * sun_mass)
-
-    return np.sqrt(period_squared)
-
-
-def calc_period_from_position_data(sat_pos, CM_pos):
-
-    semi_major_axis = calc_semi_major_axis_from_position_data(sat_pos, CM_pos)
-
-    return calc_period_from_semi_major_axis(semi_major_axis)
-
-
-def calc_semi_major_axis_from_position_data(sat_pos, CM_pos):
-
-    sat_pos = sat_pos - CM_pos
-
-    distances = norm(sat_pos, axis=1)
-
-    perihelion = min(distances)
-
-    aphelion = max(distances)
-
-    return (perihelion + aphelion) / 2
