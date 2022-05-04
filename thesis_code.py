@@ -67,7 +67,7 @@ L4 = 1 * AU * np.array((np.cos(pi / 3), np.sin(pi / 3), 0))
 L5 = 1 * AU * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
 
 try:
-    # cythonized version of integrate_py
+    # cythonized version of integrate
     # roughly 270x times faster
     from integrate_cy import integrate  # type: ignore
 
