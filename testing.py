@@ -48,7 +48,7 @@ vel_angle_high = vel_angle_avg + vel_angle_range
 
 
 @time_func
-def main(num_years=20, num_steps=10**6, num_samples=500):
+def main(num_years=100, num_steps=10**6, num_samples=500):
     """main creates samples of random inital conditions,\n
     simulates the corresponding orbits and collects data from them
 
@@ -58,7 +58,7 @@ def main(num_years=20, num_steps=10**6, num_samples=500):
     num_steps: number of steps to simulate
     num_samples: number of samples to generate
 
-    this function will take 260 seconds when called with default arguments\n
+    this function will take 280 seconds when called with default arguments\n
     assuming the cythonized functions are available.
 
     it is not recommended to call this function with default arguments if they are not
@@ -169,7 +169,8 @@ def is_valid_orbit(earth_pos, sat_pos):
 
     # this function checks if the orbit is valid
     # if the distance between the earth and the satellite
-    # is ever less than 1/ 50 AU, the orbit is invalid
+    # is ever <= than 1/ 50 AU, the orbit is invalid
+    # and it returns false
 
     distances = norm(earth_pos - sat_pos, axis=1)
 
