@@ -157,6 +157,6 @@ cdef void calc_acceleration(
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
-cdef inline double norm(const double[::1] mem_view):
+cdef double norm(const double[::1] mem_view):
     
     return sqrt(mem_view[0]*mem_view[0] + mem_view[1]*mem_view[1] + mem_view[2]*mem_view[2])
