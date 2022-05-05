@@ -1,6 +1,7 @@
 # pylint: disable=invalid-name, missing-docstring
-"""Investigating L4 Lagrange Point
-using the position Verlet algorithm"""
+"""Simulating L4 Lagrange Point using the position Verlet algorithm.
+It assumes that both the star and planet are undergoing uniform circular motion.
+"""
 
 # to measure time taken in computing. for testing purposes only.
 from functools import wraps
@@ -17,54 +18,72 @@ from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
 
 pi = np.pi
 
+# 1 AU in meters
+# serves as a conversion factor from AUs to meters
+AU = 1.495978707 * 10**11
+
+# 1 Julian year in seconds
+# serves as a conversion factor from years to seconds
+years = 365.25 * 24 * 60 * 60
+
 # mass of sun in kilograms
 sun_mass = 1.98847 * 10**30
 
 # mass of earth in kilograms
 earth_mass = 5.9722 * 10**24
 
-# mass of satellite near in kilograms
-# negligible compared to other masses
+earth_distance = 1 * AU
+
+# mass of satellite in kilograms
+# must be negligible compared to other masses
 sat_mass = 1.0
 
 # universal gravitational constant in meters^3*1/kilograms*1/seconds^2
 G = 6.67430 * 10 ** (-11)
 
-# 1 Julian year in seconds
-# serves as a conversion factor from years to seconds
-years = 365.25 * 24 * 60 * 60
 
-orbital_period = 1 * years
+def calc_period_from_semi_major_axis(semi_major_axis):
+    # pylint: disable=redefined-outer-name
+
+    period_squared = 4 * pi**2 * semi_major_axis**3 / (G * sun_mass)
+
+    return np.sqrt(period_squared)
+
+
+# star begins at the origin
+# planet starts planet_distance from the origin
+center_of_mass_pos = earth_mass * earth_distance / (sun_mass + earth_mass)
+
+# distance between planet and the system's center of mass is the semi major axis
+semi_major_axis = earth_distance - center_of_mass_pos
+
+orbital_period = calc_period_from_semi_major_axis(semi_major_axis)
 
 angular_speed = 2 * pi / orbital_period
 
-# 1 AU in meters
-# serves as a conversion factor from AUs to meters
-AU = 1.495978707 * 10**11
-
-hill_radius = 1 * AU * (earth_mass / (3 * sun_mass)) ** (1 / 3)
+hill_radius = earth_distance * (earth_mass / (3 * sun_mass)) ** (1 / 3)
 
 # Position of L1
-L1 = 1 * AU * np.array((1, 0, 0)) - np.array((hill_radius, 0, 0))
+L1 = earth_distance * np.array((1, 0, 0)) - np.array((hill_radius, 0, 0))
 
 # Position of L2
-L2 = 1 * AU * np.array((1, 0, 0)) + np.array((hill_radius, 0, 0))
+L2 = earth_distance * np.array((1, 0, 0)) + np.array((hill_radius, 0, 0))
 
-L3_dist = 1 * AU * 7 / 12 * earth_mass / sun_mass
+L3_dist = earth_distance * 7 / 12 * earth_mass / sun_mass
 
 # Position of L3
 # Located opposite of the Earth and slightly further away from the
-L3 = -1 * AU * np.array((1, 0, 0)) - np.array((L3_dist, 0, 0))
+L3 = -earth_distance * np.array((1, 0, 0)) - np.array((L3_dist, 0, 0))
 
 # Position of L4 Lagrange point.
 # It is 1 AU from both Sun and Earth.
 # It forms a 60 degree=pi/3 radians angle with the positive x-axis.
-L4 = 1 * AU * np.array((np.cos(pi / 3), np.sin(pi / 3), 0))
+L4 = earth_distance * np.array((np.cos(pi / 3), np.sin(pi / 3), 0))
 
 # Position of L5 Lagrange point.
 # It is 1 AU from both Sun and Earth.
 # It forms a 60 degree=pi/3 radians angle with the positive x-axis.
-L5 = 1 * AU * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
+L5 = earth_distance * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
 
 try:
     # cythonized version of integrate
@@ -262,7 +281,7 @@ def initialization(
     sun_pos[0] = np.array((0, 0, 0))
 
     # earth starts 1 AU from the sun (and origin) and lies on the positive x-axis
-    earth_pos[0] = np.array((1 * AU, 0, 0))
+    earth_pos[0] = np.array((earth_distance, 0, 0))
 
     # Perturbation #
 
