@@ -149,9 +149,7 @@ def collect_data(df):
 
         df.loc[idx, "inconsistency"] = measure_inconsistency(sat_pos, num_years) / AU
 
-        df.loc[idx, "predicted period"] = (
-            calc_period_from_initial_conditions(**inputs) / years
-        )
+        df.loc[idx, "predicted period"] = calc_period_from_parameters(**inputs) / years
 
         CM_pos = calc_center_of_mass(sun_pos, earth_pos, sat_pos)
 
@@ -196,7 +194,7 @@ def measure_inconsistency(sat_pos, num_years):
     return norm(sat_pos_init - sat_pos_1yr)
 
 
-def calc_period_from_initial_conditions(
+def calc_period_from_parameters(
     perturbation_size, perturbation_angle, speed, vel_angle, default_pos=L4
 ):
 
