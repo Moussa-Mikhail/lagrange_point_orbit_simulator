@@ -9,6 +9,7 @@ from thesis_code import (
     G,
     calc_center_of_mass,
     calc_orbit,
+    calc_period_from_semi_major_axis,
     initialization,
     pi,
     sat_mass,
@@ -273,13 +274,6 @@ def calc_semi_major_axis_from_initial_conditions(sat_pos, sat_vel, CM_pos):
     return angular_momentum**2 / (
         gravitational_coefficient * reduced_mass * (1 - eccentricity_squared)
     )
-
-
-def calc_period_from_semi_major_axis(semi_major_axis):
-
-    period_squared = 4 * pi**2 * semi_major_axis**3 / (G * sun_mass)
-
-    return np.sqrt(period_squared)
 
 
 def calc_period_from_position_data(sat_pos, CM_pos):
