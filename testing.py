@@ -49,22 +49,22 @@ vel_angle_high = vel_angle_avg + vel_angle_range
 
 
 @time_func
-def main(num_years=100, num_steps=10**6, num_samples=500):
-    """main creates samples of random inital conditions,\n
-    simulates the corresponding orbits and collects data from them
+def main(num_years=100.0, num_steps=10**6, num_samples=500):
+    """main creates samples of random parameters, simulates the
+    corresponding orbits, and collects data from them. This data is then saved to "data.csv".
 
-    it has the following parameters
+    It has the following parameters:
 
-    num_years: number of years to simulate
-    num_steps: number of steps to simulate
-    num_samples: number of samples to generate
+    num_years: number of years to simulate. The default is 100.0.
+    num_steps: number of steps to simulate. Must be an integer. The default is 10**6.
+    num_samples: number of samples to generate. Must be an integer. The default is 500.
 
-    this function will take 280 seconds when called with default arguments\n
+    This function will take 280 seconds when called with default arguments
     assuming the cythonized functions are available.
 
-    it is not recommended to call this function with default arguments if they are not
+    It is not recommended to call this function with default arguments if they are not.
 
-    the time taken is linear in both num_steps and num_samples
+    The time taken is linear in both num_steps and num_samples.
     """
 
     df = pd.DataFrame()

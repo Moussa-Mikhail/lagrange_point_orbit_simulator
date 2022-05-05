@@ -130,27 +130,37 @@ def main(
     default_pos=L4,
     plot_conserved=False,
 ):
-    """main simulates and creates plots of satellite's orbit in inertial and corotating frames
+    """main simulates a satellite's orbit corresponding to the following parameters.
+    It then plots the orbit in inertial and corotating frames.
 
-    has the following parameters:
+    All parameters have default values.
 
-    num_years: number of years to simulate
-    num_steps: number of steps to simulate
+    It takes the following parameters:
 
-    perturbation_size: size of perturbation in AU
-    perturbation_angle: angle of perturbation relative to positive x axis in degrees
+    num_years: Number of years to simulate. The default is 10.0.
+    num_steps: Number of steps to simulate. Must be an integer. The default is 1 * 10**5.
 
-    speed: initial speed of satellite as a factor of planet's speed
-    i.e. speed = 1 -> satellite has the same speed as planet
-    vel_angle: angle of satellite's initial velocity relative to positive x axis in degrees
+    perturbation_size: Size of perturbation in AU. The default is 0.
+    perturbation_angle: Angle of perturbation relative to positive x axis in degrees. The default is None.
+    If None, then perturbation_size has the effect of moving the satellite away or towards the origin.
 
-    default_pos: non perturbed position of satellite. default is L4 but L1, L2, L3, L5 can be used
+    speed: Initial speed of satellite as a factor of planet's speed.
+    i.e. speed = 1 -> satellite has the same speed as planet.
+    the default is 1.
 
-    plot_conserved: if True, plots the conserved quantities:
-    energy, angular momentum, linear momentum
+    vel_angle: Angle of satellite's initial velocity relative to positive x axis in degrees.
+    The default is None.
+    If None, then vel_angle is perpendicular to the satellite's default position.
 
-    this function will take ~0.15 seconds per 10**5 steps\n
-    the time may vary depending on your hardware
+    default_pos: Non-perturbed position of satellite.
+    The default is L4 but L1, L2, L3, L5 can be used if imported from thesis_code.
+
+    plot_conserved: If True, plots the conserved quantities:
+    energy, angular momentum, linear momentum.
+    The default is False.
+
+    This function will take ~0.15 seconds per 10**5 steps. More if plot_conserved is True.
+    The time may vary depending on your hardware.
     """
 
     default_pertubation_angle = np.arctan2(default_pos[1], default_pos[0])
