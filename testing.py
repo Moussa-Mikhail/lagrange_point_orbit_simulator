@@ -57,11 +57,11 @@ def main(num_years=100.0, num_steps=10**6, num_samples=500):
 
     num_years: number of years to simulate. The default is 100.0.
     num_steps: number of steps to simulate. Must be an integer. The default is 10**6.
+
     num_samples: number of samples to generate. Must be an integer. The default is 500.
 
     This function will take 280 seconds when called with default arguments
     assuming the cythonized functions are available.
-
     It is not recommended to call this function with default arguments if they are not.
 
     The time taken is linear in both num_steps and num_samples.
