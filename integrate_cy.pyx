@@ -8,15 +8,15 @@ from libc.math cimport sqrt
 
 import numpy as np
 
-cdef double sun_mass
+cdef double star_mass
 
-cdef double earth_mass
+cdef double planet_mass
 
 cdef double sat_mass
 
 cdef double G
 
-from thesis_code import sun_mass, earth_mass, sat_mass, G
+from thesis_code import G, planet_mass, star_mass
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -25,44 +25,44 @@ from thesis_code import sun_mass, earth_mass, sat_mass, G
 def integrate(
     const double time_step,
     const long num_steps,
-    sun_pos,
-    sun_vel,
-    earth_pos,
-    earth_vel,
+    star_pos,
+    star_vel,
+    planet_pos,
+    planet_vel,
     sat_pos,
     sat_vel
 ):
 
-    cdef double[:, ::1] sun_pos_view = sun_pos
+    cdef double[:, ::1] star_pos_view = star_pos
 
-    cdef double[:, ::1] sun_vel_view = sun_vel
+    cdef double[:, ::1] star_vel_view = star_vel
 
-    cdef double[:, ::1] earth_pos_view = earth_pos
+    cdef double[:, ::1] planet_pos_view = planet_pos
 
-    cdef double[:, ::1] earth_vel_view = earth_vel
+    cdef double[:, ::1] planet_vel_view = planet_vel
 
     cdef double[:, ::1] sat_pos_view = sat_pos
 
     cdef double[:, ::1] sat_vel_view = sat_vel
 
 
-    cdef double[::1] sun_intermediate_pos = np.empty(3, dtype=np.double)
+    cdef double[::1] star_intermediate_pos = np.empty(3, dtype=np.double)
 
-    cdef double[::1] earth_intermediate_pos = np.empty_like(sun_intermediate_pos)
+    cdef double[::1] planet_intermediate_pos = np.empty_like(star_intermediate_pos)
 
-    cdef double[::1] sat_intermediate_pos = np.empty_like(sun_intermediate_pos)
+    cdef double[::1] sat_intermediate_pos = np.empty_like(star_intermediate_pos)
 
-    cdef double[::1] r_earth_to_sun = np.empty_like(sun_intermediate_pos)
+    cdef double[::1] r_planet_to_star = np.empty_like(star_intermediate_pos)
 
-    cdef double[::1] r_sat_to_sun = np.empty_like(sun_intermediate_pos)
+    cdef double[::1] r_sat_to_star = np.empty_like(star_intermediate_pos)
 
-    cdef double[::1] r_sat_to_earth = np.empty_like(sun_intermediate_pos)
+    cdef double[::1] r_sat_to_planet = np.empty_like(star_intermediate_pos)
 
-    cdef double[::1] sun_accel = np.empty_like(sun_intermediate_pos)
+    cdef double[::1] star_accel = np.empty_like(star_intermediate_pos)
 
-    cdef double[::1] earth_accel = np.empty_like(sun_intermediate_pos)
+    cdef double[::1] planet_accel = np.empty_like(star_intermediate_pos)
 
-    cdef double[::1] sat_accel = np.empty_like(sun_intermediate_pos)
+    cdef double[::1] sat_accel = np.empty_like(star_intermediate_pos)
 
     cdef Py_ssize_t k
 
@@ -73,56 +73,56 @@ def integrate(
         for j in range(3):
 
             # intermediate position calculation
-            sun_intermediate_pos[j] = sun_pos_view[k - 1, j] + 0.5 * sun_vel_view[k - 1, j] * time_step
+            star_intermediate_pos[j] = star_pos_view[k - 1, j] + 0.5 * star_vel_view[k - 1, j] * time_step
 
-            earth_intermediate_pos[j] = earth_pos_view[k - 1, j] + 0.5 * earth_vel_view[k - 1, j] * time_step
+            planet_intermediate_pos[j] = planet_pos_view[k - 1, j] + 0.5 * planet_vel_view[k - 1, j] * time_step
 
             sat_intermediate_pos[j] = sat_pos_view[k - 1, j] + 0.5 * sat_vel_view[k - 1, j] * time_step
 
         # acceleration calculation
         calc_acceleration(
-            sun_intermediate_pos,
-            earth_intermediate_pos,
+            star_intermediate_pos,
+            planet_intermediate_pos,
             sat_intermediate_pos,
-            r_earth_to_sun,
-            r_sat_to_sun,
-            r_sat_to_earth,
-            sun_accel,
-            earth_accel,
+            r_planet_to_star,
+            r_sat_to_star,
+            r_sat_to_planet,
+            star_accel,
+            planet_accel,
             sat_accel,
         )
 
         for j in range(3):
             
             # velocity update
-            sun_vel_view[k, j] = sun_vel_view[k - 1, j] + sun_accel[j] * time_step
+            star_vel_view[k, j] = star_vel_view[k - 1, j] + star_accel[j] * time_step
 
-            earth_vel_view[k, j] = earth_vel_view[k - 1, j] + earth_accel[j] * time_step
+            planet_vel_view[k, j] = planet_vel_view[k - 1, j] + planet_accel[j] * time_step
 
             sat_vel_view[k, j] = sat_vel_view[k - 1, j] + sat_accel[j] * time_step
 
             # position update
-            sun_pos_view[k, j] = sun_intermediate_pos[j] + 0.5 * sun_vel_view[k, j] * time_step
+            star_pos_view[k, j] = star_intermediate_pos[j] + 0.5 * star_vel_view[k, j] * time_step
 
-            earth_pos_view[k, j] = earth_intermediate_pos[j] + 0.5 * earth_vel_view[k, j] * time_step
+            planet_pos_view[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel_view[k, j] * time_step
 
             sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step
 
-    return sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
+    return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
 @cython.nonecheck(False)
 @cython.cdivision(True)
 cdef void calc_acceleration(
-    const double[::1] sun_pos,
-    const double[::1] earth_pos,
+    const double[::1] star_pos,
+    const double[::1] planet_pos,
     const double[::1] sat_pos,
-    double[::1] r_earth_to_sun,
-    double[::1] r_sat_to_sun,
-    double[::1] r_sat_to_earth,
-    double[::1] sun_accel,
-    double[::1] earth_accel,
+    double[::1] r_planet_to_star,
+    double[::1] r_sat_to_star,
+    double[::1] r_sat_to_planet,
+    double[::1] star_accel,
+    double[::1] planet_accel,
     double[::1] sat_accel
 ):
 
@@ -130,29 +130,29 @@ cdef void calc_acceleration(
     
     for j in range(3):
 
-        # vector from earth to sun
-        r_earth_to_sun[j] = sun_pos[j] - earth_pos[j]
+        # vector from planet to star
+        r_planet_to_star[j] = star_pos[j] - planet_pos[j]
 
-        r_sat_to_sun[j] = sun_pos[j] - sat_pos[j]
+        r_sat_to_star[j] = star_pos[j] - sat_pos[j]
         
-        r_sat_to_earth[j] = earth_pos[j] - sat_pos[j]
+        r_sat_to_planet[j] = planet_pos[j] - sat_pos[j]
 
-    # distance between earth and sun
-    cdef double d_earth_to_sun = norm(r_earth_to_sun)
+    # distance between planet and star
+    cdef double d_planet_to_star = norm(r_planet_to_star)
     
-    cdef double d_sat_to_sun = norm(r_sat_to_sun)
+    cdef double d_sat_to_star = norm(r_sat_to_star)
 
-    cdef double d_sat_to_earth = norm(r_sat_to_earth)
+    cdef double d_sat_to_planet = norm(r_sat_to_planet)
 
     for j in range(3):
 
-        sun_accel[j] = -G * earth_mass * r_earth_to_sun[j] / d_earth_to_sun**3
+        star_accel[j] = -G * planet_mass * r_planet_to_star[j] / d_planet_to_star**3
         
         # note the lack of negative sign in the following lines
-        earth_accel[j] = G * sun_mass * r_earth_to_sun[j] / d_earth_to_sun**3
+        planet_accel[j] = G * star_mass * r_planet_to_star[j] / d_planet_to_star**3
 
-        sat_accel[j] = G * sun_mass * r_sat_to_sun[j] / d_sat_to_sun**3\
-                     + G * earth_mass * r_sat_to_earth[j] / d_sat_to_earth**3
+        sat_accel[j] = G * star_mass * r_sat_to_star[j] / d_sat_to_star**3\
+                     + G * planet_mass * r_sat_to_planet[j] / d_sat_to_planet**3
 
 @cython.boundscheck(False)
 @cython.wraparound(False)

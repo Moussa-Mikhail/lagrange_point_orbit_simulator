@@ -26,13 +26,13 @@ AU = 1.495978707 * 10**11
 # serves as a conversion factor from years to seconds
 years = 365.25 * 24 * 60 * 60
 
-# mass of sun in kilograms
-sun_mass = 1.98847 * 10**30
+# mass of star in kilograms
+star_mass = 1.98847 * 10**30
 
-# mass of earth in kilograms
-earth_mass = 5.9722 * 10**24
+# mass of planet in kilograms
+planet_mass = 5.9722 * 10**24
 
-earth_distance = 1 * AU
+planet_distance = 1 * AU
 
 # mass of satellite in kilograms
 # must be negligible compared to other masses
@@ -45,45 +45,45 @@ G = 6.67430 * 10 ** (-11)
 def calc_period_from_semi_major_axis(semi_major_axis):
     # pylint: disable=redefined-outer-name
 
-    period_squared = 4 * pi**2 * semi_major_axis**3 / (G * sun_mass)
+    period_squared = 4 * pi**2 * semi_major_axis**3 / (G * star_mass)
 
     return np.sqrt(period_squared)
 
 
 # star begins at the origin
 # planet starts planet_distance from the origin
-center_of_mass_pos = earth_mass * earth_distance / (sun_mass + earth_mass)
+center_of_mass_pos = planet_mass * planet_distance / (star_mass + planet_mass)
 
 # distance between planet and the system's center of mass is the semi major axis
-semi_major_axis = earth_distance - center_of_mass_pos
+semi_major_axis = planet_distance - center_of_mass_pos
 
 orbital_period = calc_period_from_semi_major_axis(semi_major_axis)
 
 angular_speed = 2 * pi / orbital_period
 
-hill_radius = earth_distance * (earth_mass / (3 * sun_mass)) ** (1 / 3)
+hill_radius = planet_distance * (planet_mass / (3 * star_mass)) ** (1 / 3)
 
 # Position of L1
-L1 = earth_distance * np.array((1, 0, 0)) - np.array((hill_radius, 0, 0))
+L1 = planet_distance * np.array((1, 0, 0)) - np.array((hill_radius, 0, 0))
 
 # Position of L2
-L2 = earth_distance * np.array((1, 0, 0)) + np.array((hill_radius, 0, 0))
+L2 = planet_distance * np.array((1, 0, 0)) + np.array((hill_radius, 0, 0))
 
-L3_dist = earth_distance * 7 / 12 * earth_mass / sun_mass
+L3_dist = planet_distance * 7 / 12 * planet_mass / star_mass
 
 # Position of L3
-# Located opposite of the Earth and slightly further away from the
-L3 = -earth_distance * np.array((1, 0, 0)) - np.array((L3_dist, 0, 0))
+# Located opposite of the planet and slightly further away from the
+L3 = -planet_distance * np.array((1, 0, 0)) - np.array((L3_dist, 0, 0))
 
 # Position of L4 Lagrange point.
-# It is 1 AU from both Sun and Earth.
+# It is 1 AU from both star and planet.
 # It forms a 60 degree=pi/3 radians angle with the positive x-axis.
-L4 = earth_distance * np.array((np.cos(pi / 3), np.sin(pi / 3), 0))
+L4 = planet_distance * np.array((np.cos(pi / 3), np.sin(pi / 3), 0))
 
 # Position of L5 Lagrange point.
-# It is 1 AU from both Sun and Earth.
+# It is 1 AU from both star and planet.
 # It forms a 60 degree=pi/3 radians angle with the positive x-axis.
-L5 = earth_distance * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
+L5 = planet_distance * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
 
 try:
     # cythonized version of integrate
@@ -140,8 +140,8 @@ def main(
     perturbation_size: size of perturbation in AU
     perturbation_angle: angle of perturbation relative to positive x axis in degrees
 
-    speed: initial speed of satellite as a factor of Earth's speed
-    i.e. speed = 1 -> satellite has the same speed as Earth
+    speed: initial speed of satellite as a factor of planet's speed
+    i.e. speed = 1 -> satellite has the same speed as planet
     vel_angle: angle of satellite's initial velocity relative to positive x axis in degrees
 
     default_pos: non perturbed position of satellite. default is L4 but L1, L2, L3, L5 can be used
@@ -165,7 +165,7 @@ def main(
 
         vel_angle = default_pertubation_angle + 90
 
-    sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel = calc_orbit(
+    star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel = calc_orbit(
         num_years,
         num_steps,
         perturbation_size,
@@ -176,26 +176,31 @@ def main(
     )
 
     # position of Center of Mass at each timestep
-    CM_pos = calc_center_of_mass(sun_pos, earth_pos, sat_pos)
+    CM_pos = calc_center_of_mass(star_pos, planet_pos, sat_pos)
 
     # converting num_years to seconds
     sim_stop = num_years * years
 
     time_step = sim_stop / num_steps
 
-    plot_orbit(sun_pos, earth_pos, sat_pos, time_step)
+    plot_orbit(star_pos, planet_pos, sat_pos, time_step)
 
     # array of num_steps+1 time points evenly spaced between 0 and sim_stop
     times = np.linspace(0, sim_stop, num_steps + 1)
 
-    sun_pos_trans = transform_to_corotating(times, sun_pos, CM_pos)
+    star_pos_trans = transform_to_corotating(times, star_pos, CM_pos)
 
-    earth_pos_trans = transform_to_corotating(times, earth_pos, CM_pos)
+    planet_pos_trans = transform_to_corotating(times, planet_pos, CM_pos)
 
     sat_pos_trans = transform_to_corotating(times, sat_pos, CM_pos)
 
     plot_corotating_orbit(
-        sun_pos_trans, earth_pos_trans, sat_pos_trans, default_pos, num_years, time_step
+        star_pos_trans,
+        planet_pos_trans,
+        sat_pos_trans,
+        default_pos,
+        num_years,
+        time_step,
     )
 
     if plot_conserved:
@@ -204,13 +209,13 @@ def main(
             total_angular_momentum,
             total_energy,
         ) = conservation_calculations(
-            sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
+            star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
         )
 
-        earth_momentum = earth_mass * earth_vel[0]
+        planet_momentum = planet_mass * planet_vel[0]
 
         plot_conserved_func(
-            times, earth_momentum, total_momentum, total_angular_momentum, total_energy
+            times, planet_momentum, total_momentum, total_angular_momentum, total_energy
         )
 
 
@@ -235,7 +240,7 @@ def calc_orbit(
 
         vel_angle = default_pertubation_angle + 90
 
-    sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel = initialization(
+    star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel = initialization(
         num_steps, perturbation_size, perturbation_angle, speed, vel_angle, default_pos
     )
 
@@ -245,7 +250,14 @@ def calc_orbit(
     time_step = sim_stop / num_steps
 
     return integrate(
-        time_step, num_steps, sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
+        time_step,
+        num_steps,
+        star_pos,
+        star_vel,
+        planet_pos,
+        planet_vel,
+        sat_pos,
+        sat_vel,
     )
 
 
@@ -263,25 +275,25 @@ def initialization(
 
     # creating position and velocity vector arrays
 
-    # array of position vectors for sun
-    sun_pos = np.empty((num_steps + 1, 3), dtype=np.double)
+    # array of position vectors for star
+    star_pos = np.empty((num_steps + 1, 3), dtype=np.double)
 
-    # array of velocity vectors for sun
-    sun_vel = np.empty_like(sun_pos)
+    # array of velocity vectors for star
+    star_vel = np.empty_like(star_pos)
 
-    earth_pos = np.empty_like(sun_pos)
+    planet_pos = np.empty_like(star_pos)
 
-    earth_vel = np.empty_like(sun_pos)
+    planet_vel = np.empty_like(star_pos)
 
-    sat_pos = np.empty_like(sun_pos)
+    sat_pos = np.empty_like(star_pos)
 
-    sat_vel = np.empty_like(sun_pos)
+    sat_vel = np.empty_like(star_pos)
 
-    # sun is initially at origin but its position is not fixed
-    sun_pos[0] = np.array((0, 0, 0))
+    # star is initially at origin but its position is not fixed
+    star_pos[0] = np.array((0, 0, 0))
 
-    # earth starts 1 AU from the sun (and origin) and lies on the positive x-axis
-    earth_pos[0] = np.array((earth_distance, 0, 0))
+    # planet starts 1 AU from the star (and origin) and lies on the positive x-axis
+    planet_pos[0] = np.array((planet_distance, 0, 0))
 
     # Perturbation #
 
@@ -298,15 +310,15 @@ def initialization(
 
     # all 3 masses orbit about the Center of Mass at an angular_speed = 1 orbit/year =
     # 2 pi radians/year
-    # we setup conditions so that the earth and sun have circular orbits
+    # we setup conditions so that the planet and star have circular orbits
     # velocities have to be defined relative to the CM
-    init_CM_pos = calc_center_of_mass(sun_pos[0], earth_pos[0], sat_pos[0])
+    init_CM_pos = calc_center_of_mass(star_pos[0], planet_pos[0], sat_pos[0])
 
     # orbits are counter clockwise so
     # angular velocity is in the positive z direction
     angular_vel = np.array((0, 0, angular_speed))
 
-    speed = speed * norm(np.cross(angular_vel, earth_pos[0] - init_CM_pos))
+    speed = speed * norm(np.cross(angular_vel, planet_pos[0] - init_CM_pos))
 
     vel_angle = np.radians(vel_angle)
 
@@ -317,24 +329,24 @@ def initialization(
     # for a circular orbit velocity = cross_product(angular velocity, position)
     # where vec(position) is the position relative to the point being orbited
     # in this case the Center of Mass
-    sun_vel[0] = np.cross(angular_vel, sun_pos[0] - init_CM_pos)
+    star_vel[0] = np.cross(angular_vel, star_pos[0] - init_CM_pos)
 
-    earth_vel[0] = np.cross(angular_vel, earth_pos[0] - init_CM_pos)
+    planet_vel[0] = np.cross(angular_vel, planet_pos[0] - init_CM_pos)
 
-    return sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
+    return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 
 
-def calc_center_of_mass(sun_pos, earth_pos, sat_pos):
+def calc_center_of_mass(star_pos, planet_pos, sat_pos):
 
-    return (sun_mass * sun_pos + earth_mass * earth_pos + sat_mass * sat_pos) / (
-        sun_mass + earth_mass + sat_mass
+    return (star_mass * star_pos + planet_mass * planet_pos + sat_mass * sat_pos) / (
+        star_mass + planet_mass + sat_mass
     )
 
 
 timer = QTimer()
 
 
-def plot_orbit(sun_pos, earth_pos, sat_pos, time_step):
+def plot_orbit(star_pos, planet_pos, sat_pos, time_step):
 
     orbit_plot = pg.plot(title="Orbits of Masses")
     orbit_plot.setLabel("bottom", "x", units="AU")
@@ -345,18 +357,18 @@ def plot_orbit(sun_pos, earth_pos, sat_pos, time_step):
     orbit_plot.setYRange(-1.2, 1.2)
     orbit_plot.setAspectLocked(True)
 
-    arr_slice = plot_slice(sun_pos.shape[0])
+    arr_slice = plot_slice(star_pos.shape[0])
 
-    # zoom into the sun until the axes are on the scale of a few micro-AU to see sun's orbit
+    # zoom into the star until the axes are on the scale of a few micro-AU to see star's orbit
     orbit_plot.plot(
-        sun_pos[arr_slice, 0] / AU, sun_pos[arr_slice, 1] / AU, pen="y", name="Sun"
+        star_pos[arr_slice, 0] / AU, star_pos[arr_slice, 1] / AU, pen="y", name="star"
     )
 
     orbit_plot.plot(
-        earth_pos[arr_slice, 0] / AU,
-        earth_pos[arr_slice, 1] / AU,
+        planet_pos[arr_slice, 0] / AU,
+        planet_pos[arr_slice, 1] / AU,
         pen="b",
-        name="Earth",
+        name="planet",
     )
 
     orbit_plot.plot(
@@ -370,7 +382,7 @@ def plot_orbit(sun_pos, earth_pos, sat_pos, time_step):
 
     orbit_plot.addItem(anim_plot)
 
-    idx = update_idx(time_step, sun_pos.shape[0] - 1)
+    idx = update_idx(time_step, star_pos.shape[0] - 1)
 
     def update_plot():
 
@@ -379,21 +391,21 @@ def plot_orbit(sun_pos, earth_pos, sat_pos, time_step):
         anim_plot.clear()
 
         anim_plot.addPoints(
-            [sun_pos[i, 0] / AU],
-            [sun_pos[i, 1] / AU],
+            [star_pos[i, 0] / AU],
+            [star_pos[i, 1] / AU],
             pen="y",
             brush="y",
             size=10,
-            name="Sun",
+            name="star",
         )
 
         anim_plot.addPoints(
-            [earth_pos[i, 0] / AU],
-            [earth_pos[i, 1] / AU],
+            [planet_pos[i, 0] / AU],
+            [planet_pos[i, 1] / AU],
             pen="b",
             brush="b",
             size=10,
-            name="Earth",
+            name="planet",
         )
 
         anim_plot.addPoints(
@@ -453,8 +465,8 @@ timer_rotating = QTimer()
 
 
 def plot_corotating_orbit(
-    sun_pos_trans,
-    earth_pos_trans,
+    star_pos_trans,
+    planet_pos_trans,
     sat_pos_trans,
     default_pos,
     num_years,  # pylint: disable=unused-argument
@@ -475,7 +487,7 @@ def plot_corotating_orbit(
 
     transform_plot.addItem(anim_trans_plot)
 
-    arr_slice = plot_slice(sun_pos_trans.shape[0])
+    arr_slice = plot_slice(star_pos_trans.shape[0])
 
     transform_plot.plot(
         sat_pos_trans[arr_slice, 0] / AU,
@@ -486,9 +498,9 @@ def plot_corotating_orbit(
 
     # The only purpose of this is to add the bodies to the plot legend
     transform_plot.plot(
-        [sun_pos_trans[0, 0] / AU],
-        [sun_pos_trans[0, 1] / AU],
-        name="Sun",
+        [star_pos_trans[0, 0] / AU],
+        [star_pos_trans[0, 1] / AU],
+        name="star",
         pen="k",
         symbol="o",
         symbolPen="y",
@@ -496,9 +508,9 @@ def plot_corotating_orbit(
     )
 
     transform_plot.plot(
-        [earth_pos_trans[0, 0] / AU],
-        [earth_pos_trans[0, 1] / AU],
-        name="Earth",
+        [planet_pos_trans[0, 0] / AU],
+        [planet_pos_trans[0, 1] / AU],
+        name="planet",
         pen="k",
         symbol="o",
         symbolPen="b",
@@ -515,7 +527,7 @@ def plot_corotating_orbit(
         symbolBrush="w",
     )
 
-    num_steps = sun_pos_trans.shape[0] - 1
+    num_steps = star_pos_trans.shape[0] - 1
 
     idx = update_idx(time_step, num_steps)
 
@@ -535,21 +547,21 @@ def plot_corotating_orbit(
         )
 
         anim_trans_plot.addPoints(
-            [sun_pos_trans[j, 0] / AU],
-            [sun_pos_trans[j, 1] / AU],
+            [star_pos_trans[j, 0] / AU],
+            [star_pos_trans[j, 1] / AU],
             pen="y",
             brush="y",
             size=10,
-            name="Sun",
+            name="star",
         )
 
         anim_trans_plot.addPoints(
-            [earth_pos_trans[j, 0] / AU],
-            [earth_pos_trans[j, 1] / AU],
+            [planet_pos_trans[j, 0] / AU],
+            [planet_pos_trans[j, 1] / AU],
             pen="b",
             brush="b",
             size=10,
-            name="Earth",
+            name="planet",
         )
 
         anim_trans_plot.addPoints(
@@ -581,43 +593,47 @@ def plot_corotating_orbit(
     timer_rotating.start(period)
 
 
-def conservation_calculations(sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel):
+def conservation_calculations(
+    star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
+):
 
-    total_momentum = sun_mass * sun_vel + earth_mass * earth_vel + sat_mass * sat_vel
+    total_momentum = (
+        star_mass * star_vel + planet_mass * planet_vel + sat_mass * sat_vel
+    )
 
-    angular_momentum_sun = np.cross(sun_pos, sun_mass * sun_vel)
+    angular_momentum_star = np.cross(star_pos, star_mass * star_vel)
 
-    angular_momentum_earth = np.cross(earth_pos, earth_mass * earth_vel)
+    angular_momentum_planet = np.cross(planet_pos, planet_mass * planet_vel)
 
     angular_momentum_sat = np.cross(sat_pos, sat_mass * sat_vel)
 
     total_angular_momentum = (
-        angular_momentum_sun + angular_momentum_earth + angular_momentum_sat
+        angular_momentum_star + angular_momentum_planet + angular_momentum_sat
     )
 
-    # array of the distance between earth and sun at each timestep
-    d_earth_to_sun = norm(sun_pos - earth_pos, axis=1)
+    # array of the distance between planet and star at each timestep
+    d_planet_to_star = norm(star_pos - planet_pos, axis=1)
 
-    d_earth_to_sat = norm(sat_pos - earth_pos, axis=1)
+    d_planet_to_sat = norm(sat_pos - planet_pos, axis=1)
 
-    d_sun_to_sat = norm(sat_pos - sun_pos, axis=1)
+    d_star_to_sat = norm(sat_pos - star_pos, axis=1)
 
     potential_energy = (
-        -G * sun_mass * earth_mass / d_earth_to_sun
-        + -G * sat_mass * earth_mass / d_earth_to_sat
-        + -G * sat_mass * sun_mass / d_sun_to_sat
+        -G * star_mass * planet_mass / d_planet_to_star
+        + -G * sat_mass * planet_mass / d_planet_to_sat
+        + -G * sat_mass * star_mass / d_star_to_sat
     )
 
-    # array of the magnitude of the velocity of sun at each timestep
-    mag_sun_vel = norm(sun_vel, axis=1)
+    # array of the magnitude of the velocity of star at each timestep
+    mag_star_vel = norm(star_vel, axis=1)
 
-    mag_earth_vel = norm(earth_vel, axis=1)
+    mag_planet_vel = norm(planet_vel, axis=1)
 
     mag_sat_vel = norm(sat_vel, axis=1)
 
     kinetic_energy = (
-        0.5 * sun_mass * mag_sun_vel**2
-        + 0.5 * earth_mass * mag_earth_vel**2
+        0.5 * star_mass * mag_star_vel**2
+        + 0.5 * planet_mass * mag_planet_vel**2
         + 0.5 * sat_mass * mag_sat_vel**2
     )
 
@@ -627,7 +643,7 @@ def conservation_calculations(sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, s
 
 
 def plot_conserved_func(
-    times, earth_momentum, total_momentum, total_angular_momentum, total_energy
+    times, planet_momentum, total_momentum, total_angular_momentum, total_energy
 ):
     # sourcery skip: extract-duplicate-method
 
@@ -641,24 +657,24 @@ def plot_conserved_func(
 
     # total linear momentum is not conserved (likely due to floating point errors)
     # however the variation is insignificant compared to
-    # the Sun's and Earth's individual linear momenta
+    # the star's and planet's individual linear momenta
     linear_momentum_plot.plot(
         times_in_years,
-        total_momentum[:, 0] / norm(earth_momentum),
+        total_momentum[:, 0] / norm(planet_momentum),
         pen="r",
         name="x",
     )
 
     linear_momentum_plot.plot(
         times_in_years,
-        total_momentum[:, 1] / norm(earth_momentum),
+        total_momentum[:, 1] / norm(planet_momentum),
         pen="g",
         name="y",
     )
 
     linear_momentum_plot.plot(
         times_in_years,
-        total_momentum[:, 2] / norm(earth_momentum),
+        total_momentum[:, 2] / norm(planet_momentum),
         pen="b",
         name="z",
     )

@@ -1,68 +1,73 @@
 # pylint: disable=missing-docstring
-from thesis_code import G, sun_mass, earth_mass, norm
+
+from numpy.linalg import norm
+
+from thesis_code import G, planet_mass, star_mass
 
 
 # pure python version of integrate function
 def integrate(
-    time_step, num_steps, sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
+    time_step, num_steps, star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 ):
 
     for k in range(1, num_steps + 1):
 
         # intermediate position calculation
-        sun_intermediate_pos = sun_pos[k - 1] + 0.5 * sun_vel[k - 1] * time_step
+        star_intermediate_pos = star_pos[k - 1] + 0.5 * star_vel[k - 1] * time_step
 
-        earth_intermediate_pos = earth_pos[k - 1] + 0.5 * earth_vel[k - 1] * time_step
+        planet_intermediate_pos = (
+            planet_pos[k - 1] + 0.5 * planet_vel[k - 1] * time_step
+        )
 
         sat_intermediate_pos = sat_pos[k - 1] + 0.5 * sat_vel[k - 1] * time_step
 
         # acceleration calculation
-        sun_accel, earth_accel, sat_accel = calc_acceleration(
-            sun_intermediate_pos, earth_intermediate_pos, sat_intermediate_pos
+        star_accel, planet_accel, sat_accel = calc_acceleration(
+            star_intermediate_pos, planet_intermediate_pos, sat_intermediate_pos
         )
 
         # velocity update
-        sun_vel[k] = sun_vel[k - 1] + sun_accel * time_step
+        star_vel[k] = star_vel[k - 1] + star_accel * time_step
 
-        earth_vel[k] = earth_vel[k - 1] + earth_accel * time_step
+        planet_vel[k] = planet_vel[k - 1] + planet_accel * time_step
 
         sat_vel[k] = sat_vel[k - 1] + sat_accel * time_step
 
         # position update
-        sun_pos[k] = sun_intermediate_pos + 0.5 * sun_vel[k] * time_step
+        star_pos[k] = star_intermediate_pos + 0.5 * star_vel[k] * time_step
 
-        earth_pos[k] = earth_intermediate_pos + 0.5 * earth_vel[k] * time_step
+        planet_pos[k] = planet_intermediate_pos + 0.5 * planet_vel[k] * time_step
 
         sat_pos[k] = sat_intermediate_pos + 0.5 * sat_vel[k] * time_step
 
-    return sun_pos, sun_vel, earth_pos, earth_vel, sat_pos, sat_vel
+    return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 
 
-def calc_acceleration(sun_pos, earth_pos, sat_pos):
+def calc_acceleration(star_pos, planet_pos, sat_pos):
 
-    # vector from earth to sun
-    r_earth_to_sun = sun_pos - earth_pos
+    # vector from planet to star
+    r_planet_to_star = star_pos - planet_pos
 
-    # distance between earth and sun
-    d_sun_to_earth = norm(r_earth_to_sun)
+    # distance between planet and star
+    d_star_to_planet = norm(r_planet_to_star)
 
     # gravity of satellite can be ignored
-    sun_accel = -G * earth_mass * r_earth_to_sun / d_sun_to_earth**3
+    star_accel = -G * planet_mass * r_planet_to_star / d_star_to_planet**3
 
     # note the lack of negative sign in the following line
-    earth_accel = G * sun_mass * r_earth_to_sun / d_sun_to_earth**3
+    planet_accel = G * star_mass * r_planet_to_star / d_star_to_planet**3
 
-    r_sun_to_sat = sat_pos - sun_pos
+    r_star_to_sat = sat_pos - star_pos
 
-    d_sun_to_sat = norm(r_sun_to_sat)
+    d_star_to_sat = norm(r_star_to_sat)
 
-    r_earth_to_sat = sat_pos - earth_pos
+    r_planet_to_sat = sat_pos - planet_pos
 
-    d_earth_to_sat = norm(r_earth_to_sat)
+    d_planet_to_sat = norm(r_planet_to_sat)
 
     sat_accel = (
-        -G * sun_mass * r_sun_to_sat / d_sun_to_sat**3
-        + -G * earth_mass * r_earth_to_sat / d_earth_to_sat**3
+        -G * star_mass * r_star_to_sat / d_star_to_sat**3
+        + -G * planet_mass * r_planet_to_sat / d_planet_to_sat**3
     )
 
-    return sun_accel, earth_accel, sat_accel
+    return star_accel, planet_accel, sat_accel

@@ -13,7 +13,7 @@ from thesis_code import (
     initialization,
     pi,
     sat_mass,
-    sun_mass,
+    star_mass,
     time_func,
     transform_to_corotating,
     years,
@@ -29,7 +29,7 @@ perturbation_angle_low = 0
 
 perturbation_angle_high = 360
 
-# in factors of Earth's speed
+# in factors of planet's speed
 speed_avg = 1.0
 
 speed_range = 0.05
@@ -120,7 +120,7 @@ def collect_data(df):
 
     df["actual period"] = None
 
-    # absolute difference between actual period and 1 year (period of earth's orbit)
+    # absolute difference between actual period and 1 year (period of planet's orbit)
     df["absolute period difference"] = None
 
     df["inconsistency"] = None
@@ -140,11 +140,11 @@ def collect_data(df):
 
         inputs = dict(inputs)
 
-        sun_pos, _, earth_pos, _, sat_pos, _ = calc_orbit(
+        star_pos, _, planet_pos, _, sat_pos, _ = calc_orbit(
             num_years, num_steps, **inputs
         )
 
-        if not is_valid_orbit(earth_pos, sat_pos):
+        if not is_valid_orbit(planet_pos, sat_pos):
 
             continue
 
@@ -152,7 +152,7 @@ def collect_data(df):
 
         df.loc[idx, "predicted period"] = calc_period_from_parameters(**inputs) / years
 
-        CM_pos = calc_center_of_mass(sun_pos, earth_pos, sat_pos)
+        CM_pos = calc_center_of_mass(star_pos, planet_pos, sat_pos)
 
         df.loc[idx, "actual period"] = (
             calc_period_from_position_data(sat_pos, CM_pos) / years
@@ -164,14 +164,14 @@ def collect_data(df):
     df["absolute period difference"] = np.abs(df["actual period"] - 1)
 
 
-def is_valid_orbit(earth_pos, sat_pos):
+def is_valid_orbit(planet_pos, sat_pos):
 
     # this function checks if the orbit is valid
-    # if the distance between the earth and the satellite
+    # if the distance between the planet and the satellite
     # is ever <= than 1/ 50 AU, the orbit is invalid
     # and it returns false
 
-    distances = norm(earth_pos - sat_pos, axis=1)
+    distances = norm(planet_pos - sat_pos, axis=1)
 
     return min(distances) > 1 / 50 * AU
 
@@ -214,11 +214,11 @@ def get_sat_initial_conditions(
     perturbation_size, perturbation_angle, speed, vel_angle, default_pos=L4
 ):
 
-    sun_pos, _, earth_pos, _, sat_pos, sat_vel = initialization(
+    star_pos, _, planet_pos, _, sat_pos, sat_vel = initialization(
         0, perturbation_size, perturbation_angle, speed, vel_angle, default_pos
     )
 
-    init_CM_pos = calc_center_of_mass(sun_pos, earth_pos, sat_pos)[0]
+    init_CM_pos = calc_center_of_mass(star_pos, planet_pos, sat_pos)[0]
 
     init_sat_pos, init_sat_vel = sat_pos[0], sat_vel[0]
 
@@ -227,7 +227,7 @@ def get_sat_initial_conditions(
 
 def calc_semi_major_axis_from_initial_conditions(sat_pos, sat_vel, CM_pos):
 
-    # Assuming the influence of earth on the satellite as negligible
+    # Assuming the influence of planet on the satellite as negligible
     # Therefore we can apply the solution to the 2-body problem to the satellite
 
     # See "solve for orbital parameters.docx" for a derivation
@@ -259,7 +259,7 @@ def calc_semi_major_axis_from_initial_conditions(sat_pos, sat_vel, CM_pos):
 
     angular_momentum = norm(angular_momentum)
 
-    gravitational_coefficient = G * sun_mass * sat_mass
+    gravitational_coefficient = G * star_mass * sat_mass
 
     transverse_vel_prime = -(
         transverse_vel - gravitational_coefficient / angular_momentum
@@ -269,7 +269,7 @@ def calc_semi_major_axis_from_initial_conditions(sat_pos, sat_vel, CM_pos):
         -angular_momentum / gravitational_coefficient * radial_vel
     ) ** 2 + (angular_momentum / gravitational_coefficient * transverse_vel_prime) ** 2
 
-    reduced_mass = sun_mass * sat_mass / (sun_mass + sat_mass)
+    reduced_mass = star_mass * sat_mass / (star_mass + sat_mass)
 
     return angular_momentum**2 / (
         gravitational_coefficient * reduced_mass * (1 - eccentricity_squared)
