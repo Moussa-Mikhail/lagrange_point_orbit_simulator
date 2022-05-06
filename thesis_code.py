@@ -164,7 +164,6 @@ def main(
     This function will take ~0.15 seconds per 10**5 steps if
     the cythonized extensions are available.
     9 seconds if not.
-    More if plot_conserved is True.
     The time may vary depending on your hardware.
     """
 
