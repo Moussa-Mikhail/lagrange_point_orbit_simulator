@@ -39,7 +39,7 @@ planet_distance = 1 * AU
 sat_mass = 1.0
 
 # universal gravitational constant in meters^3*1/kilograms*1/seconds^2
-G = 6.67430 * 10 ** (-11)
+G = 6.67430 * 10**-11
 
 
 def calc_period_from_semi_major_axis(semi_major_axis):
@@ -375,23 +375,26 @@ def plot_orbit(star_pos, planet_pos, sat_pos, time_step):
     orbit_plot.setYRange(-1.2, 1.2)
     orbit_plot.setAspectLocked(True)
 
-    arr_slice = plot_slice(star_pos.shape[0])
+    arr_step = plot_array_step(star_pos.shape[0])
 
     # zoom into the star until the axes are on the scale of a few micro-AU to see star's orbit
     orbit_plot.plot(
-        star_pos[arr_slice, 0] / AU, star_pos[arr_slice, 1] / AU, pen="y", name="star"
+        star_pos[::arr_step, 0] / AU,
+        star_pos[::arr_step, 1] / AU,
+        pen="y",
+        name="star",
     )
 
     orbit_plot.plot(
-        planet_pos[arr_slice, 0] / AU,
-        planet_pos[arr_slice, 1] / AU,
+        planet_pos[::arr_step, 0] / AU,
+        planet_pos[::arr_step, 1] / AU,
         pen="b",
         name="planet",
     )
 
     orbit_plot.plot(
-        sat_pos[arr_slice, 0] / AU,
-        sat_pos[arr_slice, 1] / AU,
+        sat_pos[::arr_step, 0] / AU,
+        sat_pos[::arr_step, 1] / AU,
         pen="g",
         name="Satellite",
     )
@@ -443,7 +446,7 @@ def plot_orbit(star_pos, planet_pos, sat_pos, time_step):
     timer.start(period)
 
 
-def plot_slice(num_points):
+def plot_array_step(num_points):
 
     # no need to plot all num_step+1 points
     # number of points to be plotted
@@ -452,7 +455,10 @@ def plot_slice(num_points):
     # step size when plotting i.e. plot every points_plotted_step point
     points_plotted_step = int(num_points / num_points_plotted)
 
-    return slice(0, -1, points_plotted_step)
+    if points_plotted_step == 0:
+        points_plotted_step = 1
+
+    return points_plotted_step
 
 
 def update_idx(time_step, num_steps):
@@ -505,11 +511,11 @@ def plot_corotating_orbit(
 
     transform_plot.addItem(anim_trans_plot)
 
-    arr_slice = plot_slice(star_pos_trans.shape[0])
+    arr_step = plot_array_step(star_pos_trans.shape[0])
 
     transform_plot.plot(
-        sat_pos_trans[arr_slice, 0] / AU,
-        sat_pos_trans[arr_slice, 1] / AU,
+        sat_pos_trans[::arr_step, 0] / AU,
+        sat_pos_trans[::arr_step, 1] / AU,
         name="Satellite orbit",
         pen="g",
     )
@@ -671,30 +677,30 @@ def plot_conserved_func(
 
     linear_momentum_plot.addLegend()
 
-    arr_slice = plot_slice(total_momentum.shape[0])
+    arr_step = plot_array_step(total_momentum.shape[0])
 
-    times_in_years = times[arr_slice] / years
+    times_in_years = times[::arr_step] / years
 
     # total linear momentum is not conserved (likely due to floating point errors)
     # however the variation is insignificant compared to
     # the star's and planet's individual linear momenta
     linear_momentum_plot.plot(
         times_in_years,
-        total_momentum[arr_slice, 0] / init_planet_momentum,
+        total_momentum[::arr_step, 0] / init_planet_momentum,
         pen="r",
         name="x",
     )
 
     linear_momentum_plot.plot(
         times_in_years,
-        total_momentum[arr_slice, 1] / init_planet_momentum,
+        total_momentum[::arr_step, 1] / init_planet_momentum,
         pen="g",
         name="y",
     )
 
     linear_momentum_plot.plot(
         times_in_years,
-        total_momentum[arr_slice, 2] / init_planet_momentum,
+        total_momentum[::arr_step, 2] / init_planet_momentum,
         pen="b",
         name="z",
     )
@@ -708,21 +714,21 @@ def plot_conserved_func(
     # x and y components of angular momentum are 0
     # angular_momentum_plot.plot(
     #   times_in_years,
-    #   total_angular_momentum[arr_slice, 0]/total_angular_momentum[0, 0]-1,
+    #   total_angular_momentum[::arr_step, 0]/total_angular_momentum[0, 0]-1,
     #   pen='r',
     #   name='x'
     # )
 
     # angular_momentum_plot.plot(
     #   times_in_years,
-    #   total_angular_momentum[arr_slice, 1]/total_angular_momentum[0, 1]-1,
+    #   total_angular_momentum[::arr_step, 1]/total_angular_momentum[0, 1]-1,
     #   pen='g',
     #   name='y'
     # )
 
     angular_momentum_plot.plot(
         times_in_years,
-        total_angular_momentum[arr_slice, 2] / total_angular_momentum[0, 2] - 1,
+        total_angular_momentum[::arr_step, 2] / total_angular_momentum[0, 2] - 1,
         pen="b",
         name="z",
     )
@@ -731,7 +737,7 @@ def plot_conserved_func(
     energy_plot.setLabel("bottom", "Time", units="years")
     energy_plot.setLabel("left", "Normalized Energy")
 
-    energy_plot.plot(times_in_years, total_energy[arr_slice] / total_energy[0] - 1)
+    energy_plot.plot(times_in_years, total_energy[::arr_step] / total_energy[0] - 1)
 
 
 # main(plot_conserved=True)
