@@ -130,6 +130,5 @@ dmypy.json
 3 body notes.txt
 .vscode/settings.json
 data.csv
-*.c
 *.html
 .VSCodeCounter
