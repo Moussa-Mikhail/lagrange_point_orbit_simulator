@@ -546,7 +546,7 @@ def plot_corotating_orbit(
     transform_plot.plot(
         [default_pos[0] / AU],
         [default_pos[1] / AU],
-        name="Lagrange Point L4",
+        name="Lagrange Point",
         pen="k",
         symbol="o",
         symbolPen="w",
