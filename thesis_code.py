@@ -1,5 +1,5 @@
 # pylint: disable=invalid-name, missing-docstring
-"""Simulating L4 Lagrange Point using the position Verlet algorithm.
+"""Simulates orbits near the Lagrange Point L4 using the position Verlet algorithm.
 It assumes that both the star and planet are undergoing uniform circular motion.
 """
 
@@ -26,12 +26,13 @@ AU = 1.495978707 * 10**11
 # serves as a conversion factor from years to seconds
 years = 365.25 * 24 * 60 * 60
 
-# mass of star in kilograms
+# mass of Sun in kilograms
 star_mass = 1.98847 * 10**30
 
-# mass of planet in kilograms
+# mass of Earth in kilograms
 planet_mass = 5.9722 * 10**24
 
+# distance between planet and star
 planet_distance = 1 * AU
 
 # mass of satellite in kilograms
@@ -45,17 +46,15 @@ G = 6.67430 * 10**-11
 def calc_period_from_semi_major_axis(semi_major_axis):
     # pylint: disable=redefined-outer-name
 
-    period_squared = 4 * pi**2 * semi_major_axis**3 / (G * star_mass)
+    period_squared = (
+        4 * pi**2 * semi_major_axis**3 / (G * (star_mass + planet_mass))
+    )
 
     return np.sqrt(period_squared)
 
 
-# star begins at the origin
-# planet starts planet_distance from the origin
-center_of_mass_pos = planet_mass * planet_distance / (star_mass + planet_mass)
-
-# distance between planet and the system's center of mass is the semi major axis
-semi_major_axis = planet_distance - center_of_mass_pos
+# semi-major axis of the planet's orbit is planet_distance
+semi_major_axis = planet_distance
 
 orbital_period = calc_period_from_semi_major_axis(semi_major_axis)
 
@@ -310,7 +309,7 @@ def initialization(
     # star is initially at origin but its position is not fixed
     star_pos[0] = np.array((0, 0, 0))
 
-    # planet starts 1 AU from the star (and origin) and lies on the positive x-axis
+    # planet starts planet_distance from the star (and origin) and lies on the positive x-axis
     planet_pos[0] = np.array((planet_distance, 0, 0))
 
     # Perturbation #
@@ -326,9 +325,8 @@ def initialization(
     # perturbing the initial position of the satellite
     sat_pos[0] = default_pos + perturbation
 
-    # all 3 masses orbit about the Center of Mass at an angular_speed = 1 orbit/year =
-    # 2 pi radians/year
-    # we setup conditions so that the planet and star have circular orbits
+    # star and planet orbit about the Center of Mass at an angular_speed = 2 pi radians/orbital_period
+    # we setup conditions so that the star and planet have circular orbits
     # velocities have to be defined relative to the CM
     init_CM_pos = calc_center_of_mass(star_pos[0], planet_pos[0], sat_pos[0])
 
@@ -371,8 +369,10 @@ def plot_orbit(star_pos, planet_pos, sat_pos, time_step):
     orbit_plot.setLabel("left", "y", units="AU")
     orbit_plot.addLegend()
 
-    orbit_plot.setXRange(-1.2, 1.2)
-    orbit_plot.setYRange(-1.2, 1.2)
+    planet_distance_in_AU = planet_distance / AU
+
+    orbit_plot.setXRange(-1.2 * planet_distance_in_AU, 1.2 * planet_distance_in_AU)
+    orbit_plot.setYRange(-1.2 * planet_distance_in_AU, 1.2 * planet_distance_in_AU)
     orbit_plot.setAspectLocked(True)
 
     arr_step = plot_array_step(star_pos.shape[0])
@@ -503,8 +503,10 @@ def plot_corotating_orbit(
     transform_plot.setLabel("left", "y", units="AU")
     transform_plot.addLegend()
 
-    transform_plot.setXRange(-0.2, 1.2)
-    transform_plot.setYRange(-0.2, 1.2)
+    planet_distance_in_AU = planet_distance / AU
+
+    transform_plot.setXRange(-0.2 * planet_distance_in_AU, 1.2 * planet_distance_in_AU)
+    transform_plot.setYRange(-0.2 * planet_distance_in_AU, 1.2 * planet_distance_in_AU)
     transform_plot.setAspectLocked(True)
 
     anim_trans_plot = pg.ScatterPlotItem()
