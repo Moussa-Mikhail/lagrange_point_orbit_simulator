@@ -162,7 +162,7 @@ def main(
     The default is False.
 
     This function will take ~0.15 seconds per 10**5 steps if
-    the cythonized extensions are available.
+    the Cythonized extensions are available.
     9 seconds if not.
     The time may vary depending on your hardware.
     """

@@ -1,13 +1,16 @@
 # thesis_code
+
 Module which simulates orbits near Lagrange Points and plots the results.
 
 ## Installation
+
 Download the repository.
 If you use Pip open your command line and enter "pip install -r requirements.txt". This will install all the packages these scripts depend on. If you use Poetry then a .lock file is provided.
 
 If you are familiar with Cython then you can use the provided setup.py file to build the extensions for a large speedup. This is optional.
 
 ## Usage
+
 The thesis_code module is meant to be used by calling the main function.
 
 ```
@@ -22,8 +25,10 @@ num_years: Number of years to simulate. The default is 10.0.
 num_steps: Number of steps to simulate. Must be an integer. The default is 1 * 10**5.
 
 perturbation_size: Size of perturbation in AU. The default is 0.
-perturbation_angle: Angle of perturbation relative to positive x axis in degrees. The default is None.
-If None, then perturbation_size has the effect of moving the satellite away or towards the origin.
+perturbation_angle: Angle of perturbation relative to positive x axis in degrees.
+The default is None.
+If None, then perturbation_size has the effect of
+moving the satellite away or towards the origin.
 
 speed: Initial speed of satellite as a factor of planet's speed.
 i.e. speed = 1 -> satellite has the same speed as planet.
@@ -40,16 +45,20 @@ plot_conserved: If True, plots the conserved quantities:
 energy, angular momentum, linear momentum.
 The default is False.
 
-This function will take ~0.15 seconds per 10**5 steps. More if plot_conserved is True.
+This function will take ~0.15 seconds per 10**5 steps if
+the Cythonized extensions are available.
+9 seconds if not.
 The time may vary depending on your hardware.
 ```
 
 This is the docstring of main which can be seen at any time by using "help(main)" in Python.
 
 # testing
+
 testing is used to collect data by simulating random orbits. The data is then saved to "data.csv".
 
 ## Usage
+
 testing also has a main function.
 
 ```
@@ -63,8 +72,10 @@ num_steps: number of steps to simulate. Must be an integer. The default is 10**6
 
 num_samples: number of samples to generate. Must be an integer. The default is 500.
 
+Note that a large fraction of orbits are rejected because they get too close to the planet.
+
 This function will take 280 seconds when called with default arguments
-assuming the cythonized functions are available.
+assuming the Cythonized functions are available.
 It is not recommended to call this function with default arguments if they are not.
 
 The time taken is linear in both num_steps and num_samples.

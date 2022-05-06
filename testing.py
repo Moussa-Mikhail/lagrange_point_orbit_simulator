@@ -63,7 +63,7 @@ def main(num_years=100.0, num_steps=10**6, num_samples=500):
     Note that a large fraction of orbits are rejected because they get too close to the planet.
 
     This function will take 280 seconds when called with default arguments
-    assuming the cythonized functions are available.
+    assuming the Cythonized functions are available.
     It is not recommended to call this function with default arguments if they are not.
 
     The time taken is linear in both num_steps and num_samples.
