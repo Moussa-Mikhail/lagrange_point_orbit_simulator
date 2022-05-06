@@ -20,7 +20,7 @@ def transform_to_corotating(times, pos, CM_pos):
     # rotates with the system
     # we can do this by linearly transforming each position vector by
     # the inverse of the coordinate transform
-    # the coordinate transform is v -> R(w*t)*v
+    # the coordinate transform is unit(x) -> R(w*t)*unit(x), unit(y) -> R(w*t)*unit(y)
     # where R(w*t) is the rotation matrix with angle w*t about the z axis
     # the inverse is R(-w*t)
     # at each time t we multiply the position vectors by the matrix R(-w*t)
