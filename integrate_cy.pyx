@@ -12,8 +12,6 @@ cdef double star_mass
 
 cdef double planet_mass
 
-cdef double sat_mass
-
 cdef double G
 
 from thesis_code import G, planet_mass, star_mass
