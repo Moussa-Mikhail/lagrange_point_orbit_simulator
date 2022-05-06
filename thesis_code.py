@@ -673,8 +673,6 @@ def plot_conserved_func(
 
     arr_slice = plot_slice(total_momentum.shape[0])
 
-    print(arr_slice)
-
     times_in_years = times[arr_slice] / years
 
     # total linear momentum is not conserved (likely due to floating point errors)
