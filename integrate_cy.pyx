@@ -23,6 +23,7 @@ from thesis_code import G, planet_mass, star_mass
 @cython.nonecheck(False)
 @cython.wraparound(False)
 @cython.boundscheck(False)
+@cython.embedsignature(True)
 @cython.initializedcheck(False)
 def integrate(
     const double time_step,

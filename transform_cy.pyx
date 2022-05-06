@@ -16,6 +16,7 @@ from thesis_code import angular_speed
 @cython.nonecheck(False)
 @cython.wraparound(False)
 @cython.boundscheck(False)
+@cython.embedsignature(True)
 @cython.initializedcheck(False)
 def transform_to_corotating(times, pos, CM_pos):
     # it is necessary to transform our coordinate system to one which
