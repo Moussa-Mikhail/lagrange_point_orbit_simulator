@@ -141,8 +141,10 @@ def main(
     num_steps: Number of steps to simulate. Must be an integer. The default is 1 * 10**5.
 
     perturbation_size: Size of perturbation in AU. The default is 0.
-    perturbation_angle: Angle of perturbation relative to positive x axis in degrees. The default is None.
-    If None, then perturbation_size has the effect of moving the satellite away or towards the origin.
+    perturbation_angle: Angle of perturbation relative to positive x axis in degrees.
+    The default is None.
+    If None, then perturbation_size has the effect of
+    moving the satellite away or towards the origin.
 
     speed: Initial speed of satellite as a factor of planet's speed.
     i.e. speed = 1 -> satellite has the same speed as planet.
@@ -159,7 +161,10 @@ def main(
     energy, angular momentum, linear momentum.
     The default is False.
 
-    This function will take ~0.15 seconds per 10**5 steps. More if plot_conserved is True.
+    This function will take ~0.15 seconds per 10**5 steps if
+    the cythonized extensions are available.
+    9 seconds if not.
+    More if plot_conserved is True.
     The time may vary depending on your hardware.
     """
 
@@ -222,10 +227,14 @@ def main(
             star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
         )
 
-        planet_momentum = planet_mass * planet_vel[0]
+        init_planet_momentum = norm(planet_mass * planet_vel[0])
 
         plot_conserved_func(
-            times, planet_momentum, total_momentum, total_angular_momentum, total_energy
+            times,
+            init_planet_momentum,
+            total_momentum,
+            total_angular_momentum,
+            total_energy,
         )
 
 
@@ -653,11 +662,9 @@ def conservation_calculations(
 
 
 def plot_conserved_func(
-    times, planet_momentum, total_momentum, total_angular_momentum, total_energy
+    times, init_planet_momentum, total_momentum, total_angular_momentum, total_energy
 ):
     # sourcery skip: extract-duplicate-method
-
-    times_in_years = times / years
 
     linear_momentum_plot = pg.plot(title="Normalized Linear Momentum vs Time")
     linear_momentum_plot.setLabel("bottom", "Time", units="years")
@@ -665,26 +672,32 @@ def plot_conserved_func(
 
     linear_momentum_plot.addLegend()
 
+    arr_slice = plot_slice(total_momentum.shape[0])
+
+    print(arr_slice)
+
+    times_in_years = times[arr_slice] / years
+
     # total linear momentum is not conserved (likely due to floating point errors)
     # however the variation is insignificant compared to
     # the star's and planet's individual linear momenta
     linear_momentum_plot.plot(
         times_in_years,
-        total_momentum[:, 0] / norm(planet_momentum),
+        total_momentum[arr_slice, 0] / init_planet_momentum,
         pen="r",
         name="x",
     )
 
     linear_momentum_plot.plot(
         times_in_years,
-        total_momentum[:, 1] / norm(planet_momentum),
+        total_momentum[arr_slice, 1] / init_planet_momentum,
         pen="g",
         name="y",
     )
 
     linear_momentum_plot.plot(
         times_in_years,
-        total_momentum[:, 2] / norm(planet_momentum),
+        total_momentum[arr_slice, 2] / init_planet_momentum,
         pen="b",
         name="z",
     )
@@ -698,21 +711,21 @@ def plot_conserved_func(
     # x and y components of angular momentum are 0
     # angular_momentum_plot.plot(
     #   times_in_years,
-    #   total_angular_momentum[:, 0]/total_angular_momentum[0, 0]-1,
+    #   total_angular_momentum[arr_slice, 0]/total_angular_momentum[0, 0]-1,
     #   pen='r',
     #   name='x'
     # )
 
     # angular_momentum_plot.plot(
     #   times_in_years,
-    #   total_angular_momentum[:, 1]/total_angular_momentum[0, 1]-1,
+    #   total_angular_momentum[arr_slice, 1]/total_angular_momentum[0, 1]-1,
     #   pen='g',
     #   name='y'
     # )
 
     angular_momentum_plot.plot(
         times_in_years,
-        total_angular_momentum[:, 2] / total_angular_momentum[0, 2] - 1,
+        total_angular_momentum[arr_slice, 2] / total_angular_momentum[0, 2] - 1,
         pen="b",
         name="z",
     )
@@ -721,4 +734,7 @@ def plot_conserved_func(
     energy_plot.setLabel("bottom", "Time", units="years")
     energy_plot.setLabel("left", "Normalized Energy")
 
-    energy_plot.plot(times_in_years, total_energy / total_energy[0] - 1)
+    energy_plot.plot(times_in_years, total_energy[arr_slice] / total_energy[0] - 1)
+
+
+# main(plot_conserved=True)
