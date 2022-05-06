@@ -18,10 +18,12 @@ cdef double G
 
 from thesis_code import G, planet_mass, star_mass
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
+
 @cython.cdivision(True)
+@cython.nonecheck(False)
+@cython.wraparound(False)
+@cython.boundscheck(False)
+@cython.initializedcheck(False)
 def integrate(
     const double time_step,
     const long num_steps,
@@ -110,10 +112,11 @@ def integrate(
 
     return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
-@cython.nonecheck(False)
 @cython.cdivision(True)
+@cython.nonecheck(False)
+@cython.wraparound(False)
+@cython.boundscheck(False)
+@cython.initializedcheck(False)
 cdef void calc_acceleration(
     const double[::1] star_pos,
     const double[::1] planet_pos,
@@ -154,9 +157,11 @@ cdef void calc_acceleration(
         sat_accel[j] = G * star_mass * r_sat_to_star[j] / d_sat_to_star**3\
                      + G * planet_mass * r_sat_to_planet[j] / d_sat_to_planet**3
 
-@cython.boundscheck(False)
-@cython.wraparound(False)
+@cython.cdivision(True)
 @cython.nonecheck(False)
+@cython.wraparound(False)
+@cython.boundscheck(False)
+@cython.initializedcheck(False)
 cdef double norm(const double[::1] mem_view):
     
     return sqrt(mem_view[0]*mem_view[0] + mem_view[1]*mem_view[1] + mem_view[2]*mem_view[2])

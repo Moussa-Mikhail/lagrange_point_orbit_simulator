@@ -2131,9 +2131,9 @@ static PyObject *__pyx_codeobj__20;
 static PyObject *__pyx_codeobj__27;
 /* Late includes */
 
-/* "transform_cy.pyx":18
- * @cython.wraparound(False)
- * @cython.nonecheck(False)
+/* "transform_cy.pyx":20
+ * @cython.boundscheck(False)
+ * @cython.initializedcheck(False)
  * def transform_to_corotating(times, pos, CM_pos):             # <<<<<<<<<<<<<<
  *     # it is necessary to transform our coordinate system to one which
  *     # rotates with the system
@@ -2177,17 +2177,17 @@ static PyObject *__pyx_pw_12transform_cy_1transform_to_corotating(PyObject *__py
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_pos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("transform_to_corotating", 1, 3, 3, 1); __PYX_ERR(0, 18, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("transform_to_corotating", 1, 3, 3, 1); __PYX_ERR(0, 20, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_CM_pos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("transform_to_corotating", 1, 3, 3, 2); __PYX_ERR(0, 18, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("transform_to_corotating", 1, 3, 3, 2); __PYX_ERR(0, 20, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "transform_to_corotating") < 0)) __PYX_ERR(0, 18, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "transform_to_corotating") < 0)) __PYX_ERR(0, 20, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -2202,7 +2202,7 @@ static PyObject *__pyx_pw_12transform_cy_1transform_to_corotating(PyObject *__py
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("transform_to_corotating", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 18, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("transform_to_corotating", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 20, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("transform_cy.transform_to_corotating", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2240,43 +2240,43 @@ static PyObject *__pyx_pf_12transform_cy_transform_to_corotating(CYTHON_UNUSED P
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("transform_to_corotating", 0);
 
-  /* "transform_cy.pyx":31
+  /* "transform_cy.pyx":33
  *     # is the origin
  * 
  *     pos_trans = pos - CM_pos             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:, ::1] pos_trans_view = pos_trans
  */
-  __pyx_t_1 = PyNumber_Subtract(__pyx_v_pos, __pyx_v_CM_pos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Subtract(__pyx_v_pos, __pyx_v_CM_pos); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_pos_trans = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "transform_cy.pyx":33
+  /* "transform_cy.pyx":35
  *     pos_trans = pos - CM_pos
  * 
  *     cdef double[:, ::1] pos_trans_view = pos_trans             # <<<<<<<<<<<<<<
  * 
  *     cdef double[::1] times_view = times
  */
-  __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_pos_trans, PyBUF_WRITABLE); if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 33, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_pos_trans, PyBUF_WRITABLE); if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 35, __pyx_L1_error)
   __pyx_v_pos_trans_view = __pyx_t_2;
   __pyx_t_2.memview = NULL;
   __pyx_t_2.data = NULL;
 
-  /* "transform_cy.pyx":35
+  /* "transform_cy.pyx":37
  *     cdef double[:, ::1] pos_trans_view = pos_trans
  * 
  *     cdef double[::1] times_view = times             # <<<<<<<<<<<<<<
  * 
  *     cdef Py_ssize_t i
  */
-  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_v_times, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_v_times, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 37, __pyx_L1_error)
   __pyx_v_times_view = __pyx_t_3;
   __pyx_t_3.memview = NULL;
   __pyx_t_3.data = NULL;
 
-  /* "transform_cy.pyx":45
+  /* "transform_cy.pyx":47
  *     cdef double pos_trans_y
  * 
  *     for i in range(times_view.shape[0]):             # <<<<<<<<<<<<<<
@@ -2288,7 +2288,7 @@ static PyObject *__pyx_pf_12transform_cy_transform_to_corotating(CYTHON_UNUSED P
   for (__pyx_t_6 = 0; __pyx_t_6 < __pyx_t_5; __pyx_t_6+=1) {
     __pyx_v_i = __pyx_t_6;
 
-    /* "transform_cy.pyx":47
+    /* "transform_cy.pyx":49
  *     for i in range(times_view.shape[0]):
  * 
  *         angle = -angular_speed * times_view[i]             # <<<<<<<<<<<<<<
@@ -2298,7 +2298,7 @@ static PyObject *__pyx_pf_12transform_cy_transform_to_corotating(CYTHON_UNUSED P
     __pyx_t_7 = __pyx_v_i;
     __pyx_v_angle = ((-__pyx_v_12transform_cy_angular_speed) * (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_times_view.data) + __pyx_t_7)) ))));
 
-    /* "transform_cy.pyx":49
+    /* "transform_cy.pyx":51
  *         angle = -angular_speed * times_view[i]
  * 
  *         c = cos(angle)             # <<<<<<<<<<<<<<
@@ -2307,7 +2307,7 @@ static PyObject *__pyx_pf_12transform_cy_transform_to_corotating(CYTHON_UNUSED P
  */
     __pyx_v_c = cos(__pyx_v_angle);
 
-    /* "transform_cy.pyx":51
+    /* "transform_cy.pyx":53
  *         c = cos(angle)
  * 
  *         s = sin(angle)             # <<<<<<<<<<<<<<
@@ -2316,7 +2316,7 @@ static PyObject *__pyx_pf_12transform_cy_transform_to_corotating(CYTHON_UNUSED P
  */
     __pyx_v_s = sin(__pyx_v_angle);
 
-    /* "transform_cy.pyx":53
+    /* "transform_cy.pyx":55
  *         s = sin(angle)
  * 
  *         pos_trans_x = pos_trans_view[i, 0]             # <<<<<<<<<<<<<<
@@ -2327,7 +2327,7 @@ static PyObject *__pyx_pf_12transform_cy_transform_to_corotating(CYTHON_UNUSED P
     __pyx_t_8 = 0;
     __pyx_v_pos_trans_x = (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_pos_trans_view.data + __pyx_t_7 * __pyx_v_pos_trans_view.strides[0]) )) + __pyx_t_8)) )));
 
-    /* "transform_cy.pyx":55
+    /* "transform_cy.pyx":57
  *         pos_trans_x = pos_trans_view[i, 0]
  * 
  *         pos_trans_y = pos_trans_view[i, 1]             # <<<<<<<<<<<<<<
@@ -2338,7 +2338,7 @@ static PyObject *__pyx_pf_12transform_cy_transform_to_corotating(CYTHON_UNUSED P
     __pyx_t_7 = 1;
     __pyx_v_pos_trans_y = (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_pos_trans_view.data + __pyx_t_8 * __pyx_v_pos_trans_view.strides[0]) )) + __pyx_t_7)) )));
 
-    /* "transform_cy.pyx":57
+    /* "transform_cy.pyx":59
  *         pos_trans_y = pos_trans_view[i, 1]
  * 
  *         pos_trans_view[i, 0] = c * pos_trans_x - s * pos_trans_y             # <<<<<<<<<<<<<<
@@ -2349,7 +2349,7 @@ static PyObject *__pyx_pf_12transform_cy_transform_to_corotating(CYTHON_UNUSED P
     __pyx_t_8 = 0;
     *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_pos_trans_view.data + __pyx_t_7 * __pyx_v_pos_trans_view.strides[0]) )) + __pyx_t_8)) )) = ((__pyx_v_c * __pyx_v_pos_trans_x) - (__pyx_v_s * __pyx_v_pos_trans_y));
 
-    /* "transform_cy.pyx":59
+    /* "transform_cy.pyx":61
  *         pos_trans_view[i, 0] = c * pos_trans_x - s * pos_trans_y
  * 
  *         pos_trans_view[i, 1] = s * pos_trans_x + c * pos_trans_y             # <<<<<<<<<<<<<<
@@ -2361,7 +2361,7 @@ static PyObject *__pyx_pf_12transform_cy_transform_to_corotating(CYTHON_UNUSED P
     *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_pos_trans_view.data + __pyx_t_8 * __pyx_v_pos_trans_view.strides[0]) )) + __pyx_t_7)) )) = ((__pyx_v_s * __pyx_v_pos_trans_x) + (__pyx_v_c * __pyx_v_pos_trans_y));
   }
 
-  /* "transform_cy.pyx":61
+  /* "transform_cy.pyx":63
  *         pos_trans_view[i, 1] = s * pos_trans_x + c * pos_trans_y
  * 
  *     return pos_trans             # <<<<<<<<<<<<<<
@@ -2371,9 +2371,9 @@ static PyObject *__pyx_pf_12transform_cy_transform_to_corotating(CYTHON_UNUSED P
   __pyx_r = __pyx_v_pos_trans;
   goto __pyx_L0;
 
-  /* "transform_cy.pyx":18
- * @cython.wraparound(False)
- * @cython.nonecheck(False)
+  /* "transform_cy.pyx":20
+ * @cython.boundscheck(False)
+ * @cython.initializedcheck(False)
  * def transform_to_corotating(times, pos, CM_pos):             # <<<<<<<<<<<<<<
  *     # it is necessary to transform our coordinate system to one which
  *     # rotates with the system
@@ -16293,7 +16293,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 47, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 133, __pyx_L1_error)
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(1, 148, __pyx_L1_error)
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(1, 151, __pyx_L1_error)
@@ -16502,17 +16502,17 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
-  /* "transform_cy.pyx":18
- * @cython.wraparound(False)
- * @cython.nonecheck(False)
+  /* "transform_cy.pyx":20
+ * @cython.boundscheck(False)
+ * @cython.initializedcheck(False)
  * def transform_to_corotating(times, pos, CM_pos):             # <<<<<<<<<<<<<<
  *     # it is necessary to transform our coordinate system to one which
  *     # rotates with the system
  */
-  __pyx_tuple__19 = PyTuple_Pack(12, __pyx_n_s_times, __pyx_n_s_pos, __pyx_n_s_CM_pos, __pyx_n_s_pos_trans, __pyx_n_s_pos_trans_view, __pyx_n_s_times_view, __pyx_n_s_i, __pyx_n_s_angle, __pyx_n_s_pos_trans_x, __pyx_n_s_pos_trans_y, __pyx_n_s_c, __pyx_n_s_s); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_tuple__19 = PyTuple_Pack(12, __pyx_n_s_times, __pyx_n_s_pos, __pyx_n_s_CM_pos, __pyx_n_s_pos_trans, __pyx_n_s_pos_trans_view, __pyx_n_s_times_view, __pyx_n_s_i, __pyx_n_s_angle, __pyx_n_s_pos_trans_x, __pyx_n_s_pos_trans_y, __pyx_n_s_c, __pyx_n_s_s); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
-  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(3, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_transform_cy_pyx, __pyx_n_s_transform_to_corotating, 18, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_codeobj__20 = (PyObject*)__Pyx_PyCode_New(3, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__19, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_transform_cy_pyx, __pyx_n_s_transform_to_corotating, 20, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__20)) __PYX_ERR(0, 20, __pyx_L1_error)
 
   /* "View.MemoryView":286
  *         return self.name
@@ -16954,7 +16954,7 @@ if (!__Pyx_RefNanny) {
  * 
  * from thesis_code import angular_speed             # <<<<<<<<<<<<<<
  * 
- * @cython.boundscheck(False)
+ * @cython.cdivision(True)
  */
   __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -16971,16 +16971,16 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "transform_cy.pyx":18
- * @cython.wraparound(False)
- * @cython.nonecheck(False)
+  /* "transform_cy.pyx":20
+ * @cython.boundscheck(False)
+ * @cython.initializedcheck(False)
  * def transform_to_corotating(times, pos, CM_pos):             # <<<<<<<<<<<<<<
  *     # it is necessary to transform our coordinate system to one which
  *     # rotates with the system
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12transform_cy_1transform_to_corotating, NULL, __pyx_n_s_transform_cy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12transform_cy_1transform_to_corotating, NULL, __pyx_n_s_transform_cy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_transform_to_corotating, __pyx_t_2) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_transform_to_corotating, __pyx_t_2) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "transform_cy.pyx":1
