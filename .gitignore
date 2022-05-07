@@ -132,3 +132,5 @@ dmypy.json
 data.csv
 *.html
 .VSCodeCounter
+data1.csv
+test_period_func.py
