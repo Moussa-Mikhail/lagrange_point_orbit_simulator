@@ -356,7 +356,7 @@ def initialization(
     # in this case the Center of Mass
     star_vel[0] = np.cross(angular_vel, star_pos[0] - init_CM_pos)
 
-    planet_vel[0] = np.cross(angular_vel, planet_pos[0] - init_CM_pos)  # * 1.2
+    planet_vel[0] = np.cross(angular_vel, planet_pos[0] - init_CM_pos) * 1.2
 
     return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 

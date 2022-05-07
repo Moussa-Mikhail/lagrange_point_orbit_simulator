@@ -1,9 +1,12 @@
-# pylint: disable=invalid-name, missing-docstring
+# pylint: disable=invalid-name, missing-docstring, unused-import
+"""Generate random parameters and simulates them.
+Data is collected from each simulation and then written to a file name "data.csv"
+"""
 import numpy as np
 import pandas as pd  # type: ignore
 from numpy.linalg import norm
 
-from thesis_code import (
+from thesis_code import (  # noqa: F401
     AU,
     L4,
     G,
@@ -11,7 +14,7 @@ from thesis_code import (
     calc_orbit,
     calc_period_from_semi_major_axis,
     initialization,
-    pi,
+    orbital_period,
     sat_mass,
     star_mass,
     time_func,
@@ -160,10 +163,12 @@ def collect_data(df):
             calc_period_from_position_data(sat_pos, CM_pos) / years
         )
 
-        df.loc[idx, "instability"] = measure_instability(times, sat_pos, CM_pos)
+        df.loc[idx, "instability"] = measure_instability(times, sat_pos, CM_pos) / AU
 
-    # absolute difference from 1 year
-    df["absolute period difference"] = np.abs(df["actual period"] - 1)
+    # absolute difference from orbital period
+    df["absolute period difference"] = np.abs(
+        df["actual period"] - orbital_period / years
+    )
 
 
 def is_valid_orbit(planet_pos, sat_pos):
@@ -201,80 +206,59 @@ def calc_period_from_parameters(
     perturbation_size, perturbation_angle, speed, vel_angle, default_pos=L4
 ):
 
-    sat_pos, sat_vel, CM_pos = get_sat_initial_conditions(
+    init_sat_pos, init_sat_vel, init_star_pos, init_star_vel = get_initial_conditions(
         perturbation_size, perturbation_angle, speed, vel_angle, default_pos
     )
 
     semi_major_axis = calc_semi_major_axis_from_initial_conditions(
-        sat_pos, sat_vel, CM_pos
+        init_sat_pos, init_sat_vel, init_star_pos, init_star_vel
     )
+
+    print(f"{semi_major_axis/AU=}")
 
     return calc_period_from_semi_major_axis(semi_major_axis)
 
 
-def get_sat_initial_conditions(
+def get_initial_conditions(
     perturbation_size, perturbation_angle, speed, vel_angle, default_pos=L4
 ):
 
-    star_pos, _, planet_pos, _, sat_pos, sat_vel = initialization(
+    star_pos, star_vel, _, _, sat_pos, sat_vel = initialization(
         0, perturbation_size, perturbation_angle, speed, vel_angle, default_pos
     )
 
-    init_CM_pos = calc_center_of_mass(star_pos, planet_pos, sat_pos)[0]
-
     init_sat_pos, init_sat_vel = sat_pos[0], sat_vel[0]
 
-    return init_sat_pos, init_sat_vel, init_CM_pos
+    init_star_pos, init_star_vel = star_pos[0], star_vel[0]
+
+    return init_sat_pos, init_sat_vel, init_star_pos, init_star_vel
 
 
-def calc_semi_major_axis_from_initial_conditions(sat_pos, sat_vel, CM_pos):
+def calc_semi_major_axis_from_initial_conditions(sat_pos, sat_vel, star_pos, star_vel):
 
     # Assuming the influence of planet on the satellite as negligible
     # Therefore we can apply the solution to the 2-body problem to the satellite
 
-    # See "solve for orbital parameters.docx" for a derivation
-    # of the following procedure
+    diff_vel = sat_vel - star_vel
 
-    sat_pos = sat_pos - CM_pos
+    reduced_mass = (star_mass * sat_mass) / (star_mass + sat_mass)
 
-    unit_pos = sat_pos / norm(sat_pos)
-
-    # 90 degrees
-    angle = pi / 2
-
-    # rotates by 90 degrees counter-clockwise
-    rotation_matrix = np.array(
-        (
-            (np.cos(angle), -np.sin(angle), 0),
-            (np.sin(angle), np.cos(angle), 0),
-            (0, 0, 1),
-        )
-    )
-
-    unit_angular = rotation_matrix.dot(unit_pos)
-
-    radial_vel = np.dot(sat_vel, unit_pos)
-
-    transverse_vel = np.dot(sat_vel, unit_angular)
-
-    angular_momentum = np.cross(sat_pos, sat_mass * sat_vel)
-
-    angular_momentum = norm(angular_momentum)
+    kinetic_energy = 0.5 * reduced_mass * diff_vel.dot(diff_vel)
 
     gravitational_coefficient = G * star_mass * sat_mass
 
-    transverse_vel_prime = -(
-        transverse_vel - gravitational_coefficient / angular_momentum
-    )
+    distance = norm(sat_pos - star_pos)
 
-    eccentricity_squared = (
-        -angular_momentum / gravitational_coefficient * radial_vel
-    ) ** 2 + (angular_momentum / gravitational_coefficient * transverse_vel_prime) ** 2
+    potential_energy = -gravitational_coefficient / distance
 
-    reduced_mass = star_mass * sat_mass / (star_mass + sat_mass)
+    total_energy = kinetic_energy + potential_energy
 
-    return angular_momentum**2 / (
-        gravitational_coefficient * reduced_mass * (1 - eccentricity_squared)
+    return (
+        -gravitational_coefficient
+        / total_energy
+        * star_mass
+        / (star_mass + sat_mass)
+        / 2  # This 2 leads to the right answer and I dont know why
     )
 
 
@@ -291,9 +275,9 @@ def calc_semi_major_axis_from_position_data(sat_pos, CM_pos):
 
     distances = norm(sat_pos, axis=1)
 
-    perihelion = min(distances)
+    perihelion = np.amin(distances)
 
-    aphelion = max(distances)
+    aphelion = np.amax(distances)
 
     return (perihelion + aphelion) / 2
 
@@ -304,9 +288,7 @@ def measure_instability(times, sat_pos, CM_pos):
 
     distances_from_L4 = norm(sat_pos_trans - L4, axis=1)
 
-    max_distance = max(distances_from_L4)
-
-    return max_distance / AU
+    return max(distances_from_L4)
 
 
 def remove_invalid_data(df):
