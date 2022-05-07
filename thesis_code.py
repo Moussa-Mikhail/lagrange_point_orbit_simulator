@@ -389,22 +389,19 @@ def plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step):
     # Sun has an orbit on the scale of micro-AU under normal
     # Zoom in to see it
     orbit_plot.plot(
-        star_pos_trans[::arr_step, 0] / AU,
-        star_pos_trans[::arr_step, 1] / AU,
+        star_pos_trans[::arr_step, :2] / AU,
         pen="y",
         name="star",
     )
 
     orbit_plot.plot(
-        planet_pos_trans[::arr_step, 0] / AU,
-        planet_pos_trans[::arr_step, 1] / AU,
+        planet_pos_trans[::arr_step, :2] / AU,
         pen="b",
         name="planet",
     )
 
     orbit_plot.plot(
-        sat_pos_trans[::arr_step, 0] / AU,
-        sat_pos_trans[::arr_step, 1] / AU,
+        sat_pos_trans[::arr_step, :2] / AU,
         pen="g",
         name="Satellite",
     )
