@@ -18,7 +18,7 @@ from thesis_code import angular_speed
 @cython.boundscheck(False)
 @cython.embedsignature(True)
 @cython.initializedcheck(False)
-def transform_to_corotating(times, pos, CM_pos):
+def transform_to_corotating(times, pos_trans):
     # it is necessary to transform our coordinate system to one which
     # rotates with the system
     # we can do this by linearly transforming each position vector by
@@ -28,10 +28,11 @@ def transform_to_corotating(times, pos, CM_pos):
     # the inverse is R(-w*t)
     # at each time t we multiply the position vectors by the matrix R(-w*t)
 
-    # first transform our coordinate system so that the Center of Mass
-    # is the origin
+    # The origin of the coordinate system is the Center of Mass
 
-    pos_trans = pos - CM_pos
+    pos_rotated = np.empty_like(pos_trans)
+
+    cdef double[:, ::1] pos_rotated_view = pos_rotated
 
     cdef double[:, ::1] pos_trans_view = pos_trans
 
@@ -57,8 +58,8 @@ def transform_to_corotating(times, pos, CM_pos):
 
         pos_trans_y = pos_trans_view[i, 1]
 
-        pos_trans_view[i, 0] = c * pos_trans_x - s * pos_trans_y
+        pos_rotated_view[i, 0] = c * pos_trans_x - s * pos_trans_y
 
-        pos_trans_view[i, 1] = s * pos_trans_x + c * pos_trans_y
+        pos_rotated_view[i, 1] = s * pos_trans_x + c * pos_trans_y
 
-    return pos_trans
+    return pos_rotated

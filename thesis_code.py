@@ -31,6 +31,7 @@ star_mass = 1.98847 * 10**30
 
 # mass of Earth in kilograms
 planet_mass = 5.9722 * 10**24
+# planet_mass = star_mass
 
 # distance between planet and star
 planet_distance = 1 * AU
@@ -71,7 +72,8 @@ L2 = planet_distance * np.array((1, 0, 0)) + np.array((hill_radius, 0, 0))
 L3_dist = planet_distance * 7 / 12 * planet_mass / star_mass
 
 # Position of L3
-# Located opposite of the planet and slightly further away from the
+# Located opposite of the planet and slightly further away from the star
+# than the planet
 L3 = -planet_distance * np.array((1, 0, 0)) - np.array((L3_dist, 0, 0))
 
 # Position of L4 Lagrange point.
@@ -191,26 +193,33 @@ def main(
     # position of Center of Mass at each timestep
     CM_pos = calc_center_of_mass(star_pos, planet_pos, sat_pos)
 
+    # Transform to coordinate system where the Center of Mass is stationary
+    star_pos_trans = star_pos - CM_pos
+
+    planet_pos_trans = planet_pos - CM_pos
+
+    sat_pos_trans = sat_pos - CM_pos
+
     # converting num_years to seconds
     sim_stop = num_years * years
 
     time_step = sim_stop / num_steps
 
-    plot_orbit(star_pos, planet_pos, sat_pos, time_step)
+    plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step)
 
     # array of num_steps+1 time points evenly spaced between 0 and sim_stop
     times = np.linspace(0, sim_stop, num_steps + 1)
 
-    star_pos_trans = transform_to_corotating(times, star_pos, CM_pos)
+    star_pos_rotated = transform_to_corotating(times, star_pos_trans)
 
-    planet_pos_trans = transform_to_corotating(times, planet_pos, CM_pos)
+    planet_pos_rotated = transform_to_corotating(times, planet_pos_trans)
 
-    sat_pos_trans = transform_to_corotating(times, sat_pos, CM_pos)
+    sat_pos_rotated = transform_to_corotating(times, sat_pos_trans)
 
     plot_corotating_orbit(
-        star_pos_trans,
-        planet_pos_trans,
-        sat_pos_trans,
+        star_pos_rotated,
+        planet_pos_rotated,
+        sat_pos_rotated,
         default_pos,
         num_years,
         time_step,
@@ -347,7 +356,7 @@ def initialization(
     # in this case the Center of Mass
     star_vel[0] = np.cross(angular_vel, star_pos[0] - init_CM_pos)
 
-    planet_vel[0] = np.cross(angular_vel, planet_pos[0] - init_CM_pos)
+    planet_vel[0] = np.cross(angular_vel, planet_pos[0] - init_CM_pos)  # * 1.2
 
     return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 
@@ -362,7 +371,7 @@ def calc_center_of_mass(star_pos, planet_pos, sat_pos):
 timer = QTimer()
 
 
-def plot_orbit(star_pos, planet_pos, sat_pos, time_step):
+def plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step):
 
     orbit_plot = pg.plot(title="Orbits of Masses")
     orbit_plot.setLabel("bottom", "x", units="AU")
@@ -375,26 +384,27 @@ def plot_orbit(star_pos, planet_pos, sat_pos, time_step):
     orbit_plot.setYRange(-1.2 * planet_distance_in_AU, 1.2 * planet_distance_in_AU)
     orbit_plot.setAspectLocked(True)
 
-    arr_step = plot_array_step(star_pos.shape[0])
+    arr_step = plot_array_step(star_pos_trans.shape[0])
 
-    # zoom into the star until the axes are on the scale of a few micro-AU to see star's orbit
+    # Sun has an orbit on the scale of micro-AU under normal
+    # Zoom in to see it
     orbit_plot.plot(
-        star_pos[::arr_step, 0] / AU,
-        star_pos[::arr_step, 1] / AU,
+        star_pos_trans[::arr_step, 0] / AU,
+        star_pos_trans[::arr_step, 1] / AU,
         pen="y",
         name="star",
     )
 
     orbit_plot.plot(
-        planet_pos[::arr_step, 0] / AU,
-        planet_pos[::arr_step, 1] / AU,
+        planet_pos_trans[::arr_step, 0] / AU,
+        planet_pos_trans[::arr_step, 1] / AU,
         pen="b",
         name="planet",
     )
 
     orbit_plot.plot(
-        sat_pos[::arr_step, 0] / AU,
-        sat_pos[::arr_step, 1] / AU,
+        sat_pos_trans[::arr_step, 0] / AU,
+        sat_pos_trans[::arr_step, 1] / AU,
         pen="g",
         name="Satellite",
     )
@@ -403,7 +413,7 @@ def plot_orbit(star_pos, planet_pos, sat_pos, time_step):
 
     orbit_plot.addItem(anim_plot)
 
-    idx = update_idx(time_step, star_pos.shape[0] - 1)
+    idx = update_idx(time_step, star_pos_trans.shape[0] - 1)
 
     def update_plot():
 
@@ -412,8 +422,8 @@ def plot_orbit(star_pos, planet_pos, sat_pos, time_step):
         anim_plot.clear()
 
         anim_plot.addPoints(
-            [star_pos[i, 0] / AU],
-            [star_pos[i, 1] / AU],
+            [star_pos_trans[i, 0] / AU],
+            [star_pos_trans[i, 1] / AU],
             pen="y",
             brush="y",
             size=10,
@@ -421,8 +431,8 @@ def plot_orbit(star_pos, planet_pos, sat_pos, time_step):
         )
 
         anim_plot.addPoints(
-            [planet_pos[i, 0] / AU],
-            [planet_pos[i, 1] / AU],
+            [planet_pos_trans[i, 0] / AU],
+            [planet_pos_trans[i, 1] / AU],
             pen="b",
             brush="b",
             size=10,
@@ -430,12 +440,12 @@ def plot_orbit(star_pos, planet_pos, sat_pos, time_step):
         )
 
         anim_plot.addPoints(
-            [sat_pos[i, 0] / AU],
-            [sat_pos[i, 1] / AU],
+            [sat_pos_trans[i, 0] / AU],
+            [sat_pos_trans[i, 1] / AU],
             pen="g",
             brush="g",
             size=10,
-            name="Satellite",
+            name="satellite",
         )
 
     # time in milliseconds between plot updates
@@ -489,9 +499,9 @@ timer_rotating = QTimer()
 
 
 def plot_corotating_orbit(
-    star_pos_trans,
-    planet_pos_trans,
-    sat_pos_trans,
+    star_pos_rotated,
+    planet_pos_rotated,
+    sat_pos_rotated,
     default_pos,
     num_years,  # pylint: disable=unused-argument
     time_step,
@@ -509,23 +519,23 @@ def plot_corotating_orbit(
     transform_plot.setYRange(-0.2 * planet_distance_in_AU, 1.2 * planet_distance_in_AU)
     transform_plot.setAspectLocked(True)
 
-    anim_trans_plot = pg.ScatterPlotItem()
+    anim_rotated_plot = pg.ScatterPlotItem()
 
-    transform_plot.addItem(anim_trans_plot)
+    transform_plot.addItem(anim_rotated_plot)
 
-    arr_step = plot_array_step(star_pos_trans.shape[0])
+    arr_step = plot_array_step(star_pos_rotated.shape[0])
 
     transform_plot.plot(
-        sat_pos_trans[::arr_step, 0] / AU,
-        sat_pos_trans[::arr_step, 1] / AU,
+        sat_pos_rotated[::arr_step, 0] / AU,
+        sat_pos_rotated[::arr_step, 1] / AU,
         name="Satellite orbit",
         pen="g",
     )
 
     # The only purpose of this is to add the bodies to the plot legend
     transform_plot.plot(
-        [star_pos_trans[0, 0] / AU],
-        [star_pos_trans[0, 1] / AU],
+        [star_pos_rotated[0, 0] / AU],
+        [star_pos_rotated[0, 1] / AU],
         name="star",
         pen="k",
         symbol="o",
@@ -534,8 +544,8 @@ def plot_corotating_orbit(
     )
 
     transform_plot.plot(
-        [planet_pos_trans[0, 0] / AU],
-        [planet_pos_trans[0, 1] / AU],
+        [planet_pos_rotated[0, 0] / AU],
+        [planet_pos_rotated[0, 1] / AU],
         name="planet",
         pen="k",
         symbol="o",
@@ -553,17 +563,17 @@ def plot_corotating_orbit(
         symbolBrush="w",
     )
 
-    num_steps = star_pos_trans.shape[0] - 1
+    num_steps = star_pos_rotated.shape[0] - 1
 
     idx = update_idx(time_step, num_steps)
 
-    def update_trans():
+    def update_rotated():
 
         j = next(idx)
 
-        anim_trans_plot.clear()
+        anim_rotated_plot.clear()
 
-        anim_trans_plot.addPoints(
+        anim_rotated_plot.addPoints(
             [default_pos[0] / AU],
             [default_pos[1] / AU],
             pen="w",
@@ -572,27 +582,27 @@ def plot_corotating_orbit(
             name="initial position",
         )
 
-        anim_trans_plot.addPoints(
-            [star_pos_trans[j, 0] / AU],
-            [star_pos_trans[j, 1] / AU],
+        anim_rotated_plot.addPoints(
+            [star_pos_rotated[j, 0] / AU],
+            [star_pos_rotated[j, 1] / AU],
             pen="y",
             brush="y",
             size=10,
             name="star",
         )
 
-        anim_trans_plot.addPoints(
-            [planet_pos_trans[j, 0] / AU],
-            [planet_pos_trans[j, 1] / AU],
+        anim_rotated_plot.addPoints(
+            [planet_pos_rotated[j, 0] / AU],
+            [planet_pos_rotated[j, 1] / AU],
             pen="b",
             brush="b",
             size=10,
             name="planet",
         )
 
-        anim_trans_plot.addPoints(
-            [sat_pos_trans[j, 0] / AU],
-            [sat_pos_trans[j, 1] / AU],
+        anim_rotated_plot.addPoints(
+            [sat_pos_rotated[j, 0] / AU],
+            [sat_pos_rotated[j, 1] / AU],
             pen="g",
             brush="g",
             size=10,
@@ -602,9 +612,9 @@ def plot_corotating_orbit(
         # steps_per_year = int(num_steps / num_years)
 
         # plots where the satellite is after 1 year
-        # anim_trans_plot.addPoints(
-        #     [sat_pos_trans[steps_per_year, 0] / AU],
-        #     [sat_pos_trans[steps_per_year, 1] / AU],
+        # anim_rotated_plot.addPoints(
+        #     [sat_pos_rotated[steps_per_year, 0] / AU],
+        #     [sat_pos_rotated[steps_per_year, 1] / AU],
         #     pen="g",
         #     brush="w",
         #     size=10,
@@ -615,7 +625,7 @@ def plot_corotating_orbit(
     # making it small (=1) and having 2 animated plots leads to crashes
     period = 33
 
-    timer_rotating.timeout.connect(update_trans)
+    timer_rotating.timeout.connect(update_rotated)
     timer_rotating.start(period)
 
 
