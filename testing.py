@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name, missing-docstring, unused-import
+# pylint: disable=invalid-name, missing-function-docstring
 """Generate random parameters and simulates them.
 Data is collected from each simulation and then written to a file name "data.csv"
 """
@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd  # type: ignore
 from numpy.linalg import norm
 
-from thesis_code import (  # noqa: F401
+from thesis_code import (
     AU,
     L4,
     G,
