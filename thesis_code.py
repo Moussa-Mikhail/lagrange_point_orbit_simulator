@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name, missing-docstring
+# pylint: disable=invalid-name, missing-function-docstring
 """Simulates orbits near the Lagrange Point L4 using the position Verlet algorithm.
 It assumes that both the star and planet are undergoing uniform circular motion.
 """
@@ -123,7 +123,7 @@ def time_func(func):
 @time_func
 def main(
     num_years=10.0,
-    num_steps=1 * 10**5,
+    num_steps=10**6,
     perturbation_size=0,
     perturbation_angle=None,
     speed=1,
@@ -139,7 +139,7 @@ def main(
     It takes the following parameters:
 
     num_years: Number of years to simulate. The default is 10.0.
-    num_steps: Number of steps to simulate. Must be an integer. The default is 1 * 10**5.
+    num_steps: Number of steps to simulate. Must be an integer. The default is 10**6.
 
     perturbation_size: Size of perturbation in AU. The default is 0.
     perturbation_angle: Angle of perturbation relative to positive x axis in degrees.
@@ -162,9 +162,9 @@ def main(
     energy, angular momentum, linear momentum.
     The default is False.
 
-    This function will take ~0.15 seconds per 10**5 steps if
+    This function will take ~0.5 seconds per 10**6 steps if
     the Cythonized extensions are available.
-    9 seconds if not.
+    81 seconds if not.
     The time may vary depending on your hardware.
     """
 
@@ -193,7 +193,7 @@ def main(
     # position of Center of Mass at each timestep
     CM_pos = calc_center_of_mass(star_pos, planet_pos, sat_pos)
 
-    # Transform to coordinate system where the Center of Mass is stationary
+    # Transform to coordinate system where the Center of Mass is the origin
     star_pos_trans = star_pos - CM_pos
 
     planet_pos_trans = planet_pos - CM_pos
@@ -334,7 +334,8 @@ def initialization(
     # perturbing the initial position of the satellite
     sat_pos[0] = default_pos + perturbation
 
-    # star and planet orbit about the Center of Mass at an angular_speed = 2 pi radians/orbital_period
+    # star and planet orbit about the Center of Mass
+    # at an angular_speed = 2 pi radians/orbital_period
     # we setup conditions so that the star and planet have circular orbits
     # velocities have to be defined relative to the CM
     init_CM_pos = calc_center_of_mass(star_pos[0], planet_pos[0], sat_pos[0])
@@ -356,7 +357,8 @@ def initialization(
     # in this case the Center of Mass
     star_vel[0] = np.cross(angular_vel, star_pos[0] - init_CM_pos)
 
-    planet_vel[0] = np.cross(angular_vel, planet_pos[0] - init_CM_pos) * 1.2
+    # * 1.2 is used for testing purposes.
+    planet_vel[0] = np.cross(angular_vel, planet_pos[0] - init_CM_pos)  # * 1.2
 
     return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 

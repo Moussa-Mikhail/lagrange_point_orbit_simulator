@@ -22,7 +22,7 @@ All parameters have default values.
 It takes the following parameters:
 
 num_years: Number of years to simulate. The default is 10.0.
-num_steps: Number of steps to simulate. Must be an integer. The default is 1 * 10**5.
+num_steps: Number of steps to simulate. Must be an integer. The default is 10**6.
 
 perturbation_size: Size of perturbation in AU. The default is 0.
 perturbation_angle: Angle of perturbation relative to positive x axis in degrees.
