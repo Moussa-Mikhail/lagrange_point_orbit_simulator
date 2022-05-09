@@ -200,6 +200,8 @@ def main(
 
     sat_pos_trans = sat_pos - CM_pos
 
+    default_pos_trans = default_pos - CM_pos
+
     # converting num_years to seconds
     sim_stop = num_years * years
 
@@ -220,7 +222,7 @@ def main(
         star_pos_rotated,
         planet_pos_rotated,
         sat_pos_rotated,
-        default_pos,
+        default_pos_trans,
         num_years,
         time_step,
     )
@@ -501,7 +503,7 @@ def plot_corotating_orbit(
     star_pos_rotated,
     planet_pos_rotated,
     sat_pos_rotated,
-    default_pos,
+    default_pos_trans,
     num_years,  # pylint: disable=unused-argument
     time_step,
 ):
@@ -514,8 +516,16 @@ def plot_corotating_orbit(
 
     planet_distance_in_AU = planet_distance / AU
 
-    transform_plot.setXRange(-0.2 * planet_distance_in_AU, 1.2 * planet_distance_in_AU)
-    transform_plot.setYRange(-0.2 * planet_distance_in_AU, 1.2 * planet_distance_in_AU)
+    min_x = star_pos_rotated[0, 0] / AU - 0.2 * planet_distance_in_AU
+
+    max_x = planet_pos_rotated[0, 0] / AU + 0.2 * planet_distance_in_AU
+
+    min_y = -0.5 * planet_distance_in_AU
+
+    max_y = default_pos_trans[0, 1] / AU + 0.5 * planet_distance_in_AU
+
+    transform_plot.setXRange(min_x, max_x)
+    transform_plot.setYRange(min_y, max_y)
     transform_plot.setAspectLocked(True)
 
     anim_rotated_plot = pg.ScatterPlotItem()
@@ -527,7 +537,7 @@ def plot_corotating_orbit(
     transform_plot.plot(
         sat_pos_rotated[::arr_step, 0] / AU,
         sat_pos_rotated[::arr_step, 1] / AU,
-        name="Satellite orbit",
+        name="Satellite Orbit",
         pen="g",
     )
 
@@ -535,7 +545,7 @@ def plot_corotating_orbit(
     transform_plot.plot(
         [star_pos_rotated[0, 0] / AU],
         [star_pos_rotated[0, 1] / AU],
-        name="star",
+        name="Star",
         pen="k",
         symbol="o",
         symbolPen="y",
@@ -545,7 +555,7 @@ def plot_corotating_orbit(
     transform_plot.plot(
         [planet_pos_rotated[0, 0] / AU],
         [planet_pos_rotated[0, 1] / AU],
-        name="planet",
+        name="Planet",
         pen="k",
         symbol="o",
         symbolPen="b",
@@ -553,8 +563,18 @@ def plot_corotating_orbit(
     )
 
     transform_plot.plot(
-        [default_pos[0] / AU],
-        [default_pos[1] / AU],
+        [sat_pos_rotated[0, 0] / AU],
+        [sat_pos_rotated[0, 1] / AU],
+        name="Satellite",
+        pen="k",
+        symbol="o",
+        symbolPen="g",
+        symbolBrush="g",
+    )
+
+    transform_plot.plot(
+        [default_pos_trans[0, 0] / AU],
+        [default_pos_trans[0, 1] / AU],
         name="Lagrange Point",
         pen="k",
         symbol="o",
@@ -571,15 +591,6 @@ def plot_corotating_orbit(
         j = next(idx)
 
         anim_rotated_plot.clear()
-
-        anim_rotated_plot.addPoints(
-            [default_pos[0] / AU],
-            [default_pos[1] / AU],
-            pen="w",
-            brush="w",
-            size=10,
-            name="initial position",
-        )
 
         anim_rotated_plot.addPoints(
             [star_pos_rotated[j, 0] / AU],
