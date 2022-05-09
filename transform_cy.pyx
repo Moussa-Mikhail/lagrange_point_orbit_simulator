@@ -6,11 +6,10 @@ cimport cython
 
 from libc.math cimport cos, sin
 
-import numpy as np
-
 cdef double angular_speed
 
 from thesis_code import angular_speed
+
 
 @cython.cdivision(True)
 @cython.nonecheck(False)
@@ -18,7 +17,7 @@ from thesis_code import angular_speed
 @cython.boundscheck(False)
 @cython.embedsignature(True)
 @cython.initializedcheck(False)
-def transform_to_corotating(times, pos_trans):
+cpdef transform_to_corotating(times, pos_trans):
     # it is necessary to transform our coordinate system to one which
     # rotates with the system
     # we can do this by linearly transforming each position vector by
@@ -30,17 +29,19 @@ def transform_to_corotating(times, pos_trans):
 
     # The origin of the coordinate system is the Center of Mass
 
-    pos_rotated = np.empty_like(pos_trans)
-
-    cdef double[:, ::1] pos_rotated_view = pos_rotated
-
     cdef double[:, ::1] pos_trans_view = pos_trans
 
     cdef double[::1] times_view = times
+
+    pos_rotated = np.empty_like(pos_trans)
+
+    cdef double[:, ::1] pos_rotated_view = pos_rotated
     
     cdef Py_ssize_t i
 
     cdef double angle
+
+    cdef double time
 
     cdef double pos_trans_x
 
@@ -48,7 +49,9 @@ def transform_to_corotating(times, pos_trans):
 
     for i in range(times_view.shape[0]):
 
-        angle = -angular_speed * times_view[i]
+        time = times_view[i]
+
+        angle = -angular_speed * time
 
         c = cos(angle)
 
