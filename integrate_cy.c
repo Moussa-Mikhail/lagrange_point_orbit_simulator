@@ -1227,18 +1227,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject
 /* GetBuiltinName.proto */
 static PyObject *__Pyx_GetBuiltinName(PyObject *name);
 
-/* RaiseArgTupleInvalid.proto */
-static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
-    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
-
-/* RaiseDoubleKeywords.proto */
-static void __Pyx_RaiseDoubleKeywordsError(const char* func_name, PyObject* kw_name);
-
-/* ParseKeywords.proto */
-static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
-    PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
-    const char* function_name);
-
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -1361,6 +1349,18 @@ static CYTHON_INLINE int __pyx_sub_acquisition_count_locked(
 #define __PYX_XDEC_MEMVIEW(slice, have_gil) __Pyx_XDEC_MEMVIEW(slice, have_gil, __LINE__)
 static CYTHON_INLINE void __Pyx_INC_MEMVIEW(__Pyx_memviewslice *, int, int);
 static CYTHON_INLINE void __Pyx_XDEC_MEMVIEW(__Pyx_memviewslice *, int, int);
+
+/* RaiseArgTupleInvalid.proto */
+static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
+    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
+
+/* RaiseDoubleKeywords.proto */
+static void __Pyx_RaiseDoubleKeywordsError(const char* func_name, PyObject* kw_name);
+
+/* ParseKeywords.proto */
+static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
+    PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
+    const char* function_name);
 
 /* ArgTypeTest.proto */
 #define __Pyx_ArgTypeTest(obj, type, none_allowed, name, exact)\
@@ -1804,8 +1804,9 @@ static PyObject *contiguous = 0;
 static PyObject *indirect_contiguous = 0;
 static int __pyx_memoryview_thread_locks_used;
 static PyThread_type_lock __pyx_memoryview_thread_locks[8];
-static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice); /*proto*/
-static double __pyx_f_12integrate_cy_norm(__Pyx_memviewslice); /*proto*/
+static PyObject *__pyx_f_12integrate_cy_integrate(double const , long const , PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, int __pyx_skip_dispatch); /*proto*/
+static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice, __Pyx_memviewslice); /*proto*/
+static double __pyx_f_12integrate_cy_norm(double const *); /*proto*/
 static struct __pyx_array_obj *__pyx_array_new(PyObject *, Py_ssize_t, char *, char *, char *); /*proto*/
 static void *__pyx_align_pointer(void *, size_t); /*proto*/
 static PyObject *__pyx_memoryview_new(PyObject *, int, int, __Pyx_TypeInfo *); /*proto*/
@@ -1856,8 +1857,6 @@ static PyObject *__pyx_builtin_IndexError;
 static const char __pyx_k_G[] = "G";
 static const char __pyx_k_O[] = "O";
 static const char __pyx_k_c[] = "c";
-static const char __pyx_k_j[] = "j";
-static const char __pyx_k_k[] = "k";
 static const char __pyx_k_id[] = "id";
 static const char __pyx_k_np[] = "np";
 static const char __pyx_k_new[] = "__new__";
@@ -1906,11 +1905,9 @@ static const char __pyx_k_star_pos[] = "star_pos";
 static const char __pyx_k_star_vel[] = "star_vel";
 static const char __pyx_k_TypeError[] = "TypeError";
 static const char __pyx_k_enumerate[] = "enumerate";
-static const char __pyx_k_integrate[] = "integrate";
 static const char __pyx_k_num_steps[] = "num_steps";
 static const char __pyx_k_pyx_state[] = "__pyx_state";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
-static const char __pyx_k_sat_accel[] = "sat_accel";
 static const char __pyx_k_star_mass[] = "star_mass";
 static const char __pyx_k_time_step[] = "time_step";
 static const char __pyx_k_IndexError[] = "IndexError";
@@ -1920,43 +1917,27 @@ static const char __pyx_k_planet_pos[] = "planet_pos";
 static const char __pyx_k_planet_vel[] = "planet_vel";
 static const char __pyx_k_pyx_result[] = "__pyx_result";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
-static const char __pyx_k_star_accel[] = "star_accel";
 static const char __pyx_k_MemoryError[] = "MemoryError";
 static const char __pyx_k_PickleError[] = "PickleError";
 static const char __pyx_k_planet_mass[] = "planet_mass";
 static const char __pyx_k_thesis_code[] = "thesis_code";
-static const char __pyx_k_integrate_cy[] = "integrate_cy";
-static const char __pyx_k_planet_accel[] = "planet_accel";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
-static const char __pyx_k_sat_pos_view[] = "sat_pos_view";
-static const char __pyx_k_sat_vel_view[] = "sat_vel_view";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
-static const char __pyx_k_r_sat_to_star[] = "r_sat_to_star";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
-static const char __pyx_k_star_pos_view[] = "star_pos_view";
-static const char __pyx_k_star_vel_view[] = "star_vel_view";
 static const char __pyx_k_View_MemoryView[] = "View.MemoryView";
 static const char __pyx_k_allocate_buffer[] = "allocate_buffer";
 static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
-static const char __pyx_k_planet_pos_view[] = "planet_pos_view";
-static const char __pyx_k_planet_vel_view[] = "planet_vel_view";
 static const char __pyx_k_pyx_PickleError[] = "__pyx_PickleError";
-static const char __pyx_k_r_sat_to_planet[] = "r_sat_to_planet";
 static const char __pyx_k_setstate_cython[] = "__setstate_cython__";
-static const char __pyx_k_integrate_cy_pyx[] = "integrate_cy.pyx";
-static const char __pyx_k_r_planet_to_star[] = "r_planet_to_star";
 static const char __pyx_k_pyx_unpickle_Enum[] = "__pyx_unpickle_Enum";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
-static const char __pyx_k_sat_intermediate_pos[] = "sat_intermediate_pos";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
 static const char __pyx_k_contiguous_and_direct[] = "<contiguous and direct>";
-static const char __pyx_k_star_intermediate_pos[] = "star_intermediate_pos";
 static const char __pyx_k_MemoryView_of_r_object[] = "<MemoryView of %r object>";
 static const char __pyx_k_MemoryView_of_r_at_0x_x[] = "<MemoryView of %r at 0x%x>";
 static const char __pyx_k_contiguous_and_indirect[] = "<contiguous and indirect>";
-static const char __pyx_k_planet_intermediate_pos[] = "planet_intermediate_pos";
 static const char __pyx_k_Cannot_index_with_type_s[] = "Cannot index with type '%s'";
 static const char __pyx_k_Invalid_shape_in_axis_d_d[] = "Invalid shape in axis %d: %d.";
 static const char __pyx_k_itemsize_0_for_cython_array[] = "itemsize <= 0 for cython.array";
@@ -2024,13 +2005,8 @@ static PyObject *__pyx_n_s_getstate;
 static PyObject *__pyx_kp_s_got_differing_extents_in_dimensi;
 static PyObject *__pyx_n_s_id;
 static PyObject *__pyx_n_s_import;
-static PyObject *__pyx_n_s_integrate;
-static PyObject *__pyx_n_s_integrate_cy;
-static PyObject *__pyx_kp_s_integrate_cy_pyx;
 static PyObject *__pyx_n_s_itemsize;
 static PyObject *__pyx_kp_s_itemsize_0_for_cython_array;
-static PyObject *__pyx_n_s_j;
-static PyObject *__pyx_n_s_k;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_memview;
 static PyObject *__pyx_n_s_mode;
@@ -2045,13 +2021,9 @@ static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_n_s_obj;
 static PyObject *__pyx_n_s_pack;
 static PyObject *__pyx_n_s_pickle;
-static PyObject *__pyx_n_s_planet_accel;
-static PyObject *__pyx_n_s_planet_intermediate_pos;
 static PyObject *__pyx_n_s_planet_mass;
 static PyObject *__pyx_n_s_planet_pos;
-static PyObject *__pyx_n_s_planet_pos_view;
 static PyObject *__pyx_n_s_planet_vel;
-static PyObject *__pyx_n_s_planet_vel_view;
 static PyObject *__pyx_n_s_pyx_PickleError;
 static PyObject *__pyx_n_s_pyx_checksum;
 static PyObject *__pyx_n_s_pyx_getbuffer;
@@ -2060,30 +2032,19 @@ static PyObject *__pyx_n_s_pyx_state;
 static PyObject *__pyx_n_s_pyx_type;
 static PyObject *__pyx_n_s_pyx_unpickle_Enum;
 static PyObject *__pyx_n_s_pyx_vtable;
-static PyObject *__pyx_n_s_r_planet_to_star;
-static PyObject *__pyx_n_s_r_sat_to_planet;
-static PyObject *__pyx_n_s_r_sat_to_star;
 static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
 static PyObject *__pyx_n_s_reduce_ex;
-static PyObject *__pyx_n_s_sat_accel;
-static PyObject *__pyx_n_s_sat_intermediate_pos;
 static PyObject *__pyx_n_s_sat_pos;
-static PyObject *__pyx_n_s_sat_pos_view;
 static PyObject *__pyx_n_s_sat_vel;
-static PyObject *__pyx_n_s_sat_vel_view;
 static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_shape;
 static PyObject *__pyx_n_s_size;
-static PyObject *__pyx_n_s_star_accel;
-static PyObject *__pyx_n_s_star_intermediate_pos;
 static PyObject *__pyx_n_s_star_mass;
 static PyObject *__pyx_n_s_star_pos;
-static PyObject *__pyx_n_s_star_pos_view;
 static PyObject *__pyx_n_s_star_vel;
-static PyObject *__pyx_n_s_star_vel_view;
 static PyObject *__pyx_n_s_start;
 static PyObject *__pyx_n_s_step;
 static PyObject *__pyx_n_s_stop;
@@ -2171,28 +2132,584 @@ static PyObject *__pyx_tuple__17;
 static PyObject *__pyx_tuple__18;
 static PyObject *__pyx_tuple__19;
 static PyObject *__pyx_tuple__20;
+static PyObject *__pyx_tuple__21;
 static PyObject *__pyx_tuple__22;
 static PyObject *__pyx_tuple__23;
 static PyObject *__pyx_tuple__24;
 static PyObject *__pyx_tuple__25;
-static PyObject *__pyx_tuple__26;
-static PyObject *__pyx_tuple__27;
-static PyObject *__pyx_codeobj__21;
-static PyObject *__pyx_codeobj__28;
+static PyObject *__pyx_codeobj__26;
 /* Late includes */
 
-/* "integrate_cy.pyx":26
+/* "integrate_cy.pyx":24
  * @cython.embedsignature(True)
  * @cython.initializedcheck(False)
- * def integrate(             # <<<<<<<<<<<<<<
+ * cpdef integrate(             # <<<<<<<<<<<<<<
  *     const double time_step,
  *     const long num_steps,
  */
 
+static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step, long const __pyx_v_num_steps, PyObject *__pyx_v_star_pos, PyObject *__pyx_v_star_vel, PyObject *__pyx_v_planet_pos, PyObject *__pyx_v_planet_vel, PyObject *__pyx_v_sat_pos, PyObject *__pyx_v_sat_vel, CYTHON_UNUSED int __pyx_skip_dispatch) {
+  __Pyx_memviewslice __pyx_v_star_pos_view = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_star_vel_view = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_planet_pos_view = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_planet_vel_view = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_sat_pos_view = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_sat_vel_view = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_star_intermediate_pos = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_planet_intermediate_pos = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_sat_intermediate_pos = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_star_accel = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_planet_accel = { 0, 0, { 0 }, { 0 }, { 0 } };
+  __Pyx_memviewslice __pyx_v_sat_accel = { 0, 0, { 0 }, { 0 }, { 0 } };
+  Py_ssize_t __pyx_v_k;
+  Py_ssize_t __pyx_v_j;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  __Pyx_memviewslice __pyx_t_6 = { 0, 0, { 0 }, { 0 }, { 0 } };
+  long __pyx_t_7;
+  long __pyx_t_8;
+  Py_ssize_t __pyx_t_9;
+  Py_ssize_t __pyx_t_10;
+  Py_ssize_t __pyx_t_11;
+  Py_ssize_t __pyx_t_12;
+  Py_ssize_t __pyx_t_13;
+  Py_ssize_t __pyx_t_14;
+  Py_ssize_t __pyx_t_15;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("integrate", 0);
+
+  /* "integrate_cy.pyx":35
+ * ):
+ * 
+ *     cdef double[:, ::1] star_pos_view = star_pos             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[:, ::1] star_vel_view = star_vel
+ */
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_star_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_v_star_pos_view = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
+
+  /* "integrate_cy.pyx":37
+ *     cdef double[:, ::1] star_pos_view = star_pos
+ * 
+ *     cdef double[:, ::1] star_vel_view = star_vel             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[:, ::1] planet_pos_view = planet_pos
+ */
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_star_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_v_star_vel_view = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
+
+  /* "integrate_cy.pyx":39
+ *     cdef double[:, ::1] star_vel_view = star_vel
+ * 
+ *     cdef double[:, ::1] planet_pos_view = planet_pos             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[:, ::1] planet_vel_view = planet_vel
+ */
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_planet_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __pyx_v_planet_pos_view = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
+
+  /* "integrate_cy.pyx":41
+ *     cdef double[:, ::1] planet_pos_view = planet_pos
+ * 
+ *     cdef double[:, ::1] planet_vel_view = planet_vel             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[:, ::1] sat_pos_view = sat_pos
+ */
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_planet_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_v_planet_vel_view = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
+
+  /* "integrate_cy.pyx":43
+ *     cdef double[:, ::1] planet_vel_view = planet_vel
+ * 
+ *     cdef double[:, ::1] sat_pos_view = sat_pos             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[:, ::1] sat_vel_view = sat_vel
+ */
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_sat_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_v_sat_pos_view = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
+
+  /* "integrate_cy.pyx":45
+ *     cdef double[:, ::1] sat_pos_view = sat_pos
+ * 
+ *     cdef double[:, ::1] sat_vel_view = sat_vel             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_sat_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_v_sat_vel_view = __pyx_t_1;
+  __pyx_t_1.memview = NULL;
+  __pyx_t_1.data = NULL;
+
+  /* "integrate_cy.pyx":48
+ * 
+ * 
+ *     cdef double[::1] star_intermediate_pos = np.empty(3, dtype=np.double)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[::1] planet_intermediate_pos = np.empty_like(star_intermediate_pos)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_double); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_5) < 0) __PYX_ERR(0, 48, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple_, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_v_star_intermediate_pos = __pyx_t_6;
+  __pyx_t_6.memview = NULL;
+  __pyx_t_6.data = NULL;
+
+  /* "integrate_cy.pyx":50
+ *     cdef double[::1] star_intermediate_pos = np.empty(3, dtype=np.double)
+ * 
+ *     cdef double[::1] planet_intermediate_pos = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[::1] sat_intermediate_pos = np.empty_like(star_intermediate_pos)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_v_planet_intermediate_pos = __pyx_t_6;
+  __pyx_t_6.memview = NULL;
+  __pyx_t_6.data = NULL;
+
+  /* "integrate_cy.pyx":52
+ *     cdef double[::1] planet_intermediate_pos = np.empty_like(star_intermediate_pos)
+ * 
+ *     cdef double[::1] sat_intermediate_pos = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[::1] star_accel = np.empty_like(star_intermediate_pos)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_v_sat_intermediate_pos = __pyx_t_6;
+  __pyx_t_6.memview = NULL;
+  __pyx_t_6.data = NULL;
+
+  /* "integrate_cy.pyx":54
+ *     cdef double[::1] sat_intermediate_pos = np.empty_like(star_intermediate_pos)
+ * 
+ *     cdef double[::1] star_accel = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[::1] planet_accel = np.empty_like(star_intermediate_pos)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_v_star_accel = __pyx_t_6;
+  __pyx_t_6.memview = NULL;
+  __pyx_t_6.data = NULL;
+
+  /* "integrate_cy.pyx":56
+ *     cdef double[::1] star_accel = np.empty_like(star_intermediate_pos)
+ * 
+ *     cdef double[::1] planet_accel = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef double[::1] sat_accel = np.empty_like(star_intermediate_pos)
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_v_planet_accel = __pyx_t_6;
+  __pyx_t_6.memview = NULL;
+  __pyx_t_6.data = NULL;
+
+  /* "integrate_cy.pyx":58
+ *     cdef double[::1] planet_accel = np.empty_like(star_intermediate_pos)
+ * 
+ *     cdef double[::1] sat_accel = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef Py_ssize_t k
+ */
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = NULL;
+  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_3, function);
+    }
+  }
+  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+  __pyx_v_sat_accel = __pyx_t_6;
+  __pyx_t_6.memview = NULL;
+  __pyx_t_6.data = NULL;
+
+  /* "integrate_cy.pyx":64
+ *     cdef Py_ssize_t j
+ * 
+ *     for k in range(1, num_steps + 1):             # <<<<<<<<<<<<<<
+ * 
+ *         for j in range(3):
+ */
+  __pyx_t_7 = (__pyx_v_num_steps + 1);
+  __pyx_t_8 = __pyx_t_7;
+  for (__pyx_t_9 = 1; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
+    __pyx_v_k = __pyx_t_9;
+
+    /* "integrate_cy.pyx":66
+ *     for k in range(1, num_steps + 1):
+ * 
+ *         for j in range(3):             # <<<<<<<<<<<<<<
+ * 
+ *             # intermediate position calculation
+ */
+    for (__pyx_t_10 = 0; __pyx_t_10 < 3; __pyx_t_10+=1) {
+      __pyx_v_j = __pyx_t_10;
+
+      /* "integrate_cy.pyx":69
+ * 
+ *             # intermediate position calculation
+ *             star_intermediate_pos[j] = star_pos_view[k - 1, j] + 0.5 * star_vel_view[k - 1, j] * time_step             # <<<<<<<<<<<<<<
+ * 
+ *             planet_intermediate_pos[j] = planet_pos_view[k - 1, j] + 0.5 * planet_vel_view[k - 1, j] * time_step
+ */
+      __pyx_t_11 = (__pyx_v_k - 1);
+      __pyx_t_12 = __pyx_v_j;
+      __pyx_t_13 = (__pyx_v_k - 1);
+      __pyx_t_14 = __pyx_v_j;
+      __pyx_t_15 = __pyx_v_j;
+      *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_star_intermediate_pos.data) + __pyx_t_15)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_pos_view.data + __pyx_t_11 * __pyx_v_star_pos_view.strides[0]) )) + __pyx_t_12)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_13 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_14)) )))) * __pyx_v_time_step));
+
+      /* "integrate_cy.pyx":71
+ *             star_intermediate_pos[j] = star_pos_view[k - 1, j] + 0.5 * star_vel_view[k - 1, j] * time_step
+ * 
+ *             planet_intermediate_pos[j] = planet_pos_view[k - 1, j] + 0.5 * planet_vel_view[k - 1, j] * time_step             # <<<<<<<<<<<<<<
+ * 
+ *             sat_intermediate_pos[j] = sat_pos_view[k - 1, j] + 0.5 * sat_vel_view[k - 1, j] * time_step
+ */
+      __pyx_t_14 = (__pyx_v_k - 1);
+      __pyx_t_13 = __pyx_v_j;
+      __pyx_t_12 = (__pyx_v_k - 1);
+      __pyx_t_11 = __pyx_v_j;
+      __pyx_t_15 = __pyx_v_j;
+      *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_planet_intermediate_pos.data) + __pyx_t_15)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_pos_view.data + __pyx_t_14 * __pyx_v_planet_pos_view.strides[0]) )) + __pyx_t_13)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_12 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_11)) )))) * __pyx_v_time_step));
+
+      /* "integrate_cy.pyx":73
+ *             planet_intermediate_pos[j] = planet_pos_view[k - 1, j] + 0.5 * planet_vel_view[k - 1, j] * time_step
+ * 
+ *             sat_intermediate_pos[j] = sat_pos_view[k - 1, j] + 0.5 * sat_vel_view[k - 1, j] * time_step             # <<<<<<<<<<<<<<
+ * 
+ *         # acceleration calculation
+ */
+      __pyx_t_11 = (__pyx_v_k - 1);
+      __pyx_t_12 = __pyx_v_j;
+      __pyx_t_13 = (__pyx_v_k - 1);
+      __pyx_t_14 = __pyx_v_j;
+      __pyx_t_15 = __pyx_v_j;
+      *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_sat_intermediate_pos.data) + __pyx_t_15)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_pos_view.data + __pyx_t_11 * __pyx_v_sat_pos_view.strides[0]) )) + __pyx_t_12)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_vel_view.data + __pyx_t_13 * __pyx_v_sat_vel_view.strides[0]) )) + __pyx_t_14)) )))) * __pyx_v_time_step));
+    }
+
+    /* "integrate_cy.pyx":77
+ *         # acceleration calculation
+ *         # calc_acceleration changes the values in the accel arrays
+ *         calc_acceleration(             # <<<<<<<<<<<<<<
+ *             star_intermediate_pos,
+ *             planet_intermediate_pos,
+ */
+    __pyx_f_12integrate_cy_calc_acceleration(__pyx_v_star_intermediate_pos, __pyx_v_planet_intermediate_pos, __pyx_v_sat_intermediate_pos, __pyx_v_star_accel, __pyx_v_planet_accel, __pyx_v_sat_accel);
+
+    /* "integrate_cy.pyx":86
+ *         )
+ * 
+ *         for j in range(3):             # <<<<<<<<<<<<<<
+ * 
+ *             # velocity update
+ */
+    for (__pyx_t_10 = 0; __pyx_t_10 < 3; __pyx_t_10+=1) {
+      __pyx_v_j = __pyx_t_10;
+
+      /* "integrate_cy.pyx":89
+ * 
+ *             # velocity update
+ *             star_vel_view[k, j] = star_vel_view[k - 1, j] + star_accel[j] * time_step             # <<<<<<<<<<<<<<
+ * 
+ *             planet_vel_view[k, j] = planet_vel_view[k - 1, j] + planet_accel[j] * time_step
+ */
+      __pyx_t_14 = (__pyx_v_k - 1);
+      __pyx_t_13 = __pyx_v_j;
+      __pyx_t_12 = __pyx_v_j;
+      __pyx_t_11 = __pyx_v_k;
+      __pyx_t_15 = __pyx_v_j;
+      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_11 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_15)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_14 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_13)) ))) + ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_star_accel.data) + __pyx_t_12)) ))) * __pyx_v_time_step));
+
+      /* "integrate_cy.pyx":91
+ *             star_vel_view[k, j] = star_vel_view[k - 1, j] + star_accel[j] * time_step
+ * 
+ *             planet_vel_view[k, j] = planet_vel_view[k - 1, j] + planet_accel[j] * time_step             # <<<<<<<<<<<<<<
+ * 
+ *             sat_vel_view[k, j] = sat_vel_view[k - 1, j] + sat_accel[j] * time_step
+ */
+      __pyx_t_12 = (__pyx_v_k - 1);
+      __pyx_t_13 = __pyx_v_j;
+      __pyx_t_14 = __pyx_v_j;
+      __pyx_t_15 = __pyx_v_k;
+      __pyx_t_11 = __pyx_v_j;
+      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_15 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_11)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_12 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_13)) ))) + ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_planet_accel.data) + __pyx_t_14)) ))) * __pyx_v_time_step));
+
+      /* "integrate_cy.pyx":93
+ *             planet_vel_view[k, j] = planet_vel_view[k - 1, j] + planet_accel[j] * time_step
+ * 
+ *             sat_vel_view[k, j] = sat_vel_view[k - 1, j] + sat_accel[j] * time_step             # <<<<<<<<<<<<<<
+ * 
+ *             # position update
+ */
+      __pyx_t_14 = (__pyx_v_k - 1);
+      __pyx_t_13 = __pyx_v_j;
+      __pyx_t_12 = __pyx_v_j;
+      __pyx_t_11 = __pyx_v_k;
+      __pyx_t_15 = __pyx_v_j;
+      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_vel_view.data + __pyx_t_11 * __pyx_v_sat_vel_view.strides[0]) )) + __pyx_t_15)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_vel_view.data + __pyx_t_14 * __pyx_v_sat_vel_view.strides[0]) )) + __pyx_t_13)) ))) + ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_sat_accel.data) + __pyx_t_12)) ))) * __pyx_v_time_step));
+
+      /* "integrate_cy.pyx":96
+ * 
+ *             # position update
+ *             star_pos_view[k, j] = star_intermediate_pos[j] + 0.5 * star_vel_view[k, j] * time_step             # <<<<<<<<<<<<<<
+ * 
+ *             planet_pos_view[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel_view[k, j] * time_step
+ */
+      __pyx_t_12 = __pyx_v_j;
+      __pyx_t_13 = __pyx_v_k;
+      __pyx_t_14 = __pyx_v_j;
+      __pyx_t_15 = __pyx_v_k;
+      __pyx_t_11 = __pyx_v_j;
+      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_pos_view.data + __pyx_t_15 * __pyx_v_star_pos_view.strides[0]) )) + __pyx_t_11)) )) = ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_star_intermediate_pos.data) + __pyx_t_12)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_13 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_14)) )))) * __pyx_v_time_step));
+
+      /* "integrate_cy.pyx":98
+ *             star_pos_view[k, j] = star_intermediate_pos[j] + 0.5 * star_vel_view[k, j] * time_step
+ * 
+ *             planet_pos_view[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel_view[k, j] * time_step             # <<<<<<<<<<<<<<
+ * 
+ *             sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step
+ */
+      __pyx_t_14 = __pyx_v_j;
+      __pyx_t_13 = __pyx_v_k;
+      __pyx_t_12 = __pyx_v_j;
+      __pyx_t_11 = __pyx_v_k;
+      __pyx_t_15 = __pyx_v_j;
+      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_pos_view.data + __pyx_t_11 * __pyx_v_planet_pos_view.strides[0]) )) + __pyx_t_15)) )) = ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_planet_intermediate_pos.data) + __pyx_t_14)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_13 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_12)) )))) * __pyx_v_time_step));
+
+      /* "integrate_cy.pyx":100
+ *             planet_pos_view[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel_view[k, j] * time_step
+ * 
+ *             sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step             # <<<<<<<<<<<<<<
+ * 
+ *     return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
+ */
+      __pyx_t_12 = __pyx_v_j;
+      __pyx_t_13 = __pyx_v_k;
+      __pyx_t_14 = __pyx_v_j;
+      __pyx_t_15 = __pyx_v_k;
+      __pyx_t_11 = __pyx_v_j;
+      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_pos_view.data + __pyx_t_15 * __pyx_v_sat_pos_view.strides[0]) )) + __pyx_t_11)) )) = ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_sat_intermediate_pos.data) + __pyx_t_12)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_vel_view.data + __pyx_t_13 * __pyx_v_sat_vel_view.strides[0]) )) + __pyx_t_14)) )))) * __pyx_v_time_step));
+    }
+  }
+
+  /* "integrate_cy.pyx":102
+ *             sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step
+ * 
+ *     return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel             # <<<<<<<<<<<<<<
+ * 
+ * @cython.cdivision(True)
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_5 = PyTuple_New(6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 102, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_INCREF(__pyx_v_star_pos);
+  __Pyx_GIVEREF(__pyx_v_star_pos);
+  PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_v_star_pos);
+  __Pyx_INCREF(__pyx_v_star_vel);
+  __Pyx_GIVEREF(__pyx_v_star_vel);
+  PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_v_star_vel);
+  __Pyx_INCREF(__pyx_v_planet_pos);
+  __Pyx_GIVEREF(__pyx_v_planet_pos);
+  PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_v_planet_pos);
+  __Pyx_INCREF(__pyx_v_planet_vel);
+  __Pyx_GIVEREF(__pyx_v_planet_vel);
+  PyTuple_SET_ITEM(__pyx_t_5, 3, __pyx_v_planet_vel);
+  __Pyx_INCREF(__pyx_v_sat_pos);
+  __Pyx_GIVEREF(__pyx_v_sat_pos);
+  PyTuple_SET_ITEM(__pyx_t_5, 4, __pyx_v_sat_pos);
+  __Pyx_INCREF(__pyx_v_sat_vel);
+  __Pyx_GIVEREF(__pyx_v_sat_vel);
+  PyTuple_SET_ITEM(__pyx_t_5, 5, __pyx_v_sat_vel);
+  __pyx_r = __pyx_t_5;
+  __pyx_t_5 = 0;
+  goto __pyx_L0;
+
+  /* "integrate_cy.pyx":24
+ * @cython.embedsignature(True)
+ * @cython.initializedcheck(False)
+ * cpdef integrate(             # <<<<<<<<<<<<<<
+ *     const double time_step,
+ *     const long num_steps,
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __PYX_XDEC_MEMVIEW(&__pyx_t_6, 1);
+  __Pyx_AddTraceback("integrate_cy.integrate", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __PYX_XDEC_MEMVIEW(&__pyx_v_star_pos_view, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_star_vel_view, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_planet_pos_view, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_planet_vel_view, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_sat_pos_view, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_sat_vel_view, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_star_intermediate_pos, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_planet_intermediate_pos, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_sat_intermediate_pos, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_star_accel, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_planet_accel, 1);
+  __PYX_XDEC_MEMVIEW(&__pyx_v_sat_accel, 1);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
 /* Python wrapper */
 static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static char __pyx_doc_12integrate_cy_integrate[] = "integrate(double time_step, long num_steps, star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel)";
-static PyMethodDef __pyx_mdef_12integrate_cy_1integrate = {"integrate", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_12integrate_cy_1integrate, METH_VARARGS|METH_KEYWORDS, __pyx_doc_12integrate_cy_integrate};
 static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   double __pyx_v_time_step;
   long __pyx_v_num_steps;
@@ -2243,47 +2760,47 @@ static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObje
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_num_steps)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 1); __PYX_ERR(0, 26, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 1); __PYX_ERR(0, 24, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_star_pos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 2); __PYX_ERR(0, 26, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 2); __PYX_ERR(0, 24, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_star_vel)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 3); __PYX_ERR(0, 26, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 3); __PYX_ERR(0, 24, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_planet_pos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 4); __PYX_ERR(0, 26, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 4); __PYX_ERR(0, 24, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_planet_vel)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 5); __PYX_ERR(0, 26, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 5); __PYX_ERR(0, 24, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
         if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sat_pos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 6); __PYX_ERR(0, 26, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 6); __PYX_ERR(0, 24, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
         if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sat_vel)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 7); __PYX_ERR(0, 26, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 7); __PYX_ERR(0, 24, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "integrate") < 0)) __PYX_ERR(0, 26, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "integrate") < 0)) __PYX_ERR(0, 24, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 8) {
       goto __pyx_L5_argtuple_error;
@@ -2297,8 +2814,8 @@ static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObje
       values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
       values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
     }
-    __pyx_v_time_step = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_time_step == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 27, __pyx_L3_error)
-    __pyx_v_num_steps = __Pyx_PyInt_As_long(values[1]); if (unlikely((__pyx_v_num_steps == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 28, __pyx_L3_error)
+    __pyx_v_time_step = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_time_step == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 25, __pyx_L3_error)
+    __pyx_v_num_steps = __Pyx_PyInt_As_long(values[1]); if (unlikely((__pyx_v_num_steps == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 26, __pyx_L3_error)
     __pyx_v_star_pos = values[2];
     __pyx_v_star_vel = values[3];
     __pyx_v_planet_pos = values[4];
@@ -2308,7 +2825,7 @@ static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObje
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 26, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 24, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("integrate_cy.integrate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2322,678 +2839,32 @@ static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObje
 }
 
 static PyObject *__pyx_pf_12integrate_cy_integrate(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_time_step, long __pyx_v_num_steps, PyObject *__pyx_v_star_pos, PyObject *__pyx_v_star_vel, PyObject *__pyx_v_planet_pos, PyObject *__pyx_v_planet_vel, PyObject *__pyx_v_sat_pos, PyObject *__pyx_v_sat_vel) {
-  __Pyx_memviewslice __pyx_v_star_pos_view = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_star_vel_view = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_planet_pos_view = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_planet_vel_view = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_sat_pos_view = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_sat_vel_view = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_star_intermediate_pos = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_planet_intermediate_pos = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_sat_intermediate_pos = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_r_planet_to_star = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_r_sat_to_star = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_r_sat_to_planet = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_star_accel = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_planet_accel = { 0, 0, { 0 }, { 0 }, { 0 } };
-  __Pyx_memviewslice __pyx_v_sat_accel = { 0, 0, { 0 }, { 0 }, { 0 } };
-  Py_ssize_t __pyx_v_k;
-  Py_ssize_t __pyx_v_j;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  __Pyx_memviewslice __pyx_t_1 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  PyObject *__pyx_t_5 = NULL;
-  __Pyx_memviewslice __pyx_t_6 = { 0, 0, { 0 }, { 0 }, { 0 } };
-  long __pyx_t_7;
-  long __pyx_t_8;
-  Py_ssize_t __pyx_t_9;
-  Py_ssize_t __pyx_t_10;
-  Py_ssize_t __pyx_t_11;
-  Py_ssize_t __pyx_t_12;
-  Py_ssize_t __pyx_t_13;
-  Py_ssize_t __pyx_t_14;
-  Py_ssize_t __pyx_t_15;
+  PyObject *__pyx_t_1 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("integrate", 0);
-
-  /* "integrate_cy.pyx":37
- * ):
- * 
- *     cdef double[:, ::1] star_pos_view = star_pos             # <<<<<<<<<<<<<<
- * 
- *     cdef double[:, ::1] star_vel_view = star_vel
- */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_star_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 37, __pyx_L1_error)
-  __pyx_v_star_pos_view = __pyx_t_1;
-  __pyx_t_1.memview = NULL;
-  __pyx_t_1.data = NULL;
-
-  /* "integrate_cy.pyx":39
- *     cdef double[:, ::1] star_pos_view = star_pos
- * 
- *     cdef double[:, ::1] star_vel_view = star_vel             # <<<<<<<<<<<<<<
- * 
- *     cdef double[:, ::1] planet_pos_view = planet_pos
- */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_star_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 39, __pyx_L1_error)
-  __pyx_v_star_vel_view = __pyx_t_1;
-  __pyx_t_1.memview = NULL;
-  __pyx_t_1.data = NULL;
-
-  /* "integrate_cy.pyx":41
- *     cdef double[:, ::1] star_vel_view = star_vel
- * 
- *     cdef double[:, ::1] planet_pos_view = planet_pos             # <<<<<<<<<<<<<<
- * 
- *     cdef double[:, ::1] planet_vel_view = planet_vel
- */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_planet_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 41, __pyx_L1_error)
-  __pyx_v_planet_pos_view = __pyx_t_1;
-  __pyx_t_1.memview = NULL;
-  __pyx_t_1.data = NULL;
-
-  /* "integrate_cy.pyx":43
- *     cdef double[:, ::1] planet_pos_view = planet_pos
- * 
- *     cdef double[:, ::1] planet_vel_view = planet_vel             # <<<<<<<<<<<<<<
- * 
- *     cdef double[:, ::1] sat_pos_view = sat_pos
- */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_planet_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 43, __pyx_L1_error)
-  __pyx_v_planet_vel_view = __pyx_t_1;
-  __pyx_t_1.memview = NULL;
-  __pyx_t_1.data = NULL;
-
-  /* "integrate_cy.pyx":45
- *     cdef double[:, ::1] planet_vel_view = planet_vel
- * 
- *     cdef double[:, ::1] sat_pos_view = sat_pos             # <<<<<<<<<<<<<<
- * 
- *     cdef double[:, ::1] sat_vel_view = sat_vel
- */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_sat_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 45, __pyx_L1_error)
-  __pyx_v_sat_pos_view = __pyx_t_1;
-  __pyx_t_1.memview = NULL;
-  __pyx_t_1.data = NULL;
-
-  /* "integrate_cy.pyx":47
- *     cdef double[:, ::1] sat_pos_view = sat_pos
- * 
- *     cdef double[:, ::1] sat_vel_view = sat_vel             # <<<<<<<<<<<<<<
- * 
- * 
- */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_sat_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 47, __pyx_L1_error)
-  __pyx_v_sat_vel_view = __pyx_t_1;
-  __pyx_t_1.memview = NULL;
-  __pyx_t_1.data = NULL;
-
-  /* "integrate_cy.pyx":50
- * 
- * 
- *     cdef double[::1] star_intermediate_pos = np.empty(3, dtype=np.double)             # <<<<<<<<<<<<<<
- * 
- *     cdef double[::1] planet_intermediate_pos = np.empty_like(star_intermediate_pos)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_double); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_s_dtype, __pyx_t_5) < 0) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple_, __pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 50, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_star_intermediate_pos = __pyx_t_6;
-  __pyx_t_6.memview = NULL;
-  __pyx_t_6.data = NULL;
-
-  /* "integrate_cy.pyx":52
- *     cdef double[::1] star_intermediate_pos = np.empty(3, dtype=np.double)
- * 
- *     cdef double[::1] planet_intermediate_pos = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
- * 
- *     cdef double[::1] sat_intermediate_pos = np.empty_like(star_intermediate_pos)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 52, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_planet_intermediate_pos = __pyx_t_6;
-  __pyx_t_6.memview = NULL;
-  __pyx_t_6.data = NULL;
-
-  /* "integrate_cy.pyx":54
- *     cdef double[::1] planet_intermediate_pos = np.empty_like(star_intermediate_pos)
- * 
- *     cdef double[::1] sat_intermediate_pos = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
- * 
- *     cdef double[::1] r_planet_to_star = np.empty_like(star_intermediate_pos)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 54, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 54, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 54, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 54, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_sat_intermediate_pos = __pyx_t_6;
-  __pyx_t_6.memview = NULL;
-  __pyx_t_6.data = NULL;
-
-  /* "integrate_cy.pyx":56
- *     cdef double[::1] sat_intermediate_pos = np.empty_like(star_intermediate_pos)
- * 
- *     cdef double[::1] r_planet_to_star = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
- * 
- *     cdef double[::1] r_sat_to_star = np.empty_like(star_intermediate_pos)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 56, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 56, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 56, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 56, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_r_planet_to_star = __pyx_t_6;
-  __pyx_t_6.memview = NULL;
-  __pyx_t_6.data = NULL;
-
-  /* "integrate_cy.pyx":58
- *     cdef double[::1] r_planet_to_star = np.empty_like(star_intermediate_pos)
- * 
- *     cdef double[::1] r_sat_to_star = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
- * 
- *     cdef double[::1] r_sat_to_planet = np.empty_like(star_intermediate_pos)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 58, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_r_sat_to_star = __pyx_t_6;
-  __pyx_t_6.memview = NULL;
-  __pyx_t_6.data = NULL;
-
-  /* "integrate_cy.pyx":60
- *     cdef double[::1] r_sat_to_star = np.empty_like(star_intermediate_pos)
- * 
- *     cdef double[::1] r_sat_to_planet = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
- * 
- *     cdef double[::1] star_accel = np.empty_like(star_intermediate_pos)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 60, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_r_sat_to_planet = __pyx_t_6;
-  __pyx_t_6.memview = NULL;
-  __pyx_t_6.data = NULL;
-
-  /* "integrate_cy.pyx":62
- *     cdef double[::1] r_sat_to_planet = np.empty_like(star_intermediate_pos)
- * 
- *     cdef double[::1] star_accel = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
- * 
- *     cdef double[::1] planet_accel = np.empty_like(star_intermediate_pos)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 62, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 62, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 62, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 62, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 62, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_star_accel = __pyx_t_6;
-  __pyx_t_6.memview = NULL;
-  __pyx_t_6.data = NULL;
-
-  /* "integrate_cy.pyx":64
- *     cdef double[::1] star_accel = np.empty_like(star_intermediate_pos)
- * 
- *     cdef double[::1] planet_accel = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
- * 
- *     cdef double[::1] sat_accel = np.empty_like(star_intermediate_pos)
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 64, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_planet_accel = __pyx_t_6;
-  __pyx_t_6.memview = NULL;
-  __pyx_t_6.data = NULL;
-
-  /* "integrate_cy.pyx":66
- *     cdef double[::1] planet_accel = np.empty_like(star_intermediate_pos)
- * 
- *     cdef double[::1] sat_accel = np.empty_like(star_intermediate_pos)             # <<<<<<<<<<<<<<
- * 
- *     cdef Py_ssize_t k
- */
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 66, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_empty_like); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 66, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_star_intermediate_pos, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 66, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  __pyx_t_5 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 66, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = __Pyx_PyObject_to_MemoryviewSlice_dc_double(__pyx_t_5, PyBUF_WRITABLE); if (unlikely(!__pyx_t_6.memview)) __PYX_ERR(0, 66, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_v_sat_accel = __pyx_t_6;
-  __pyx_t_6.memview = NULL;
-  __pyx_t_6.data = NULL;
-
-  /* "integrate_cy.pyx":72
- *     cdef Py_ssize_t j
- * 
- *     for k in range(1, num_steps + 1):             # <<<<<<<<<<<<<<
- * 
- *         for j in range(3):
- */
-  __pyx_t_7 = (__pyx_v_num_steps + 1);
-  __pyx_t_8 = __pyx_t_7;
-  for (__pyx_t_9 = 1; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
-    __pyx_v_k = __pyx_t_9;
-
-    /* "integrate_cy.pyx":74
- *     for k in range(1, num_steps + 1):
- * 
- *         for j in range(3):             # <<<<<<<<<<<<<<
- * 
- *             # intermediate position calculation
- */
-    for (__pyx_t_10 = 0; __pyx_t_10 < 3; __pyx_t_10+=1) {
-      __pyx_v_j = __pyx_t_10;
-
-      /* "integrate_cy.pyx":77
- * 
- *             # intermediate position calculation
- *             star_intermediate_pos[j] = star_pos_view[k - 1, j] + 0.5 * star_vel_view[k - 1, j] * time_step             # <<<<<<<<<<<<<<
- * 
- *             planet_intermediate_pos[j] = planet_pos_view[k - 1, j] + 0.5 * planet_vel_view[k - 1, j] * time_step
- */
-      __pyx_t_11 = (__pyx_v_k - 1);
-      __pyx_t_12 = __pyx_v_j;
-      __pyx_t_13 = (__pyx_v_k - 1);
-      __pyx_t_14 = __pyx_v_j;
-      __pyx_t_15 = __pyx_v_j;
-      *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_star_intermediate_pos.data) + __pyx_t_15)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_pos_view.data + __pyx_t_11 * __pyx_v_star_pos_view.strides[0]) )) + __pyx_t_12)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_13 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_14)) )))) * __pyx_v_time_step));
-
-      /* "integrate_cy.pyx":79
- *             star_intermediate_pos[j] = star_pos_view[k - 1, j] + 0.5 * star_vel_view[k - 1, j] * time_step
- * 
- *             planet_intermediate_pos[j] = planet_pos_view[k - 1, j] + 0.5 * planet_vel_view[k - 1, j] * time_step             # <<<<<<<<<<<<<<
- * 
- *             sat_intermediate_pos[j] = sat_pos_view[k - 1, j] + 0.5 * sat_vel_view[k - 1, j] * time_step
- */
-      __pyx_t_14 = (__pyx_v_k - 1);
-      __pyx_t_13 = __pyx_v_j;
-      __pyx_t_12 = (__pyx_v_k - 1);
-      __pyx_t_11 = __pyx_v_j;
-      __pyx_t_15 = __pyx_v_j;
-      *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_planet_intermediate_pos.data) + __pyx_t_15)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_pos_view.data + __pyx_t_14 * __pyx_v_planet_pos_view.strides[0]) )) + __pyx_t_13)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_12 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_11)) )))) * __pyx_v_time_step));
-
-      /* "integrate_cy.pyx":81
- *             planet_intermediate_pos[j] = planet_pos_view[k - 1, j] + 0.5 * planet_vel_view[k - 1, j] * time_step
- * 
- *             sat_intermediate_pos[j] = sat_pos_view[k - 1, j] + 0.5 * sat_vel_view[k - 1, j] * time_step             # <<<<<<<<<<<<<<
- * 
- *         # acceleration calculation
- */
-      __pyx_t_11 = (__pyx_v_k - 1);
-      __pyx_t_12 = __pyx_v_j;
-      __pyx_t_13 = (__pyx_v_k - 1);
-      __pyx_t_14 = __pyx_v_j;
-      __pyx_t_15 = __pyx_v_j;
-      *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_sat_intermediate_pos.data) + __pyx_t_15)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_pos_view.data + __pyx_t_11 * __pyx_v_sat_pos_view.strides[0]) )) + __pyx_t_12)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_vel_view.data + __pyx_t_13 * __pyx_v_sat_vel_view.strides[0]) )) + __pyx_t_14)) )))) * __pyx_v_time_step));
-    }
-
-    /* "integrate_cy.pyx":84
- * 
- *         # acceleration calculation
- *         calc_acceleration(             # <<<<<<<<<<<<<<
- *             star_intermediate_pos,
- *             planet_intermediate_pos,
- */
-    __pyx_f_12integrate_cy_calc_acceleration(__pyx_v_star_intermediate_pos, __pyx_v_planet_intermediate_pos, __pyx_v_sat_intermediate_pos, __pyx_v_r_planet_to_star, __pyx_v_r_sat_to_star, __pyx_v_r_sat_to_planet, __pyx_v_star_accel, __pyx_v_planet_accel, __pyx_v_sat_accel);
-
-    /* "integrate_cy.pyx":96
- *         )
- * 
- *         for j in range(3):             # <<<<<<<<<<<<<<
- * 
- *             # velocity update
- */
-    for (__pyx_t_10 = 0; __pyx_t_10 < 3; __pyx_t_10+=1) {
-      __pyx_v_j = __pyx_t_10;
-
-      /* "integrate_cy.pyx":99
- * 
- *             # velocity update
- *             star_vel_view[k, j] = star_vel_view[k - 1, j] + star_accel[j] * time_step             # <<<<<<<<<<<<<<
- * 
- *             planet_vel_view[k, j] = planet_vel_view[k - 1, j] + planet_accel[j] * time_step
- */
-      __pyx_t_14 = (__pyx_v_k - 1);
-      __pyx_t_13 = __pyx_v_j;
-      __pyx_t_12 = __pyx_v_j;
-      __pyx_t_11 = __pyx_v_k;
-      __pyx_t_15 = __pyx_v_j;
-      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_11 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_15)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_14 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_13)) ))) + ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_star_accel.data) + __pyx_t_12)) ))) * __pyx_v_time_step));
-
-      /* "integrate_cy.pyx":101
- *             star_vel_view[k, j] = star_vel_view[k - 1, j] + star_accel[j] * time_step
- * 
- *             planet_vel_view[k, j] = planet_vel_view[k - 1, j] + planet_accel[j] * time_step             # <<<<<<<<<<<<<<
- * 
- *             sat_vel_view[k, j] = sat_vel_view[k - 1, j] + sat_accel[j] * time_step
- */
-      __pyx_t_12 = (__pyx_v_k - 1);
-      __pyx_t_13 = __pyx_v_j;
-      __pyx_t_14 = __pyx_v_j;
-      __pyx_t_15 = __pyx_v_k;
-      __pyx_t_11 = __pyx_v_j;
-      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_15 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_11)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_12 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_13)) ))) + ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_planet_accel.data) + __pyx_t_14)) ))) * __pyx_v_time_step));
-
-      /* "integrate_cy.pyx":103
- *             planet_vel_view[k, j] = planet_vel_view[k - 1, j] + planet_accel[j] * time_step
- * 
- *             sat_vel_view[k, j] = sat_vel_view[k - 1, j] + sat_accel[j] * time_step             # <<<<<<<<<<<<<<
- * 
- *             # position update
- */
-      __pyx_t_14 = (__pyx_v_k - 1);
-      __pyx_t_13 = __pyx_v_j;
-      __pyx_t_12 = __pyx_v_j;
-      __pyx_t_11 = __pyx_v_k;
-      __pyx_t_15 = __pyx_v_j;
-      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_vel_view.data + __pyx_t_11 * __pyx_v_sat_vel_view.strides[0]) )) + __pyx_t_15)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_vel_view.data + __pyx_t_14 * __pyx_v_sat_vel_view.strides[0]) )) + __pyx_t_13)) ))) + ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_sat_accel.data) + __pyx_t_12)) ))) * __pyx_v_time_step));
-
-      /* "integrate_cy.pyx":106
- * 
- *             # position update
- *             star_pos_view[k, j] = star_intermediate_pos[j] + 0.5 * star_vel_view[k, j] * time_step             # <<<<<<<<<<<<<<
- * 
- *             planet_pos_view[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel_view[k, j] * time_step
- */
-      __pyx_t_12 = __pyx_v_j;
-      __pyx_t_13 = __pyx_v_k;
-      __pyx_t_14 = __pyx_v_j;
-      __pyx_t_15 = __pyx_v_k;
-      __pyx_t_11 = __pyx_v_j;
-      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_pos_view.data + __pyx_t_15 * __pyx_v_star_pos_view.strides[0]) )) + __pyx_t_11)) )) = ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_star_intermediate_pos.data) + __pyx_t_12)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_13 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_14)) )))) * __pyx_v_time_step));
-
-      /* "integrate_cy.pyx":108
- *             star_pos_view[k, j] = star_intermediate_pos[j] + 0.5 * star_vel_view[k, j] * time_step
- * 
- *             planet_pos_view[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel_view[k, j] * time_step             # <<<<<<<<<<<<<<
- * 
- *             sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step
- */
-      __pyx_t_14 = __pyx_v_j;
-      __pyx_t_13 = __pyx_v_k;
-      __pyx_t_12 = __pyx_v_j;
-      __pyx_t_11 = __pyx_v_k;
-      __pyx_t_15 = __pyx_v_j;
-      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_pos_view.data + __pyx_t_11 * __pyx_v_planet_pos_view.strides[0]) )) + __pyx_t_15)) )) = ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_planet_intermediate_pos.data) + __pyx_t_14)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_13 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_12)) )))) * __pyx_v_time_step));
-
-      /* "integrate_cy.pyx":110
- *             planet_pos_view[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel_view[k, j] * time_step
- * 
- *             sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step             # <<<<<<<<<<<<<<
- * 
- *     return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
- */
-      __pyx_t_12 = __pyx_v_j;
-      __pyx_t_13 = __pyx_v_k;
-      __pyx_t_14 = __pyx_v_j;
-      __pyx_t_15 = __pyx_v_k;
-      __pyx_t_11 = __pyx_v_j;
-      *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_pos_view.data + __pyx_t_15 * __pyx_v_sat_pos_view.strides[0]) )) + __pyx_t_11)) )) = ((*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_sat_intermediate_pos.data) + __pyx_t_12)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_vel_view.data + __pyx_t_13 * __pyx_v_sat_vel_view.strides[0]) )) + __pyx_t_14)) )))) * __pyx_v_time_step));
-    }
-  }
-
-  /* "integrate_cy.pyx":112
- *             sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step
- * 
- *     return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel             # <<<<<<<<<<<<<<
- * 
- * @cython.cdivision(True)
- */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_5 = PyTuple_New(6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 112, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  __Pyx_INCREF(__pyx_v_star_pos);
-  __Pyx_GIVEREF(__pyx_v_star_pos);
-  PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_v_star_pos);
-  __Pyx_INCREF(__pyx_v_star_vel);
-  __Pyx_GIVEREF(__pyx_v_star_vel);
-  PyTuple_SET_ITEM(__pyx_t_5, 1, __pyx_v_star_vel);
-  __Pyx_INCREF(__pyx_v_planet_pos);
-  __Pyx_GIVEREF(__pyx_v_planet_pos);
-  PyTuple_SET_ITEM(__pyx_t_5, 2, __pyx_v_planet_pos);
-  __Pyx_INCREF(__pyx_v_planet_vel);
-  __Pyx_GIVEREF(__pyx_v_planet_vel);
-  PyTuple_SET_ITEM(__pyx_t_5, 3, __pyx_v_planet_vel);
-  __Pyx_INCREF(__pyx_v_sat_pos);
-  __Pyx_GIVEREF(__pyx_v_sat_pos);
-  PyTuple_SET_ITEM(__pyx_t_5, 4, __pyx_v_sat_pos);
-  __Pyx_INCREF(__pyx_v_sat_vel);
-  __Pyx_GIVEREF(__pyx_v_sat_vel);
-  PyTuple_SET_ITEM(__pyx_t_5, 5, __pyx_v_sat_vel);
-  __pyx_r = __pyx_t_5;
-  __pyx_t_5 = 0;
+  __pyx_t_1 = __pyx_f_12integrate_cy_integrate(__pyx_v_time_step, __pyx_v_num_steps, __pyx_v_star_pos, __pyx_v_star_vel, __pyx_v_planet_pos, __pyx_v_planet_vel, __pyx_v_sat_pos, __pyx_v_sat_vel, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
   goto __pyx_L0;
-
-  /* "integrate_cy.pyx":26
- * @cython.embedsignature(True)
- * @cython.initializedcheck(False)
- * def integrate(             # <<<<<<<<<<<<<<
- *     const double time_step,
- *     const long num_steps,
- */
 
   /* function exit code */
   __pyx_L1_error:;
-  __PYX_XDEC_MEMVIEW(&__pyx_t_1, 1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_5);
-  __PYX_XDEC_MEMVIEW(&__pyx_t_6, 1);
+  __Pyx_XDECREF(__pyx_t_1);
   __Pyx_AddTraceback("integrate_cy.integrate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __PYX_XDEC_MEMVIEW(&__pyx_v_star_pos_view, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_star_vel_view, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_planet_pos_view, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_planet_vel_view, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_sat_pos_view, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_sat_vel_view, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_star_intermediate_pos, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_planet_intermediate_pos, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_sat_intermediate_pos, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_r_planet_to_star, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_r_sat_to_star, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_r_sat_to_planet, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_star_accel, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_planet_accel, 1);
-  __PYX_XDEC_MEMVIEW(&__pyx_v_sat_accel, 1);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "integrate_cy.pyx":119
+/* "integrate_cy.pyx":109
  * @cython.boundscheck(False)
  * @cython.initializedcheck(False)
  * cdef void calc_acceleration(             # <<<<<<<<<<<<<<
@@ -3001,7 +2872,10 @@ static PyObject *__pyx_pf_12integrate_cy_integrate(CYTHON_UNUSED PyObject *__pyx
  *     const double[::1] planet_pos,
  */
 
-static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_star_pos, __Pyx_memviewslice __pyx_v_planet_pos, __Pyx_memviewslice __pyx_v_sat_pos, __Pyx_memviewslice __pyx_v_r_planet_to_star, __Pyx_memviewslice __pyx_v_r_sat_to_star, __Pyx_memviewslice __pyx_v_r_sat_to_planet, __Pyx_memviewslice __pyx_v_star_accel, __Pyx_memviewslice __pyx_v_planet_accel, __Pyx_memviewslice __pyx_v_sat_accel) {
+static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_star_pos, __Pyx_memviewslice __pyx_v_planet_pos, __Pyx_memviewslice __pyx_v_sat_pos, __Pyx_memviewslice __pyx_v_star_accel, __Pyx_memviewslice __pyx_v_planet_accel, __Pyx_memviewslice __pyx_v_sat_accel) {
+  double __pyx_v_r_planet_to_star[3];
+  double __pyx_v_r_sat_to_star[3];
+  double __pyx_v_r_sat_to_planet[3];
   Py_ssize_t __pyx_v_j;
   double __pyx_v_d_planet_to_star;
   double __pyx_v_d_sat_to_star;
@@ -3010,10 +2884,9 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
   Py_ssize_t __pyx_t_1;
   Py_ssize_t __pyx_t_2;
   Py_ssize_t __pyx_t_3;
-  Py_ssize_t __pyx_t_4;
   __Pyx_RefNannySetupContext("calc_acceleration", 0);
 
-  /* "integrate_cy.pyx":133
+  /* "integrate_cy.pyx":126
  *     cdef Py_ssize_t j
  * 
  *     for j in range(3):             # <<<<<<<<<<<<<<
@@ -3023,7 +2896,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
   for (__pyx_t_1 = 0; __pyx_t_1 < 3; __pyx_t_1+=1) {
     __pyx_v_j = __pyx_t_1;
 
-    /* "integrate_cy.pyx":136
+    /* "integrate_cy.pyx":129
  * 
  *         # vector from planet to star
  *         r_planet_to_star[j] = star_pos[j] - planet_pos[j]             # <<<<<<<<<<<<<<
@@ -3032,10 +2905,9 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
  */
     __pyx_t_2 = __pyx_v_j;
     __pyx_t_3 = __pyx_v_j;
-    __pyx_t_4 = __pyx_v_j;
-    *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_r_planet_to_star.data) + __pyx_t_4)) )) = ((*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_star_pos.data) + __pyx_t_2)) ))) - (*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_planet_pos.data) + __pyx_t_3)) ))));
+    (__pyx_v_r_planet_to_star[__pyx_v_j]) = ((*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_star_pos.data) + __pyx_t_2)) ))) - (*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_planet_pos.data) + __pyx_t_3)) ))));
 
-    /* "integrate_cy.pyx":138
+    /* "integrate_cy.pyx":131
  *         r_planet_to_star[j] = star_pos[j] - planet_pos[j]
  * 
  *         r_sat_to_star[j] = star_pos[j] - sat_pos[j]             # <<<<<<<<<<<<<<
@@ -3044,10 +2916,9 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
  */
     __pyx_t_3 = __pyx_v_j;
     __pyx_t_2 = __pyx_v_j;
-    __pyx_t_4 = __pyx_v_j;
-    *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_r_sat_to_star.data) + __pyx_t_4)) )) = ((*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_star_pos.data) + __pyx_t_3)) ))) - (*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_sat_pos.data) + __pyx_t_2)) ))));
+    (__pyx_v_r_sat_to_star[__pyx_v_j]) = ((*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_star_pos.data) + __pyx_t_3)) ))) - (*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_sat_pos.data) + __pyx_t_2)) ))));
 
-    /* "integrate_cy.pyx":140
+    /* "integrate_cy.pyx":133
  *         r_sat_to_star[j] = star_pos[j] - sat_pos[j]
  * 
  *         r_sat_to_planet[j] = planet_pos[j] - sat_pos[j]             # <<<<<<<<<<<<<<
@@ -3056,11 +2927,10 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
  */
     __pyx_t_2 = __pyx_v_j;
     __pyx_t_3 = __pyx_v_j;
-    __pyx_t_4 = __pyx_v_j;
-    *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_r_sat_to_planet.data) + __pyx_t_4)) )) = ((*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_planet_pos.data) + __pyx_t_2)) ))) - (*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_sat_pos.data) + __pyx_t_3)) ))));
+    (__pyx_v_r_sat_to_planet[__pyx_v_j]) = ((*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_planet_pos.data) + __pyx_t_2)) ))) - (*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_sat_pos.data) + __pyx_t_3)) ))));
   }
 
-  /* "integrate_cy.pyx":143
+  /* "integrate_cy.pyx":136
  * 
  *     # distance between planet and star
  *     cdef double d_planet_to_star = norm(r_planet_to_star)             # <<<<<<<<<<<<<<
@@ -3069,7 +2939,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
  */
   __pyx_v_d_planet_to_star = __pyx_f_12integrate_cy_norm(__pyx_v_r_planet_to_star);
 
-  /* "integrate_cy.pyx":145
+  /* "integrate_cy.pyx":138
  *     cdef double d_planet_to_star = norm(r_planet_to_star)
  * 
  *     cdef double d_sat_to_star = norm(r_sat_to_star)             # <<<<<<<<<<<<<<
@@ -3078,7 +2948,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
  */
   __pyx_v_d_sat_to_star = __pyx_f_12integrate_cy_norm(__pyx_v_r_sat_to_star);
 
-  /* "integrate_cy.pyx":147
+  /* "integrate_cy.pyx":140
  *     cdef double d_sat_to_star = norm(r_sat_to_star)
  * 
  *     cdef double d_sat_to_planet = norm(r_sat_to_planet)             # <<<<<<<<<<<<<<
@@ -3087,7 +2957,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
  */
   __pyx_v_d_sat_to_planet = __pyx_f_12integrate_cy_norm(__pyx_v_r_sat_to_planet);
 
-  /* "integrate_cy.pyx":149
+  /* "integrate_cy.pyx":142
  *     cdef double d_sat_to_planet = norm(r_sat_to_planet)
  * 
  *     for j in range(3):             # <<<<<<<<<<<<<<
@@ -3097,7 +2967,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
   for (__pyx_t_1 = 0; __pyx_t_1 < 3; __pyx_t_1+=1) {
     __pyx_v_j = __pyx_t_1;
 
-    /* "integrate_cy.pyx":151
+    /* "integrate_cy.pyx":144
  *     for j in range(3):
  * 
  *         star_accel[j] = -G * planet_mass * r_planet_to_star[j] / d_planet_to_star**3             # <<<<<<<<<<<<<<
@@ -3105,10 +2975,9 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
  *         # note the lack of negative sign in the following lines
  */
     __pyx_t_3 = __pyx_v_j;
-    __pyx_t_2 = __pyx_v_j;
-    *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_star_accel.data) + __pyx_t_2)) )) = ((((-__pyx_v_12integrate_cy_G) * __pyx_v_12integrate_cy_planet_mass) * (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_r_planet_to_star.data) + __pyx_t_3)) )))) / pow(__pyx_v_d_planet_to_star, 3.0));
+    *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_star_accel.data) + __pyx_t_3)) )) = ((((-__pyx_v_12integrate_cy_G) * __pyx_v_12integrate_cy_planet_mass) * (__pyx_v_r_planet_to_star[__pyx_v_j])) / pow(__pyx_v_d_planet_to_star, 3.0));
 
-    /* "integrate_cy.pyx":154
+    /* "integrate_cy.pyx":147
  * 
  *         # note the lack of negative sign in the following lines
  *         planet_accel[j] = G * star_mass * r_planet_to_star[j] / d_planet_to_star**3             # <<<<<<<<<<<<<<
@@ -3116,10 +2985,9 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
  *         sat_accel[j] = G * star_mass * r_sat_to_star[j] / d_sat_to_star**3\
  */
     __pyx_t_3 = __pyx_v_j;
-    __pyx_t_2 = __pyx_v_j;
-    *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_planet_accel.data) + __pyx_t_2)) )) = (((__pyx_v_12integrate_cy_G * __pyx_v_12integrate_cy_star_mass) * (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_r_planet_to_star.data) + __pyx_t_3)) )))) / pow(__pyx_v_d_planet_to_star, 3.0));
+    *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_planet_accel.data) + __pyx_t_3)) )) = (((__pyx_v_12integrate_cy_G * __pyx_v_12integrate_cy_star_mass) * (__pyx_v_r_planet_to_star[__pyx_v_j])) / pow(__pyx_v_d_planet_to_star, 3.0));
 
-    /* "integrate_cy.pyx":156
+    /* "integrate_cy.pyx":149
  *         planet_accel[j] = G * star_mass * r_planet_to_star[j] / d_planet_to_star**3
  * 
  *         sat_accel[j] = G * star_mass * r_sat_to_star[j] / d_sat_to_star**3\             # <<<<<<<<<<<<<<
@@ -3127,28 +2995,10 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
  * 
  */
     __pyx_t_3 = __pyx_v_j;
-
-    /* "integrate_cy.pyx":157
- * 
- *         sat_accel[j] = G * star_mass * r_sat_to_star[j] / d_sat_to_star**3\
- *                      + G * planet_mass * r_sat_to_planet[j] / d_sat_to_planet**3             # <<<<<<<<<<<<<<
- * 
- * @cython.cdivision(True)
- */
-    __pyx_t_2 = __pyx_v_j;
-
-    /* "integrate_cy.pyx":156
- *         planet_accel[j] = G * star_mass * r_planet_to_star[j] / d_planet_to_star**3
- * 
- *         sat_accel[j] = G * star_mass * r_sat_to_star[j] / d_sat_to_star**3\             # <<<<<<<<<<<<<<
- *                      + G * planet_mass * r_sat_to_planet[j] / d_sat_to_planet**3
- * 
- */
-    __pyx_t_4 = __pyx_v_j;
-    *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_sat_accel.data) + __pyx_t_4)) )) = ((((__pyx_v_12integrate_cy_G * __pyx_v_12integrate_cy_star_mass) * (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_r_sat_to_star.data) + __pyx_t_3)) )))) / pow(__pyx_v_d_sat_to_star, 3.0)) + (((__pyx_v_12integrate_cy_G * __pyx_v_12integrate_cy_planet_mass) * (*((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_r_sat_to_planet.data) + __pyx_t_2)) )))) / pow(__pyx_v_d_sat_to_planet, 3.0)));
+    *((double *) ( /* dim=0 */ ((char *) (((double *) __pyx_v_sat_accel.data) + __pyx_t_3)) )) = ((((__pyx_v_12integrate_cy_G * __pyx_v_12integrate_cy_star_mass) * (__pyx_v_r_sat_to_star[__pyx_v_j])) / pow(__pyx_v_d_sat_to_star, 3.0)) + (((__pyx_v_12integrate_cy_G * __pyx_v_12integrate_cy_planet_mass) * (__pyx_v_r_sat_to_planet[__pyx_v_j])) / pow(__pyx_v_d_sat_to_planet, 3.0)));
   }
 
-  /* "integrate_cy.pyx":119
+  /* "integrate_cy.pyx":109
  * @cython.boundscheck(False)
  * @cython.initializedcheck(False)
  * cdef void calc_acceleration(             # <<<<<<<<<<<<<<
@@ -3160,45 +3010,33 @@ static void __pyx_f_12integrate_cy_calc_acceleration(__Pyx_memviewslice __pyx_v_
   __Pyx_RefNannyFinishContext();
 }
 
-/* "integrate_cy.pyx":164
+/* "integrate_cy.pyx":157
  * @cython.boundscheck(False)
  * @cython.initializedcheck(False)
- * cdef double norm(const double[::1] mem_view):             # <<<<<<<<<<<<<<
+ * cdef double norm(const double *arr):             # <<<<<<<<<<<<<<
  * 
- *     return sqrt(mem_view[0]*mem_view[0] + mem_view[1]*mem_view[1] + mem_view[2]*mem_view[2])
+ *     return sqrt(arr[0]*arr[0] + arr[1]*arr[1] + arr[2]*arr[2])
  */
 
-static double __pyx_f_12integrate_cy_norm(__Pyx_memviewslice __pyx_v_mem_view) {
+static double __pyx_f_12integrate_cy_norm(double const *__pyx_v_arr) {
   double __pyx_r;
   __Pyx_RefNannyDeclarations
-  Py_ssize_t __pyx_t_1;
-  Py_ssize_t __pyx_t_2;
-  Py_ssize_t __pyx_t_3;
-  Py_ssize_t __pyx_t_4;
-  Py_ssize_t __pyx_t_5;
-  Py_ssize_t __pyx_t_6;
   __Pyx_RefNannySetupContext("norm", 0);
 
-  /* "integrate_cy.pyx":166
- * cdef double norm(const double[::1] mem_view):
+  /* "integrate_cy.pyx":159
+ * cdef double norm(const double *arr):
  * 
- *     return sqrt(mem_view[0]*mem_view[0] + mem_view[1]*mem_view[1] + mem_view[2]*mem_view[2])             # <<<<<<<<<<<<<<
+ *     return sqrt(arr[0]*arr[0] + arr[1]*arr[1] + arr[2]*arr[2])             # <<<<<<<<<<<<<<
  */
-  __pyx_t_1 = 0;
-  __pyx_t_2 = 0;
-  __pyx_t_3 = 1;
-  __pyx_t_4 = 1;
-  __pyx_t_5 = 2;
-  __pyx_t_6 = 2;
-  __pyx_r = sqrt(((((*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_mem_view.data) + __pyx_t_1)) ))) * (*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_mem_view.data) + __pyx_t_2)) )))) + ((*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_mem_view.data) + __pyx_t_3)) ))) * (*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_mem_view.data) + __pyx_t_4)) ))))) + ((*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_mem_view.data) + __pyx_t_5)) ))) * (*((double const  *) ( /* dim=0 */ ((char *) (((double const  *) __pyx_v_mem_view.data) + __pyx_t_6)) ))))));
+  __pyx_r = sqrt(((((__pyx_v_arr[0]) * (__pyx_v_arr[0])) + ((__pyx_v_arr[1]) * (__pyx_v_arr[1]))) + ((__pyx_v_arr[2]) * (__pyx_v_arr[2]))));
   goto __pyx_L0;
 
-  /* "integrate_cy.pyx":164
+  /* "integrate_cy.pyx":157
  * @cython.boundscheck(False)
  * @cython.initializedcheck(False)
- * cdef double norm(const double[::1] mem_view):             # <<<<<<<<<<<<<<
+ * cdef double norm(const double *arr):             # <<<<<<<<<<<<<<
  * 
- *     return sqrt(mem_view[0]*mem_view[0] + mem_view[1]*mem_view[1] + mem_view[2]*mem_view[2])
+ *     return sqrt(arr[0]*arr[0] + arr[1]*arr[1] + arr[2]*arr[2])
  */
 
   /* function exit code */
@@ -16953,6 +16791,7 @@ static PyTypeObject __pyx_type___pyx_memoryviewslice = {
 };
 
 static PyMethodDef __pyx_methods[] = {
+  {"integrate", (PyCFunction)(void*)(PyCFunctionWithKeywords)__pyx_pw_12integrate_cy_1integrate, METH_VARARGS|METH_KEYWORDS, __pyx_doc_12integrate_cy_integrate},
   {0, 0, 0, 0}
 };
 
@@ -17047,13 +16886,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_got_differing_extents_in_dimensi, __pyx_k_got_differing_extents_in_dimensi, sizeof(__pyx_k_got_differing_extents_in_dimensi), 0, 0, 1, 0},
   {&__pyx_n_s_id, __pyx_k_id, sizeof(__pyx_k_id), 0, 0, 1, 1},
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
-  {&__pyx_n_s_integrate, __pyx_k_integrate, sizeof(__pyx_k_integrate), 0, 0, 1, 1},
-  {&__pyx_n_s_integrate_cy, __pyx_k_integrate_cy, sizeof(__pyx_k_integrate_cy), 0, 0, 1, 1},
-  {&__pyx_kp_s_integrate_cy_pyx, __pyx_k_integrate_cy_pyx, sizeof(__pyx_k_integrate_cy_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_itemsize, __pyx_k_itemsize, sizeof(__pyx_k_itemsize), 0, 0, 1, 1},
   {&__pyx_kp_s_itemsize_0_for_cython_array, __pyx_k_itemsize_0_for_cython_array, sizeof(__pyx_k_itemsize_0_for_cython_array), 0, 0, 1, 0},
-  {&__pyx_n_s_j, __pyx_k_j, sizeof(__pyx_k_j), 0, 0, 1, 1},
-  {&__pyx_n_s_k, __pyx_k_k, sizeof(__pyx_k_k), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_memview, __pyx_k_memview, sizeof(__pyx_k_memview), 0, 0, 1, 1},
   {&__pyx_n_s_mode, __pyx_k_mode, sizeof(__pyx_k_mode), 0, 0, 1, 1},
@@ -17068,13 +16902,9 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_obj, __pyx_k_obj, sizeof(__pyx_k_obj), 0, 0, 1, 1},
   {&__pyx_n_s_pack, __pyx_k_pack, sizeof(__pyx_k_pack), 0, 0, 1, 1},
   {&__pyx_n_s_pickle, __pyx_k_pickle, sizeof(__pyx_k_pickle), 0, 0, 1, 1},
-  {&__pyx_n_s_planet_accel, __pyx_k_planet_accel, sizeof(__pyx_k_planet_accel), 0, 0, 1, 1},
-  {&__pyx_n_s_planet_intermediate_pos, __pyx_k_planet_intermediate_pos, sizeof(__pyx_k_planet_intermediate_pos), 0, 0, 1, 1},
   {&__pyx_n_s_planet_mass, __pyx_k_planet_mass, sizeof(__pyx_k_planet_mass), 0, 0, 1, 1},
   {&__pyx_n_s_planet_pos, __pyx_k_planet_pos, sizeof(__pyx_k_planet_pos), 0, 0, 1, 1},
-  {&__pyx_n_s_planet_pos_view, __pyx_k_planet_pos_view, sizeof(__pyx_k_planet_pos_view), 0, 0, 1, 1},
   {&__pyx_n_s_planet_vel, __pyx_k_planet_vel, sizeof(__pyx_k_planet_vel), 0, 0, 1, 1},
-  {&__pyx_n_s_planet_vel_view, __pyx_k_planet_vel_view, sizeof(__pyx_k_planet_vel_view), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_PickleError, __pyx_k_pyx_PickleError, sizeof(__pyx_k_pyx_PickleError), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_checksum, __pyx_k_pyx_checksum, sizeof(__pyx_k_pyx_checksum), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_getbuffer, __pyx_k_pyx_getbuffer, sizeof(__pyx_k_pyx_getbuffer), 0, 0, 1, 1},
@@ -17083,30 +16913,19 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_pyx_type, __pyx_k_pyx_type, sizeof(__pyx_k_pyx_type), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_unpickle_Enum, __pyx_k_pyx_unpickle_Enum, sizeof(__pyx_k_pyx_unpickle_Enum), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
-  {&__pyx_n_s_r_planet_to_star, __pyx_k_r_planet_to_star, sizeof(__pyx_k_r_planet_to_star), 0, 0, 1, 1},
-  {&__pyx_n_s_r_sat_to_planet, __pyx_k_r_sat_to_planet, sizeof(__pyx_k_r_sat_to_planet), 0, 0, 1, 1},
-  {&__pyx_n_s_r_sat_to_star, __pyx_k_r_sat_to_star, sizeof(__pyx_k_r_sat_to_star), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_ex, __pyx_k_reduce_ex, sizeof(__pyx_k_reduce_ex), 0, 0, 1, 1},
-  {&__pyx_n_s_sat_accel, __pyx_k_sat_accel, sizeof(__pyx_k_sat_accel), 0, 0, 1, 1},
-  {&__pyx_n_s_sat_intermediate_pos, __pyx_k_sat_intermediate_pos, sizeof(__pyx_k_sat_intermediate_pos), 0, 0, 1, 1},
   {&__pyx_n_s_sat_pos, __pyx_k_sat_pos, sizeof(__pyx_k_sat_pos), 0, 0, 1, 1},
-  {&__pyx_n_s_sat_pos_view, __pyx_k_sat_pos_view, sizeof(__pyx_k_sat_pos_view), 0, 0, 1, 1},
   {&__pyx_n_s_sat_vel, __pyx_k_sat_vel, sizeof(__pyx_k_sat_vel), 0, 0, 1, 1},
-  {&__pyx_n_s_sat_vel_view, __pyx_k_sat_vel_view, sizeof(__pyx_k_sat_vel_view), 0, 0, 1, 1},
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
   {&__pyx_n_s_shape, __pyx_k_shape, sizeof(__pyx_k_shape), 0, 0, 1, 1},
   {&__pyx_n_s_size, __pyx_k_size, sizeof(__pyx_k_size), 0, 0, 1, 1},
-  {&__pyx_n_s_star_accel, __pyx_k_star_accel, sizeof(__pyx_k_star_accel), 0, 0, 1, 1},
-  {&__pyx_n_s_star_intermediate_pos, __pyx_k_star_intermediate_pos, sizeof(__pyx_k_star_intermediate_pos), 0, 0, 1, 1},
   {&__pyx_n_s_star_mass, __pyx_k_star_mass, sizeof(__pyx_k_star_mass), 0, 0, 1, 1},
   {&__pyx_n_s_star_pos, __pyx_k_star_pos, sizeof(__pyx_k_star_pos), 0, 0, 1, 1},
-  {&__pyx_n_s_star_pos_view, __pyx_k_star_pos_view, sizeof(__pyx_k_star_pos_view), 0, 0, 1, 1},
   {&__pyx_n_s_star_vel, __pyx_k_star_vel, sizeof(__pyx_k_star_vel), 0, 0, 1, 1},
-  {&__pyx_n_s_star_vel_view, __pyx_k_star_vel_view, sizeof(__pyx_k_star_vel_view), 0, 0, 1, 1},
   {&__pyx_n_s_start, __pyx_k_start, sizeof(__pyx_k_start), 0, 0, 1, 1},
   {&__pyx_n_s_step, __pyx_k_step, sizeof(__pyx_k_step), 0, 0, 1, 1},
   {&__pyx_n_s_stop, __pyx_k_stop, sizeof(__pyx_k_stop), 0, 0, 1, 1},
@@ -17125,7 +16944,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 72, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 64, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 133, __pyx_L1_error)
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(1, 148, __pyx_L1_error)
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(1, 151, __pyx_L1_error)
@@ -17142,14 +16961,14 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "integrate_cy.pyx":50
+  /* "integrate_cy.pyx":48
  * 
  * 
  *     cdef double[::1] star_intermediate_pos = np.empty(3, dtype=np.double)             # <<<<<<<<<<<<<<
  * 
  *     cdef double[::1] planet_intermediate_pos = np.empty_like(star_intermediate_pos)
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_int_3); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_int_3); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 48, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
@@ -17345,18 +17164,6 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__19);
   __Pyx_GIVEREF(__pyx_tuple__19);
 
-  /* "integrate_cy.pyx":26
- * @cython.embedsignature(True)
- * @cython.initializedcheck(False)
- * def integrate(             # <<<<<<<<<<<<<<
- *     const double time_step,
- *     const long num_steps,
- */
-  __pyx_tuple__20 = PyTuple_Pack(25, __pyx_n_s_time_step, __pyx_n_s_num_steps, __pyx_n_s_star_pos, __pyx_n_s_star_vel, __pyx_n_s_planet_pos, __pyx_n_s_planet_vel, __pyx_n_s_sat_pos, __pyx_n_s_sat_vel, __pyx_n_s_star_pos_view, __pyx_n_s_star_vel_view, __pyx_n_s_planet_pos_view, __pyx_n_s_planet_vel_view, __pyx_n_s_sat_pos_view, __pyx_n_s_sat_vel_view, __pyx_n_s_star_intermediate_pos, __pyx_n_s_planet_intermediate_pos, __pyx_n_s_sat_intermediate_pos, __pyx_n_s_r_planet_to_star, __pyx_n_s_r_sat_to_star, __pyx_n_s_r_sat_to_planet, __pyx_n_s_star_accel, __pyx_n_s_planet_accel, __pyx_n_s_sat_accel, __pyx_n_s_k, __pyx_n_s_j); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 26, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__20);
-  __Pyx_GIVEREF(__pyx_tuple__20);
-  __pyx_codeobj__21 = (PyObject*)__Pyx_PyCode_New(8, 0, 25, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__20, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_integrate_cy_pyx, __pyx_n_s_integrate, 26, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__21)) __PYX_ERR(0, 26, __pyx_L1_error)
-
   /* "View.MemoryView":286
  *         return self.name
  * 
@@ -17364,9 +17171,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(1, 286, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__22);
-  __Pyx_GIVEREF(__pyx_tuple__22);
+  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(1, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__20);
+  __Pyx_GIVEREF(__pyx_tuple__20);
 
   /* "View.MemoryView":287
  * 
@@ -17375,9 +17182,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(1, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__23);
-  __Pyx_GIVEREF(__pyx_tuple__23);
+  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(1, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__21);
+  __Pyx_GIVEREF(__pyx_tuple__21);
 
   /* "View.MemoryView":288
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -17386,9 +17193,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(1, 288, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__24);
-  __Pyx_GIVEREF(__pyx_tuple__24);
+  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(1, 288, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__22);
+  __Pyx_GIVEREF(__pyx_tuple__22);
 
   /* "View.MemoryView":291
  * 
@@ -17397,9 +17204,9 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_tuple__25 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(1, 291, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__25);
-  __Pyx_GIVEREF(__pyx_tuple__25);
+  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(1, 291, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__23);
+  __Pyx_GIVEREF(__pyx_tuple__23);
 
   /* "View.MemoryView":292
  * 
@@ -17408,19 +17215,19 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__26 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(1, 292, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__26);
-  __Pyx_GIVEREF(__pyx_tuple__26);
+  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(1, 292, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__24);
+  __Pyx_GIVEREF(__pyx_tuple__24);
 
   /* "(tree fragment)":1
  * def __pyx_unpickle_Enum(__pyx_type, long __pyx_checksum, __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_PickleError
  *     cdef object __pyx_result
  */
-  __pyx_tuple__27 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(1, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__27);
-  __Pyx_GIVEREF(__pyx_tuple__27);
-  __pyx_codeobj__28 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__27, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__28)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_tuple__25 = PyTuple_Pack(5, __pyx_n_s_pyx_type, __pyx_n_s_pyx_checksum, __pyx_n_s_pyx_state, __pyx_n_s_pyx_PickleError, __pyx_n_s_pyx_result); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__25);
+  __Pyx_GIVEREF(__pyx_tuple__25);
+  __pyx_codeobj__26 = (PyObject*)__Pyx_PyCode_New(3, 0, 5, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__25, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_stringsource, __pyx_n_s_pyx_unpickle_Enum, 1, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__26)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -17781,26 +17588,14 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "integrate_cy.pyx":9
- * from libc.math cimport sqrt
- * 
- * import numpy as np             # <<<<<<<<<<<<<<
- * 
- * cdef double star_mass
- */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "integrate_cy.pyx":17
+  /* "integrate_cy.pyx":15
  * cdef double G
  * 
  * from thesis_code import G, planet_mass, star_mass             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = PyList_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_G);
   __Pyx_GIVEREF(__pyx_n_s_G);
@@ -17811,36 +17606,24 @@ if (!__Pyx_RefNanny) {
   __Pyx_INCREF(__pyx_n_s_star_mass);
   __Pyx_GIVEREF(__pyx_n_s_star_mass);
   PyList_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_star_mass);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_thesis_code, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_thesis_code, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_G); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_G); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L1_error)
   __pyx_v_12integrate_cy_G = __pyx_t_3;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_planet_mass); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_planet_mass); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L1_error)
   __pyx_v_12integrate_cy_planet_mass = __pyx_t_3;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_star_mass); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_star_mass); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L1_error)
   __pyx_v_12integrate_cy_star_mass = __pyx_t_3;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-  /* "integrate_cy.pyx":26
- * @cython.embedsignature(True)
- * @cython.initializedcheck(False)
- * def integrate(             # <<<<<<<<<<<<<<
- *     const double time_step,
- *     const long num_steps,
- */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_12integrate_cy_1integrate, NULL, __pyx_n_s_integrate_cy); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 26, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_integrate, __pyx_t_2) < 0) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "integrate_cy.pyx":1
@@ -17873,7 +17656,7 @@ if (!__Pyx_RefNanny) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 286, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(generic);
   __Pyx_DECREF_SET(generic, __pyx_t_2);
@@ -17887,7 +17670,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 287, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(strided);
   __Pyx_DECREF_SET(strided, __pyx_t_2);
@@ -17901,7 +17684,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 288, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 288, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(indirect);
   __Pyx_DECREF_SET(indirect, __pyx_t_2);
@@ -17915,7 +17698,7 @@ if (!__Pyx_RefNanny) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 291, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 291, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(contiguous);
   __Pyx_DECREF_SET(contiguous, __pyx_t_2);
@@ -17929,7 +17712,7 @@ if (!__Pyx_RefNanny) {
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__26, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 292, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 292, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(indirect_contiguous);
   __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_2);
@@ -18075,148 +17858,6 @@ static PyObject *__Pyx_GetBuiltinName(PyObject *name) {
 #endif
     }
     return result;
-}
-
-/* RaiseArgTupleInvalid */
-static void __Pyx_RaiseArgtupleInvalid(
-    const char* func_name,
-    int exact,
-    Py_ssize_t num_min,
-    Py_ssize_t num_max,
-    Py_ssize_t num_found)
-{
-    Py_ssize_t num_expected;
-    const char *more_or_less;
-    if (num_found < num_min) {
-        num_expected = num_min;
-        more_or_less = "at least";
-    } else {
-        num_expected = num_max;
-        more_or_less = "at most";
-    }
-    if (exact) {
-        more_or_less = "exactly";
-    }
-    PyErr_Format(PyExc_TypeError,
-                 "%.200s() takes %.8s %" CYTHON_FORMAT_SSIZE_T "d positional argument%.1s (%" CYTHON_FORMAT_SSIZE_T "d given)",
-                 func_name, more_or_less, num_expected,
-                 (num_expected == 1) ? "" : "s", num_found);
-}
-
-/* RaiseDoubleKeywords */
-static void __Pyx_RaiseDoubleKeywordsError(
-    const char* func_name,
-    PyObject* kw_name)
-{
-    PyErr_Format(PyExc_TypeError,
-        #if PY_MAJOR_VERSION >= 3
-        "%s() got multiple values for keyword argument '%U'", func_name, kw_name);
-        #else
-        "%s() got multiple values for keyword argument '%s'", func_name,
-        PyString_AsString(kw_name));
-        #endif
-}
-
-/* ParseKeywords */
-static int __Pyx_ParseOptionalKeywords(
-    PyObject *kwds,
-    PyObject **argnames[],
-    PyObject *kwds2,
-    PyObject *values[],
-    Py_ssize_t num_pos_args,
-    const char* function_name)
-{
-    PyObject *key = 0, *value = 0;
-    Py_ssize_t pos = 0;
-    PyObject*** name;
-    PyObject*** first_kw_arg = argnames + num_pos_args;
-    while (PyDict_Next(kwds, &pos, &key, &value)) {
-        name = first_kw_arg;
-        while (*name && (**name != key)) name++;
-        if (*name) {
-            values[name-argnames] = value;
-            continue;
-        }
-        name = first_kw_arg;
-        #if PY_MAJOR_VERSION < 3
-        if (likely(PyString_Check(key))) {
-            while (*name) {
-                if ((CYTHON_COMPILING_IN_PYPY || PyString_GET_SIZE(**name) == PyString_GET_SIZE(key))
-                        && _PyString_Eq(**name, key)) {
-                    values[name-argnames] = value;
-                    break;
-                }
-                name++;
-            }
-            if (*name) continue;
-            else {
-                PyObject*** argname = argnames;
-                while (argname != first_kw_arg) {
-                    if ((**argname == key) || (
-                            (CYTHON_COMPILING_IN_PYPY || PyString_GET_SIZE(**argname) == PyString_GET_SIZE(key))
-                             && _PyString_Eq(**argname, key))) {
-                        goto arg_passed_twice;
-                    }
-                    argname++;
-                }
-            }
-        } else
-        #endif
-        if (likely(PyUnicode_Check(key))) {
-            while (*name) {
-                int cmp = (**name == key) ? 0 :
-                #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION >= 3
-                    (__Pyx_PyUnicode_GET_LENGTH(**name) != __Pyx_PyUnicode_GET_LENGTH(key)) ? 1 :
-                #endif
-                    PyUnicode_Compare(**name, key);
-                if (cmp < 0 && unlikely(PyErr_Occurred())) goto bad;
-                if (cmp == 0) {
-                    values[name-argnames] = value;
-                    break;
-                }
-                name++;
-            }
-            if (*name) continue;
-            else {
-                PyObject*** argname = argnames;
-                while (argname != first_kw_arg) {
-                    int cmp = (**argname == key) ? 0 :
-                    #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION >= 3
-                        (__Pyx_PyUnicode_GET_LENGTH(**argname) != __Pyx_PyUnicode_GET_LENGTH(key)) ? 1 :
-                    #endif
-                        PyUnicode_Compare(**argname, key);
-                    if (cmp < 0 && unlikely(PyErr_Occurred())) goto bad;
-                    if (cmp == 0) goto arg_passed_twice;
-                    argname++;
-                }
-            }
-        } else
-            goto invalid_keyword_type;
-        if (kwds2) {
-            if (unlikely(PyDict_SetItem(kwds2, key, value))) goto bad;
-        } else {
-            goto invalid_keyword;
-        }
-    }
-    return 0;
-arg_passed_twice:
-    __Pyx_RaiseDoubleKeywordsError(function_name, key);
-    goto bad;
-invalid_keyword_type:
-    PyErr_Format(PyExc_TypeError,
-        "%.200s() keywords must be strings", function_name);
-    goto bad;
-invalid_keyword:
-    PyErr_Format(PyExc_TypeError,
-    #if PY_MAJOR_VERSION < 3
-        "%.200s() got an unexpected keyword argument '%.200s'",
-        function_name, PyString_AsString(key));
-    #else
-        "%s() got an unexpected keyword argument '%U'",
-        function_name, key);
-    #endif
-bad:
-    return -1;
 }
 
 /* PyDictVersioning */
@@ -18661,6 +18302,148 @@ static CYTHON_INLINE void __Pyx_XDEC_MEMVIEW(__Pyx_memviewslice *memslice,
     } else {
         memslice->memview = NULL;
     }
+}
+
+/* RaiseArgTupleInvalid */
+static void __Pyx_RaiseArgtupleInvalid(
+    const char* func_name,
+    int exact,
+    Py_ssize_t num_min,
+    Py_ssize_t num_max,
+    Py_ssize_t num_found)
+{
+    Py_ssize_t num_expected;
+    const char *more_or_less;
+    if (num_found < num_min) {
+        num_expected = num_min;
+        more_or_less = "at least";
+    } else {
+        num_expected = num_max;
+        more_or_less = "at most";
+    }
+    if (exact) {
+        more_or_less = "exactly";
+    }
+    PyErr_Format(PyExc_TypeError,
+                 "%.200s() takes %.8s %" CYTHON_FORMAT_SSIZE_T "d positional argument%.1s (%" CYTHON_FORMAT_SSIZE_T "d given)",
+                 func_name, more_or_less, num_expected,
+                 (num_expected == 1) ? "" : "s", num_found);
+}
+
+/* RaiseDoubleKeywords */
+static void __Pyx_RaiseDoubleKeywordsError(
+    const char* func_name,
+    PyObject* kw_name)
+{
+    PyErr_Format(PyExc_TypeError,
+        #if PY_MAJOR_VERSION >= 3
+        "%s() got multiple values for keyword argument '%U'", func_name, kw_name);
+        #else
+        "%s() got multiple values for keyword argument '%s'", func_name,
+        PyString_AsString(kw_name));
+        #endif
+}
+
+/* ParseKeywords */
+static int __Pyx_ParseOptionalKeywords(
+    PyObject *kwds,
+    PyObject **argnames[],
+    PyObject *kwds2,
+    PyObject *values[],
+    Py_ssize_t num_pos_args,
+    const char* function_name)
+{
+    PyObject *key = 0, *value = 0;
+    Py_ssize_t pos = 0;
+    PyObject*** name;
+    PyObject*** first_kw_arg = argnames + num_pos_args;
+    while (PyDict_Next(kwds, &pos, &key, &value)) {
+        name = first_kw_arg;
+        while (*name && (**name != key)) name++;
+        if (*name) {
+            values[name-argnames] = value;
+            continue;
+        }
+        name = first_kw_arg;
+        #if PY_MAJOR_VERSION < 3
+        if (likely(PyString_Check(key))) {
+            while (*name) {
+                if ((CYTHON_COMPILING_IN_PYPY || PyString_GET_SIZE(**name) == PyString_GET_SIZE(key))
+                        && _PyString_Eq(**name, key)) {
+                    values[name-argnames] = value;
+                    break;
+                }
+                name++;
+            }
+            if (*name) continue;
+            else {
+                PyObject*** argname = argnames;
+                while (argname != first_kw_arg) {
+                    if ((**argname == key) || (
+                            (CYTHON_COMPILING_IN_PYPY || PyString_GET_SIZE(**argname) == PyString_GET_SIZE(key))
+                             && _PyString_Eq(**argname, key))) {
+                        goto arg_passed_twice;
+                    }
+                    argname++;
+                }
+            }
+        } else
+        #endif
+        if (likely(PyUnicode_Check(key))) {
+            while (*name) {
+                int cmp = (**name == key) ? 0 :
+                #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION >= 3
+                    (__Pyx_PyUnicode_GET_LENGTH(**name) != __Pyx_PyUnicode_GET_LENGTH(key)) ? 1 :
+                #endif
+                    PyUnicode_Compare(**name, key);
+                if (cmp < 0 && unlikely(PyErr_Occurred())) goto bad;
+                if (cmp == 0) {
+                    values[name-argnames] = value;
+                    break;
+                }
+                name++;
+            }
+            if (*name) continue;
+            else {
+                PyObject*** argname = argnames;
+                while (argname != first_kw_arg) {
+                    int cmp = (**argname == key) ? 0 :
+                    #if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION >= 3
+                        (__Pyx_PyUnicode_GET_LENGTH(**argname) != __Pyx_PyUnicode_GET_LENGTH(key)) ? 1 :
+                    #endif
+                        PyUnicode_Compare(**argname, key);
+                    if (cmp < 0 && unlikely(PyErr_Occurred())) goto bad;
+                    if (cmp == 0) goto arg_passed_twice;
+                    argname++;
+                }
+            }
+        } else
+            goto invalid_keyword_type;
+        if (kwds2) {
+            if (unlikely(PyDict_SetItem(kwds2, key, value))) goto bad;
+        } else {
+            goto invalid_keyword;
+        }
+    }
+    return 0;
+arg_passed_twice:
+    __Pyx_RaiseDoubleKeywordsError(function_name, key);
+    goto bad;
+invalid_keyword_type:
+    PyErr_Format(PyExc_TypeError,
+        "%.200s() keywords must be strings", function_name);
+    goto bad;
+invalid_keyword:
+    PyErr_Format(PyExc_TypeError,
+    #if PY_MAJOR_VERSION < 3
+        "%.200s() got an unexpected keyword argument '%.200s'",
+        function_name, PyString_AsString(key));
+    #else
+        "%s() got an unexpected keyword argument '%U'",
+        function_name, key);
+    #endif
+bad:
+    return -1;
 }
 
 /* ArgTypeTest */

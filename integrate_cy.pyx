@@ -6,8 +6,6 @@ cimport cython
 
 from libc.math cimport sqrt
 
-import numpy as np
-
 cdef double star_mass
 
 cdef double planet_mass
@@ -23,7 +21,7 @@ from thesis_code import G, planet_mass, star_mass
 @cython.boundscheck(False)
 @cython.embedsignature(True)
 @cython.initializedcheck(False)
-def integrate(
+cpdef integrate(
     const double time_step,
     const long num_steps,
     star_pos,
@@ -53,12 +51,6 @@ def integrate(
 
     cdef double[::1] sat_intermediate_pos = np.empty_like(star_intermediate_pos)
 
-    cdef double[::1] r_planet_to_star = np.empty_like(star_intermediate_pos)
-
-    cdef double[::1] r_sat_to_star = np.empty_like(star_intermediate_pos)
-
-    cdef double[::1] r_sat_to_planet = np.empty_like(star_intermediate_pos)
-
     cdef double[::1] star_accel = np.empty_like(star_intermediate_pos)
 
     cdef double[::1] planet_accel = np.empty_like(star_intermediate_pos)
@@ -81,16 +73,14 @@ def integrate(
             sat_intermediate_pos[j] = sat_pos_view[k - 1, j] + 0.5 * sat_vel_view[k - 1, j] * time_step
 
         # acceleration calculation
+        # calc_acceleration changes the values in the accel arrays
         calc_acceleration(
             star_intermediate_pos,
             planet_intermediate_pos,
             sat_intermediate_pos,
-            r_planet_to_star,
-            r_sat_to_star,
-            r_sat_to_planet,
             star_accel,
             planet_accel,
-            sat_accel,
+            sat_accel
         )
 
         for j in range(3):
@@ -120,13 +110,16 @@ cdef void calc_acceleration(
     const double[::1] star_pos,
     const double[::1] planet_pos,
     const double[::1] sat_pos,
-    double[::1] r_planet_to_star,
-    double[::1] r_sat_to_star,
-    double[::1] r_sat_to_planet,
     double[::1] star_accel,
     double[::1] planet_accel,
     double[::1] sat_accel
 ):
+
+    cdef double r_planet_to_star[3]
+
+    cdef double r_sat_to_star[3]
+
+    cdef double r_sat_to_planet[3]
 
     cdef Py_ssize_t j
     
@@ -161,6 +154,6 @@ cdef void calc_acceleration(
 @cython.wraparound(False)
 @cython.boundscheck(False)
 @cython.initializedcheck(False)
-cdef double norm(const double[::1] mem_view):
+cdef double norm(const double *arr):
     
-    return sqrt(mem_view[0]*mem_view[0] + mem_view[1]*mem_view[1] + mem_view[2]*mem_view[2])
+    return sqrt(arr[0]*arr[0] + arr[1]*arr[1] + arr[2]*arr[2])
