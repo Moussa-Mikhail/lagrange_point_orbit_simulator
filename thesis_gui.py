@@ -20,7 +20,7 @@ class ThesisUi(QMainWindow):
 
         super().__init__()
 
-        self.setWindowTitle("L4 Simulation")
+        self.setWindowTitle("Simulation of Orbits near Lagrange Points")
 
         self._generalLayout = QHBoxLayout()
 
