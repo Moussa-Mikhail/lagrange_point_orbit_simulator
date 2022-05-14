@@ -390,18 +390,18 @@ def plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step):
 
     arr_step = plot_array_step(star_pos_trans.shape[0])
 
-    # Sun has an orbit on the scale of micro-AU under normal
+    # Sun has an orbit on the scale of micro-AU under normal Earth-Sun conditions
     # Zoom in to see it
     orbit_plot.plot(
         star_pos_trans[::arr_step, :2] / AU,
         pen="y",
-        name="star",
+        name="Star",
     )
 
     orbit_plot.plot(
         planet_pos_trans[::arr_step, :2] / AU,
         pen="b",
-        name="planet",
+        name="Planet",
     )
 
     orbit_plot.plot(
@@ -428,7 +428,7 @@ def plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step):
             pen="y",
             brush="y",
             size=10,
-            name="star",
+            name="Star",
         )
 
         anim_plot.addPoints(
@@ -437,7 +437,7 @@ def plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step):
             pen="b",
             brush="b",
             size=10,
-            name="planet",
+            name="Planet",
         )
 
         anim_plot.addPoints(
@@ -446,7 +446,7 @@ def plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step):
             pen="g",
             brush="g",
             size=10,
-            name="satellite",
+            name="Satellite",
         )
 
     # time in milliseconds between plot updates
@@ -537,7 +537,6 @@ def plot_corotating_orbit(
     transform_plot.plot(
         sat_pos_rotated[::arr_step, 0] / AU,
         sat_pos_rotated[::arr_step, 1] / AU,
-        name="Satellite Orbit",
         pen="g",
     )
 
@@ -598,7 +597,7 @@ def plot_corotating_orbit(
             pen="y",
             brush="y",
             size=10,
-            name="star",
+            name="Star",
         )
 
         anim_rotated_plot.addPoints(
@@ -607,7 +606,7 @@ def plot_corotating_orbit(
             pen="b",
             brush="b",
             size=10,
-            name="planet",
+            name="Planet",
         )
 
         anim_rotated_plot.addPoints(
@@ -760,6 +759,3 @@ def plot_conserved_func(
     energy_plot.setLabel("left", "Normalized Energy")
 
     energy_plot.plot(times_in_years, total_energy[::arr_step] / total_energy[0] - 1)
-
-
-# main(plot_conserved=True)
