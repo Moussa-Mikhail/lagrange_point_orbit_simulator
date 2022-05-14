@@ -207,7 +207,7 @@ def main(
 
     time_step = sim_stop / num_steps
 
-    plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step)
+    orbit_plot = plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step)
 
     # array of num_steps+1 time points evenly spaced between 0 and sim_stop
     times = np.linspace(0, sim_stop, num_steps + 1)
@@ -218,7 +218,7 @@ def main(
 
     sat_pos_rotated = transform_to_corotating(times, sat_pos_trans)
 
-    plot_corotating_orbit(
+    corotating_plot = plot_corotating_orbit(
         star_pos_rotated,
         planet_pos_rotated,
         sat_pos_rotated,
@@ -245,6 +245,8 @@ def main(
             total_angular_momentum,
             total_energy,
         )
+
+    return orbit_plot, corotating_plot
 
 
 def calc_orbit(
@@ -456,6 +458,8 @@ def plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step):
     timer.timeout.connect(update_plot)
     timer.start(period)
 
+    return orbit_plot
+
 
 def plot_array_step(num_points):
 
@@ -509,10 +513,10 @@ def plot_corotating_orbit(
 ):
 
     # Animated plot of satellites orbit in co-rotating frame.
-    transform_plot = pg.plot(title="Orbits in Co-Rotating Coordinate System")
-    transform_plot.setLabel("bottom", "x", units="AU")
-    transform_plot.setLabel("left", "y", units="AU")
-    transform_plot.addLegend()
+    corotating_plot = pg.plot(title="Orbits in Co-Rotating Coordinate System")
+    corotating_plot.setLabel("bottom", "x", units="AU")
+    corotating_plot.setLabel("left", "y", units="AU")
+    corotating_plot.addLegend()
 
     planet_distance_in_AU = planet_distance / AU
 
@@ -524,24 +528,24 @@ def plot_corotating_orbit(
 
     max_y = default_pos_trans[0, 1] / AU + 0.5 * planet_distance_in_AU
 
-    transform_plot.setXRange(min_x, max_x)
-    transform_plot.setYRange(min_y, max_y)
-    transform_plot.setAspectLocked(True)
+    corotating_plot.setXRange(min_x, max_x)
+    corotating_plot.setYRange(min_y, max_y)
+    corotating_plot.setAspectLocked(True)
 
     anim_rotated_plot = pg.ScatterPlotItem()
 
-    transform_plot.addItem(anim_rotated_plot)
+    corotating_plot.addItem(anim_rotated_plot)
 
     arr_step = plot_array_step(star_pos_rotated.shape[0])
 
-    transform_plot.plot(
+    corotating_plot.plot(
         sat_pos_rotated[::arr_step, 0] / AU,
         sat_pos_rotated[::arr_step, 1] / AU,
         pen="g",
     )
 
     # The only purpose of this is to add the bodies to the plot legend
-    transform_plot.plot(
+    corotating_plot.plot(
         [star_pos_rotated[0, 0] / AU],
         [star_pos_rotated[0, 1] / AU],
         name="Star",
@@ -551,7 +555,7 @@ def plot_corotating_orbit(
         symbolBrush="y",
     )
 
-    transform_plot.plot(
+    corotating_plot.plot(
         [planet_pos_rotated[0, 0] / AU],
         [planet_pos_rotated[0, 1] / AU],
         name="Planet",
@@ -561,7 +565,7 @@ def plot_corotating_orbit(
         symbolBrush="b",
     )
 
-    transform_plot.plot(
+    corotating_plot.plot(
         [sat_pos_rotated[0, 0] / AU],
         [sat_pos_rotated[0, 1] / AU],
         name="Satellite",
@@ -571,7 +575,7 @@ def plot_corotating_orbit(
         symbolBrush="g",
     )
 
-    transform_plot.plot(
+    corotating_plot.plot(
         [default_pos_trans[0, 0] / AU],
         [default_pos_trans[0, 1] / AU],
         name="Lagrange Point",
@@ -636,6 +640,8 @@ def plot_corotating_orbit(
 
     timer_rotating.timeout.connect(update_rotated)
     timer_rotating.start(period)
+
+    return corotating_plot
 
 
 def conservation_calculations(
