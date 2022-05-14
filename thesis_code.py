@@ -120,6 +120,9 @@ def time_func(func):
     return wrapper
 
 
+timer = QTimer()
+
+
 @time_func
 def main(
     num_years=10.0,
@@ -207,7 +210,11 @@ def main(
 
     time_step = sim_stop / num_steps
 
-    orbit_plot = plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step)
+    orbit_plot, update_plot = plot_orbit(
+        star_pos_trans, planet_pos_trans, sat_pos_trans, time_step
+    )
+
+    timer.timeout.connect(update_plot)
 
     # array of num_steps+1 time points evenly spaced between 0 and sim_stop
     times = np.linspace(0, sim_stop, num_steps + 1)
@@ -218,7 +225,7 @@ def main(
 
     sat_pos_rotated = transform_to_corotating(times, sat_pos_trans)
 
-    corotating_plot = plot_corotating_orbit(
+    corotating_plot, update_rotated = plot_corotating_orbit(
         star_pos_rotated,
         planet_pos_rotated,
         sat_pos_rotated,
@@ -226,6 +233,14 @@ def main(
         num_years,
         time_step,
     )
+
+    timer.timeout.connect(update_rotated)
+
+    # time in milliseconds between plot updates
+    # making it small (=1) and having 2 animated plots leads to crashes
+    period = 33
+
+    timer.start(period)
 
     if plot_conserved:
         (
@@ -246,7 +261,7 @@ def main(
             total_energy,
         )
 
-    return orbit_plot, corotating_plot
+    return orbit_plot, corotating_plot, timer
 
 
 def calc_orbit(
@@ -374,9 +389,6 @@ def calc_center_of_mass(star_pos, planet_pos, sat_pos):
     )
 
 
-timer = QTimer()
-
-
 def plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step):
 
     orbit_plot = pg.plot(title="Orbits of Masses")
@@ -451,14 +463,7 @@ def plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step):
             name="Satellite",
         )
 
-    # time in milliseconds between plot updates
-    # making it small (=1) and having 2 animated plots leads to crashes
-    period = 33
-
-    timer.timeout.connect(update_plot)
-    timer.start(period)
-
-    return orbit_plot
+    return orbit_plot, update_plot
 
 
 def plot_array_step(num_points):
@@ -634,14 +639,7 @@ def plot_corotating_orbit(
         #     name="Satellite 1 yr",
         # )
 
-    # time in milliseconds between plot updates
-    # making it small (=1) and having 2 animated plots leads to crashes
-    period = 33
-
-    timer_rotating.timeout.connect(update_rotated)
-    timer_rotating.start(period)
-
-    return corotating_plot
+    return corotating_plot, update_rotated
 
 
 def conservation_calculations(
