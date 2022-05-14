@@ -237,8 +237,7 @@ def main(
     timer.timeout.connect(update_rotated)
 
     # time in milliseconds between plot updates
-    # making it small (=1) and having 2 animated plots leads to crashes
-    period = 33
+    period = 1
 
     timer.start(period)
 
