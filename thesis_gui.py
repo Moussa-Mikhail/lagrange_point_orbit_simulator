@@ -58,8 +58,6 @@ class ThesisUi(QMainWindow):
 
         self._timer = None
 
-        # TODO: make it so that plot_orbit shows initial conditions
-
     def _addInputFields(self):
 
         # TODO: refactor how this is done.

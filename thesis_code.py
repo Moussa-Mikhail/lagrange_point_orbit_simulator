@@ -425,6 +425,32 @@ def plot_orbit(star_pos_trans, planet_pos_trans, sat_pos_trans, time_step):
 
     anim_plot = pg.ScatterPlotItem()
 
+    # The purpose of this is to add the bodies to the plot legend
+    # and plot their initial positions
+    anim_plot.addPoints(
+        [star_pos_trans[0, 0] / AU],
+        [star_pos_trans[0, 1] / AU],
+        pen="y",
+        brush="y",
+        size=10,
+    )
+
+    anim_plot.addPoints(
+        [planet_pos_trans[0, 0] / AU],
+        [planet_pos_trans[0, 1] / AU],
+        pen="b",
+        brush="b",
+        size=10,
+    )
+
+    anim_plot.addPoints(
+        [sat_pos_trans[0, 0] / AU],
+        [sat_pos_trans[0, 1] / AU],
+        pen="g",
+        brush="g",
+        size=10,
+    )
+
     orbit_plot.addItem(anim_plot)
 
     idx = update_idx(time_step, star_pos_trans.shape[0] - 1)
@@ -548,7 +574,8 @@ def plot_corotating_orbit(
         pen="g",
     )
 
-    # The only purpose of this is to add the bodies to the plot legend
+    # The purpose of this is to add the bodies to the plot legend
+    # and plot their initial positions
     corotating_plot.plot(
         [star_pos_rotated[0, 0] / AU],
         [star_pos_rotated[0, 1] / AU],
