@@ -1,18 +1,31 @@
-# pylint: disable=no-name-in-module, invalid-name
+# pylint: disable=no-name-in-module, invalid-name, protected-access, missing-docstring
 import sys
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QApplication,
+    QCheckBox,
+    QHBoxLayout,
+    QLabel,
     QLineEdit,
     QMainWindow,
     QPushButton,
     QVBoxLayout,
-    QHBoxLayout,
     QWidget,
-    QLabel,
 )
 
-from PyQt5.QtCore import Qt
+import pyqtgraph as pg  # type: ignore
+
+from thesis_code import L1, L2, L3, L4, L5
+from thesis_code import main as thesisMain
+
+lagrangePoints = {
+    "L1": L1,
+    "L2": L2,
+    "L3": L3,
+    "L4": L4,
+    "L5": L5,
+}
 
 
 class ThesisUi(QMainWindow):
@@ -30,11 +43,27 @@ class ThesisUi(QMainWindow):
 
         self._centralWidget.setLayout(self._generalLayout)
 
-        self._createInputs()
+        self._addInputFields()
 
-        # self._createDisplay()
+        self._initializePlots()
 
-    def _createInputs(self):
+        # TODO: implement conserved plots
+
+        # plotConservedLayout = QHBoxLayout()
+
+        # plotConservedLayout.addWidget(QLabel("plot conserved quantities"))
+
+        # time in milliseconds between plot updates
+        self._period = 33
+
+        self._timer = None
+
+        # TODO: make it so that plot_orbit shows initial conditions
+
+    def _addInputFields(self):
+
+        # TODO: refactor how this is done.
+        # Add input fields all at once and then insert text
 
         self._inputsLayout = QVBoxLayout()
 
@@ -50,9 +79,7 @@ class ThesisUi(QMainWindow):
 
     def _addButtons(self):
 
-        # Add Run button
-
-        buttons = ["Simulate", "Start Animation", "Pause"]
+        buttons = ("Simulate", "Start/Stop")
 
         buttonsLayout = QHBoxLayout()
 
@@ -65,8 +92,6 @@ class ThesisUi(QMainWindow):
         self._inputsLayout.addLayout(buttonsLayout)
 
     def _addSimParams(self):
-
-        # Add Simulation Parameters
 
         simParamsLabel = QLabel("Simulation Parameters")
 
@@ -90,17 +115,11 @@ class ThesisUi(QMainWindow):
 
             fieldLine.setAlignment(Qt.AlignRight)
 
-            if fieldText == "time step":
-
-                fieldLine.setReadOnly(True)
-
             fieldLayout.addWidget(fieldLine)
 
             self._inputsLayout.addLayout(fieldLayout)
 
     def _addSatParams(self):
-
-        # Add Satellite Parameters
 
         satParamsLabel = QLabel("\nSatellite Parameters")
 
@@ -130,27 +149,153 @@ class ThesisUi(QMainWindow):
 
             self._inputsLayout.addLayout(fieldLayout)
 
-    # TODO: Figure out how to insert graph into gui
-    # def _createDisplay(self):
+    def _initializePlots(self):
 
-    #     self._display = QHBoxLayout()
+        orbitPlot = pg.plot(title="Orbits of Masses")
+        orbitPlot.setLabel("bottom", "x", units="AU")
+        orbitPlot.setLabel("left", "y", units="AU")
 
-    #     self._generalLayout.addWidget(self._display)
+        self._orbitPlot = orbitPlot
+
+        corotatingPlot = pg.plot(title="Orbits in Co-Rotating Coordinate System")
+        corotatingPlot.setLabel("bottom", "x", units="AU")
+        corotatingPlot.setLabel("left", "y", units="AU")
+
+        self._corotatingPlot = corotatingPlot
+
+        self._generalLayout.addWidget(orbitPlot)
+
+        self._generalLayout.addWidget(corotatingPlot)
+
+
+class ThesisCtrl:
+    def __init__(self, model, view):
+
+        self._model = model
+
+        self._view = view
+
+        self._connectSignals()
+
+    def _connectSignals(self):
+
+        btnActions = {"Simulate": self._simulate, "Start/Stop": self._toggleAnimation}
+
+        for btnText, btn in self._view._buttons.items():
+
+            action = btnActions[btnText]
+
+            btn.clicked.connect(action)
+
+    def _simulate(self):
+
+        simulationInputs = self._getSimulationInputs()
+
+        orbitPlot, corotatingPlot, timer = self._model(*simulationInputs.values())
+
+        timer.stop()
+
+        self._view._timer = timer
+
+        currOrbitPlot = self._view._orbitPlot
+
+        currCorotatingPlot = self._view._corotatingPlot
+
+        self._view._generalLayout.replaceWidget(currOrbitPlot, orbitPlot)
+
+        self._view._generalLayout.replaceWidget(currCorotatingPlot, corotatingPlot)
+
+        self._view._orbitPlot = orbitPlot
+
+        self._view._corotatingPlot = corotatingPlot
+
+        currOrbitPlot.hide()
+
+        currCorotatingPlot.hide()
+
+        del currOrbitPlot
+
+        del currCorotatingPlot
+
+    def _getSimulationInputs(self):
+
+        inputs = {}
+
+        inputsLayout = self._view._inputsLayout
+
+        num_items = inputsLayout.count()
+
+        for i in range(num_items):
+
+            itemAtIdx = inputsLayout.itemAt(i)
+
+            if isinstance(itemAtIdx, QHBoxLayout):
+
+                label = itemAtIdx.itemAt(0).widget().text()
+
+                field = itemAtIdx.itemAt(1).widget()
+
+                if isinstance(field, QLineEdit):
+
+                    displayText = field.displayText()
+
+                    try:
+
+                        inputs[label] = float(displayText)
+
+                    except ValueError:
+
+                        try:
+
+                            inputs[label] = int(safeEval(displayText))
+
+                        except (ValueError, TypeError):
+
+                            inputs[label] = displayText
+
+                elif isinstance(field, QCheckBox):
+
+                    inputs[label] = field.isChecked()
+
+        lagrangeStr = inputs["Lagrange Point"]
+        inputs["Lagrange Point"] = lagrangePoints[lagrangeStr]
+
+        del inputs["time step"]
+
+        return inputs
+
+    def _toggleAnimation(self):
+
+        if self._view._timer.isActive():
+
+            self._view._timer.stop()
+
+        else:
+
+            self._view._timer.start(self._view._period)
+
+
+def safeEval(expr):
+
+    chars = set(expr)
+
+    if not chars.issubset("0123456789.+-*/()"):
+
+        raise ValueError("invalid expression")
+
+    return eval(expr)  # pylint: disable=eval-used
 
 
 def main():
-    """Main function."""
-    # Create an instance of `QApplication`
+
     thesisGui = QApplication(sys.argv)
 
-    # Show the calculator's GUI
     view = ThesisUi()
 
     view.show()
 
-    # ThesisCtrl(model=model, view=view)
+    ctrl = ThesisCtrl(model=thesisMain, view=view)
 
-    # Execute calculator's main loop
     sys.exit(thesisGui.exec_())
 
 
