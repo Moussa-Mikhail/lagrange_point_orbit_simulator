@@ -57,9 +57,7 @@ cpdef integrate(
 
     cdef double sat_accel[3]
 
-    cdef Py_ssize_t k
-
-    cdef Py_ssize_t j
+    cdef Py_ssize_t k, j
 
     for k in range(1, num_steps + 1):
 
@@ -113,7 +111,7 @@ cdef void calc_acceleration(
     double *star_accel,
     double *planet_accel,
     double *sat_accel
-):
+) nogil:
 
     cdef double r_planet_to_star[3]
 
@@ -154,6 +152,6 @@ cdef void calc_acceleration(
 @cython.wraparound(False)
 @cython.boundscheck(False)
 @cython.initializedcheck(False)
-cdef double norm(const double * const arr):
+cdef double norm(const double * const arr) nogil:
     
     return sqrt(arr[0]*arr[0] + arr[1]*arr[1] + arr[2]*arr[2])
