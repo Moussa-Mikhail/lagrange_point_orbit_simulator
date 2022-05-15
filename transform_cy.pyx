@@ -6,6 +6,8 @@ cimport cython
 
 from libc.math cimport cos, sin
 
+from cython.parallel import prange
+
 cdef double angular_speed
 
 from thesis_code import angular_speed
@@ -39,15 +41,9 @@ cpdef transform_to_corotating(times, pos_trans):
     
     cdef Py_ssize_t i
 
-    cdef double angle
+    cdef double time, angle, c, s, pos_trans_x, pos_trans_y
 
-    cdef double time
-
-    cdef double pos_trans_x
-
-    cdef double pos_trans_y
-
-    for i in range(times_view.shape[0]):
+    for i in prange(times_view.shape[0], nogil=True, schedule='static'):
 
         time = times_view[i]
 
