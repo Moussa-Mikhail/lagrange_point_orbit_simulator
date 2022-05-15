@@ -43,6 +43,8 @@ class ThesisUi(QMainWindow):
 
         self._centralWidget.setLayout(self._generalLayout)
 
+        self._inputFields = {}
+
         self._addInputFields()
 
         self._initializePlots()
@@ -113,6 +115,8 @@ class ThesisUi(QMainWindow):
 
             fieldLine.setAlignment(Qt.AlignRight)
 
+            self._inputFields[fieldText] = fieldLine
+
             fieldLayout.addWidget(fieldLine)
 
             self._inputsLayout.addLayout(fieldLayout)
@@ -142,6 +146,8 @@ class ThesisUi(QMainWindow):
             fieldLine = QLineEdit(defaultValue)
 
             fieldLine.setAlignment(Qt.AlignRight)
+
+            self._inputFields[fieldText] = fieldLine
 
             fieldLayout.addWidget(fieldLine)
 
@@ -219,41 +225,31 @@ class ThesisCtrl:
 
         inputs = {}
 
-        inputsLayout = self._view._inputsLayout
+        inputFields = self._view._inputFields
 
-        num_items = inputsLayout.count()
+        for fieldText, field in inputFields.items():
 
-        for i in range(num_items):
+            fieldValue = field.text()
 
-            itemAtIdx = inputsLayout.itemAt(i)
+            if fieldText == "Lagrange Point":
 
-            if isinstance(itemAtIdx, QHBoxLayout):
+                inputs[fieldText] = fieldValue
 
-                label = itemAtIdx.itemAt(0).widget().text()
+                continue
 
-                field = itemAtIdx.itemAt(1).widget()
+            try:
 
-                if isinstance(field, QLineEdit):
+                inputs[fieldText] = float(fieldValue)
 
-                    displayText = field.displayText()
+            except ValueError:
 
-                    try:
+                try:
 
-                        inputs[label] = float(displayText)
+                    inputs[fieldText] = int(safeEval(fieldValue))
 
-                    except ValueError:
+                except (ValueError, TypeError):
 
-                        try:
-
-                            inputs[label] = int(safeEval(displayText))
-
-                        except (ValueError, TypeError):
-
-                            inputs[label] = displayText
-
-                elif isinstance(field, QCheckBox):
-
-                    inputs[label] = field.isChecked()
+                    inputs[fieldText] = fieldValue
 
         lagrangeStr = inputs["Lagrange Point"]
         inputs["Lagrange Point"] = lagrangePoints[lagrangeStr]
