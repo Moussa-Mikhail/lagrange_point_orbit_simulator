@@ -165,7 +165,7 @@ def main(
     energy, angular momentum, linear momentum.
     The default is False.
 
-    This function will take ~0.5 seconds per 10**6 steps if
+    This function will take ~0.45 seconds per 10**6 steps if
     the Cythonized extensions are available.
     81 seconds if not.
     The time may vary depending on your hardware.
