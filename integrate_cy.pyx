@@ -45,17 +45,17 @@ cpdef integrate(
     cdef double[:, ::1] sat_vel_view = sat_vel
 
 
-    cdef double[::1] star_intermediate_pos = np.empty(3, dtype=np.double)
+    cdef double star_intermediate_pos[3]
 
-    cdef double[::1] planet_intermediate_pos = np.empty_like(star_intermediate_pos)
+    cdef double planet_intermediate_pos[3]
 
-    cdef double[::1] sat_intermediate_pos = np.empty_like(star_intermediate_pos)
+    cdef double sat_intermediate_pos[3]
 
-    cdef double[::1] star_accel = np.empty_like(star_intermediate_pos)
+    cdef double star_accel[3]
 
-    cdef double[::1] planet_accel = np.empty_like(star_intermediate_pos)
+    cdef double planet_accel[3]
 
-    cdef double[::1] sat_accel = np.empty_like(star_intermediate_pos)
+    cdef double sat_accel[3]
 
     cdef Py_ssize_t k
 
@@ -107,12 +107,12 @@ cpdef integrate(
 @cython.boundscheck(False)
 @cython.initializedcheck(False)
 cdef void calc_acceleration(
-    const double[::1] star_pos,
-    const double[::1] planet_pos,
-    const double[::1] sat_pos,
-    double[::1] star_accel,
-    double[::1] planet_accel,
-    double[::1] sat_accel
+    const double * const star_pos,
+    const double * const planet_pos,
+    const double * const sat_pos,
+    double *star_accel,
+    double *planet_accel,
+    double *sat_accel
 ):
 
     cdef double r_planet_to_star[3]
@@ -154,6 +154,6 @@ cdef void calc_acceleration(
 @cython.wraparound(False)
 @cython.boundscheck(False)
 @cython.initializedcheck(False)
-cdef double norm(const double *arr):
+cdef double norm(const double * const arr):
     
     return sqrt(arr[0]*arr[0] + arr[1]*arr[1] + arr[2]*arr[2])
