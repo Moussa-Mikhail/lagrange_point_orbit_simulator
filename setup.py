@@ -1,8 +1,18 @@
 # pylint: disable=missing-docstring
-from distutils.core import setup  # type: ignore
+from setuptools import Extension, setup  # type: ignore
 from Cython.Build import cythonize  # type: ignore
 
+ext_modules = [
+    Extension(
+        "integrate_cy",
+        ["integrate_cy.pyx"],
+    ),
+    Extension(
+        "transform_cy",
+        ["transform_cy.pyx"],
+    ),
+]
+
 setup(
-    name="integrate_cy",
-    ext_modules=cythonize(["integrate_cy.pyx", "transform_cy.pyx"], language_level=3),
+    ext_modules=cythonize(ext_modules, language_level=3),
 )
