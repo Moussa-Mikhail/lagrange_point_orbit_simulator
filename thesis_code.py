@@ -237,7 +237,7 @@ def main(
     timer.timeout.connect(update_rotated)
 
     # time in milliseconds between plot updates
-    period = 1
+    period = 33
 
     timer.start(period)
 
