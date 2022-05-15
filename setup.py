@@ -10,6 +10,7 @@ ext_modules = [
     Extension(
         "transform_cy",
         ["transform_cy.pyx"],
+        extra_compile_args=["/openmp"],
     ),
 ]
 
