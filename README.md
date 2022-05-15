@@ -30,8 +30,8 @@ The default is None.
 If None, then perturbation_size has the effect of
 moving the satellite away or towards the origin.
 
-speed: Initial speed of satellite as a factor of planet's speed.
-i.e. speed = 1 -> satellite has the same speed as planet.
+speed: Initial speed of satellite as a factor of the planet's speed.
+i.e. speed = 1 -> satellite has the same speed as the planet.
 the default is 1.
 
 vel_angle: Angle of satellite's initial velocity relative to positive x axis in degrees.
