@@ -127,10 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-3 body notes.txt
+
 .vscode/settings.json
 data.csv
 *.html
 .VSCodeCounter
 data1.csv
 test_period_func.py
+thesis code notes.txt
