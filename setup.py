@@ -11,6 +11,7 @@ ext_modules = [
         "transform_cy",
         ["transform_cy.pyx"],
         extra_compile_args=["/openmp"],
+        extra_link_args=["/openmp"],
     ),
 ]
 

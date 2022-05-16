@@ -2,7 +2,7 @@
 
 import numpy as np
 
-cimport cython
+import cython
 
 from libc.math cimport cos, sin
 
