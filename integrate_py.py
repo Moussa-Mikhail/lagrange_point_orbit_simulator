@@ -57,7 +57,6 @@ def calc_acceleration(
         )
 
 
-# pure python version of integrate function
 @njit()
 def integrate(
     time_step, num_steps, star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
