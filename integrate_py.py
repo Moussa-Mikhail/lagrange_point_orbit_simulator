@@ -46,9 +46,9 @@ def calc_acceleration(
 
     for j in range(3):
         # gravity of satellite can be ignored
+        # note the lack of negative sign in the following line
         star_accel[j] = G * planet_mass * r_star_to_planet[j] / d_star_to_planet**3
 
-        # note the lack of negative sign in the following line
         planet_accel[j] = -G * star_mass * r_star_to_planet[j] / d_star_to_planet**3
 
         sat_accel[j] = (
