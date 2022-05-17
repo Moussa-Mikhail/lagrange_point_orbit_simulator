@@ -159,11 +159,13 @@ def collect_data(df):
 
         CM_pos = calc_center_of_mass(star_pos, planet_pos, sat_pos)
 
+        sat_pos_trans = sat_pos - CM_pos
+
         df.loc[idx, "actual period"] = (
-            calc_period_from_position_data(sat_pos, CM_pos) / years
+            calc_period_from_position_data(sat_pos_trans) / years
         )
 
-        df.loc[idx, "instability"] = measure_instability(times, sat_pos, CM_pos) / AU
+        df.loc[idx, "instability"] = measure_instability(times, sat_pos_trans) / AU
 
     # absolute difference from orbital period
     df["absolute period difference"] = np.abs(
@@ -214,7 +216,7 @@ def calc_period_from_parameters(
         init_sat_pos, init_sat_vel, init_star_pos, init_star_vel
     )
 
-    print(f"{semi_major_axis/AU=}")
+    # print(f"{semi_major_axis/AU=}")
 
     return calc_period_from_semi_major_axis(semi_major_axis)
 
@@ -262,18 +264,16 @@ def calc_semi_major_axis_from_initial_conditions(sat_pos, sat_vel, star_pos, sta
     )
 
 
-def calc_period_from_position_data(sat_pos, CM_pos):
+def calc_period_from_position_data(sat_pos_trans):
 
-    semi_major_axis = calc_semi_major_axis_from_position_data(sat_pos, CM_pos)
+    semi_major_axis = calc_semi_major_axis_from_position_data(sat_pos_trans)
 
     return calc_period_from_semi_major_axis(semi_major_axis)
 
 
-def calc_semi_major_axis_from_position_data(sat_pos, CM_pos):
+def calc_semi_major_axis_from_position_data(sat_pos_trans):
 
-    sat_pos = sat_pos - CM_pos
-
-    distances = norm(sat_pos, axis=1)
+    distances = norm(sat_pos_trans, axis=1)
 
     perihelion = np.amin(distances)
 
@@ -282,13 +282,13 @@ def calc_semi_major_axis_from_position_data(sat_pos, CM_pos):
     return (perihelion + aphelion) / 2
 
 
-def measure_instability(times, sat_pos, CM_pos):
+def measure_instability(times, sat_pos_trans):
 
-    sat_pos_trans = transform_to_corotating(times, sat_pos, CM_pos)
+    sat_pos_rotated = transform_to_corotating(times, sat_pos_trans)
 
-    distances_from_L4 = norm(sat_pos_trans - L4, axis=1)
+    distances_from_L4 = norm(sat_pos_rotated - L4, axis=1)
 
-    return max(distances_from_L4)
+    return np.amax(distances_from_L4)
 
 
 def remove_invalid_data(df):
@@ -300,3 +300,5 @@ def remove_invalid_data(df):
         if df.loc[idx, "predicted period"] is None:
 
             df.drop(idx, inplace=True)
+
+    df.reset_index(drop=True)
