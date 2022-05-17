@@ -293,7 +293,8 @@ def calc_orbit(
 
     time_step = sim_stop / num_steps
 
-    return integrate(
+    # integrate modifies the input arrays
+    integrate(
         time_step,
         num_steps,
         star_pos,
@@ -303,6 +304,8 @@ def calc_orbit(
         sat_pos,
         sat_vel,
     )
+
+    return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 
 
 def initialization(

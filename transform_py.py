@@ -1,9 +1,12 @@
 # pylint: disable=invalid-name, missing-docstring
 import numpy as np
 
+from numba import njit  # type: ignore
+
 from thesis_code import angular_speed
 
 
+@njit(parallel=True)
 def transform_to_corotating(times, pos_trans):
     # it is necessary to transform our coordinate system to one which
     # rotates with the system
@@ -18,7 +21,9 @@ def transform_to_corotating(times, pos_trans):
 
     pos_rotated = np.empty_like(pos_trans)
 
-    for i, t in enumerate(times):
+    for i in range(pos_trans.shape[0]):
+
+        t = times[i]
 
         angle = -angular_speed * t
 
@@ -33,5 +38,7 @@ def transform_to_corotating(times, pos_trans):
         pos_rotated[i, 0] = cos * pos_trans_x - sin * pos_trans_y
 
         pos_rotated[i, 1] = sin * pos_trans_x + cos * pos_trans_y
+
+    pos_rotated[:, 2] = 0
 
     return pos_rotated
