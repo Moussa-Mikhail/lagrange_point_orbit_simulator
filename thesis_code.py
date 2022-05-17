@@ -88,7 +88,7 @@ L5 = planet_distance * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
 
 try:
     # cythonized version of integrate
-    # roughly 270x times faster
+    # roughly 4.5x times faster
     from integrate_cy import integrate  # type: ignore
 
 except ImportError:
@@ -98,7 +98,7 @@ except ImportError:
 try:
 
     # cythonized version of transform_to_corotating
-    # roughly 100x times faster
+    # roughly 4.5x times faster
     from transform_cy import transform_to_corotating  # type: ignore
 
 except ImportError:
@@ -125,7 +125,7 @@ timer = QTimer()
 
 @time_func
 def main(
-    num_years=10.0,
+    num_years=100.0,
     num_steps=10**6,
     perturbation_size=0,
     perturbation_angle=None,
@@ -141,7 +141,7 @@ def main(
 
     It takes the following parameters:
 
-    num_years: Number of years to simulate. The default is 10.0.
+    num_years: Number of years to simulate. The default is 100.0.
     num_steps: Number of steps to simulate. Must be an integer. The default is 10**6.
 
     perturbation_size: Size of perturbation in AU. The default is 0.
@@ -165,10 +165,11 @@ def main(
     energy, angular momentum, linear momentum.
     The default is False.
 
-    This function will take ~0.45 seconds per 10**6 steps if
+    This function will take ~0.46 seconds per 10**6 steps if
     the Cythonized extensions are available.
-    81 seconds if not.
+    1.4 seconds if not.
     The time may vary depending on your hardware.
+    It will take longer than usual on the first call.
     """
 
     default_pertubation_angle = np.arctan2(default_pos[1], default_pos[0])
@@ -264,8 +265,8 @@ def main(
 
 
 def calc_orbit(
-    num_years=10.0,
-    num_steps=1 * 10**5,
+    num_years=100.0,
+    num_steps=1 * 10**6,
     perturbation_size=0,
     perturbation_angle=None,
     speed=1,
