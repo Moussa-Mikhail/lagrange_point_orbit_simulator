@@ -27,6 +27,20 @@ lagrangePoints = {
     "L5": L5,
 }
 
+simParams = {
+    "number of years": "10",
+    "number of steps": "10**6",
+    "time step": "0.1",
+}
+
+satParams = {
+    "perturbation size": "0",
+    "perturbation angle": "60",
+    "initial speed": "1",
+    "initial velocity angle": "150",
+    "Lagrange Point": "L4",
+}
+
 
 class ThesisUi(QMainWindow):
     def __init__(self):
@@ -63,9 +77,9 @@ class ThesisUi(QMainWindow):
 
         self._addButtons()
 
-        self._addSimParams()
+        self._addParams("Simulation Parameters", simParams)
 
-        self._addSatParams()
+        self._addParams("Satellite Parameters", satParams)
 
         self._generalLayout.addLayout(self._inputsLayout)
 
@@ -83,45 +97,15 @@ class ThesisUi(QMainWindow):
 
         self._inputsLayout.addRow(buttonsLayout)
 
-    def _addSimParams(self):
+    def _addParams(self, paramLabelText, params):
 
-        simParamsLabel = QLabel("Simulation Parameters")
+        paramLabel = QLabel(paramLabelText)
 
-        simParamsLabel.setAlignment(Qt.AlignCenter)
+        paramLabel.setAlignment(Qt.AlignCenter)
 
-        self._inputsLayout.addRow(simParamsLabel)
+        self._inputsLayout.addRow(paramLabel)
 
-        simParams = {
-            "number of years": "10",
-            "number of steps": "10**6",
-            "time step": "0.1",
-        }
-
-        for fieldText, defaultValue in simParams.items():
-
-            fieldLine = QLineEdit(defaultValue)
-
-            self._inputFields[fieldText] = fieldLine
-
-            self._inputsLayout.addRow(fieldText, fieldLine)
-
-    def _addSatParams(self):
-
-        satParamsLabel = QLabel("\nSatellite Parameters")
-
-        satParamsLabel.setAlignment(Qt.AlignCenter)
-
-        self._inputsLayout.addRow(satParamsLabel)
-
-        satParams = {
-            "perturbation size": "0",
-            "perturbation angle": "60",
-            "initial speed": "1",
-            "initial velocity angle": "150",
-            "Lagrange Point": "L4",
-        }
-
-        for fieldText, defaultValue in satParams.items():
+        for fieldText, defaultValue in params.items():
 
             fieldLine = QLineEdit(defaultValue)
 
