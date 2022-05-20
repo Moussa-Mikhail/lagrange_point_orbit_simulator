@@ -13,6 +13,8 @@ import numpy as np
 
 # plotting module.
 import pyqtgraph as pg  # type: ignore
+
+# shortens function call
 from numpy.linalg import norm
 from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
 
