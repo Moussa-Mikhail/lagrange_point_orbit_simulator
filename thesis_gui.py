@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QMainWindow,
     QPushButton,
-    QVBoxLayout,
+    QFormLayout,
     QWidget,
 )
 
@@ -55,17 +55,9 @@ class ThesisUi(QMainWindow):
 
         # plotConservedLayout.addWidget(QLabel("plot conserved quantities"))
 
-        # time in milliseconds between plot updates
-        self._period = 33
-
-        self._timer = None
-
     def _addInputFields(self):
 
-        # TODO: refactor how this is done.
-        # Add input fields all at once and then insert text
-
-        self._inputsLayout = QVBoxLayout()
+        self._inputsLayout = QFormLayout()
 
         self._buttons = {}
 
@@ -89,13 +81,15 @@ class ThesisUi(QMainWindow):
 
             buttonsLayout.addWidget(self._buttons[btnText])
 
-        self._inputsLayout.addLayout(buttonsLayout)
+        self._inputsLayout.addRow(buttonsLayout)
 
     def _addSimParams(self):
 
         simParamsLabel = QLabel("Simulation Parameters")
 
-        self._inputsLayout.addWidget(simParamsLabel)
+        simParamsLabel.setAlignment(Qt.AlignCenter)
+
+        self._inputsLayout.addRow(simParamsLabel)
 
         simParams = {
             "number of years": "10",
@@ -105,27 +99,19 @@ class ThesisUi(QMainWindow):
 
         for fieldText, defaultValue in simParams.items():
 
-            fieldLayout = QHBoxLayout()
-
-            fieldLabel = QLabel(fieldText)
-
-            fieldLayout.addWidget(fieldLabel)
-
             fieldLine = QLineEdit(defaultValue)
-
-            fieldLine.setAlignment(Qt.AlignRight)
 
             self._inputFields[fieldText] = fieldLine
 
-            fieldLayout.addWidget(fieldLine)
-
-            self._inputsLayout.addLayout(fieldLayout)
+            self._inputsLayout.addRow(fieldText, fieldLine)
 
     def _addSatParams(self):
 
         satParamsLabel = QLabel("\nSatellite Parameters")
 
-        self._inputsLayout.addWidget(satParamsLabel)
+        satParamsLabel.setAlignment(Qt.AlignCenter)
+
+        self._inputsLayout.addRow(satParamsLabel)
 
         satParams = {
             "perturbation size": "0",
@@ -137,21 +123,11 @@ class ThesisUi(QMainWindow):
 
         for fieldText, defaultValue in satParams.items():
 
-            fieldLayout = QHBoxLayout()
-
-            fieldLabel = QLabel(fieldText)
-
-            fieldLayout.addWidget(fieldLabel)
-
             fieldLine = QLineEdit(defaultValue)
-
-            fieldLine.setAlignment(Qt.AlignRight)
 
             self._inputFields[fieldText] = fieldLine
 
-            fieldLayout.addWidget(fieldLine)
-
-            self._inputsLayout.addLayout(fieldLayout)
+            self._inputsLayout.addRow(fieldText, fieldLine)
 
     def _initializePlots(self):
 
@@ -170,6 +146,11 @@ class ThesisUi(QMainWindow):
         self._generalLayout.addWidget(orbitPlot)
 
         self._generalLayout.addWidget(corotatingPlot)
+
+        # time in milliseconds between plot updates
+        self._period = 33
+
+        self._timer = None
 
 
 class ThesisCtrl:
