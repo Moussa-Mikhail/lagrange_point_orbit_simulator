@@ -167,24 +167,16 @@ def main(
     energy, angular momentum, linear momentum.
     The default is False.
 
-    This function will take ~0.46 seconds per 10**6 steps if
+    This function will take ~0.5 seconds per 10**6 steps if
     the Cythonized extensions are available.
     1.4 seconds if not.
     The time may vary depending on your hardware.
     It will take longer than usual on the first call.
     """
 
-    default_pertubation_angle = np.arctan2(default_pos[1], default_pos[0])
-
-    default_pertubation_angle = np.degrees(default_pertubation_angle)
-
-    if perturbation_angle is None:
-
-        perturbation_angle = default_pertubation_angle
-
-    if vel_angle is None:
-
-        vel_angle = default_pertubation_angle + 90
+    perturbation_angle, vel_angle = calc_default_angles(
+        default_pos, perturbation_angle, vel_angle
+    )
 
     star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel = calc_orbit(
         num_years,
@@ -266,15 +258,8 @@ def main(
     return orbit_plot, corotating_plot, timer
 
 
-def calc_orbit(
-    num_years=100.0,
-    num_steps=1 * 10**6,
-    perturbation_size=0,
-    perturbation_angle=None,
-    speed=1,
-    vel_angle=None,
-    default_pos=L4,
-):
+def calc_default_angles(default_pos, perturbation_angle, vel_angle):
+
     default_pertubation_angle = np.arctan2(default_pos[1], default_pos[0])
 
     default_pertubation_angle = np.degrees(default_pertubation_angle)
@@ -286,6 +271,22 @@ def calc_orbit(
     if vel_angle is None:
 
         vel_angle = default_pertubation_angle + 90
+
+    return perturbation_angle, vel_angle
+
+
+def calc_orbit(
+    num_years=100.0,
+    num_steps=1 * 10**6,
+    perturbation_size=0,
+    perturbation_angle=None,
+    speed=1,
+    vel_angle=None,
+    default_pos=L4,
+):
+    perturbation_angle, vel_angle = calc_default_angles(
+        default_pos, perturbation_angle, vel_angle
+    )
 
     star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel = initialization(
         num_steps, perturbation_size, perturbation_angle, speed, vel_angle, default_pos
