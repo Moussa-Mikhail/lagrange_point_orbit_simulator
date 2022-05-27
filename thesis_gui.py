@@ -4,7 +4,6 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QApplication,
-    QCheckBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -12,25 +11,19 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QFormLayout,
     QWidget,
+    QErrorMessage,
 )
 
 import pyqtgraph as pg  # type: ignore
 
-from thesis_code import L1, L2, L3, L4, L5
-from thesis_code import main as thesisMain
+from thesis_code import main as simMain
 
-lagrangePoints = {
-    "L1": L1,
-    "L2": L2,
-    "L3": L3,
-    "L4": L4,
-    "L5": L5,
-}
+# pylint: disable=unused-import
+from constants import sun_mass, earth_mass, constants_names  # noqa: F401
 
 simParams = {
     "number of years": "10",
-    "number of steps": "10**6",
-    "time step": "0.1",
+    "number of steps": "10**5",
 }
 
 satParams = {
@@ -39,6 +32,27 @@ satParams = {
     "initial speed": "1",
     "initial velocity angle": "150",
     "Lagrange Point": "L4",
+}
+
+sysParams = {
+    "star mass": "sun_mass",
+    "planet mass": "earth_mass",
+    "planet distance": "1.0",
+}
+
+# used to translate param labels used in gui to arg names used in simMain
+argNames = {
+    "number of steps": "num_steps",
+    "number of years": "num_years",
+    "time step": "time_step",
+    "perturbation size": "perturbation_size",
+    "perturbation angle": "perturbation_angle",
+    "initial speed": "speed",
+    "initial velocity angle": "vel_angle",
+    "star mass": "star_mass",
+    "planet mass": "planet_mass",
+    "planet distance": "planet_distance",
+    "Lagrange Point": "lagrange_point",
 }
 
 
@@ -63,12 +77,6 @@ class ThesisUi(QMainWindow):
 
         self._initializePlots()
 
-        # TODO: implement conserved plots
-
-        # plotConservedLayout = QHBoxLayout()
-
-        # plotConservedLayout.addWidget(QLabel("plot conserved quantities"))
-
     def _addInputFields(self):
 
         self._inputsLayout = QFormLayout()
@@ -80,6 +88,8 @@ class ThesisUi(QMainWindow):
         self._addParams("Simulation Parameters", simParams)
 
         self._addParams("Satellite Parameters", satParams)
+
+        self._addParams("System Parameters", sysParams)
 
         self._generalLayout.addLayout(self._inputsLayout)
 
@@ -97,15 +107,15 @@ class ThesisUi(QMainWindow):
 
         self._inputsLayout.addRow(buttonsLayout)
 
-    def _addParams(self, paramLabelText, params):
+    def _addParams(self, argLabelText, Params):
 
-        paramLabel = QLabel(paramLabelText)
+        argLabel = QLabel(argLabelText)
 
-        paramLabel.setAlignment(Qt.AlignCenter)
+        argLabel.setAlignment(Qt.AlignCenter)
 
-        self._inputsLayout.addRow(paramLabel)
+        self._inputsLayout.addRow(argLabel)
 
-        for fieldText, defaultValue in params.items():
+        for fieldText, defaultValue in Params.items():
 
             fieldLine = QLineEdit(defaultValue)
 
@@ -119,11 +129,11 @@ class ThesisUi(QMainWindow):
         orbitPlot.setLabel("bottom", "x", units="AU")
         orbitPlot.setLabel("left", "y", units="AU")
 
-        self._orbitPlot = orbitPlot
-
         corotatingPlot = pg.plot(title="Orbits in Co-Rotating Coordinate System")
         corotatingPlot.setLabel("bottom", "x", units="AU")
         corotatingPlot.setLabel("left", "y", units="AU")
+
+        self._orbitPlot = orbitPlot
 
         self._corotatingPlot = corotatingPlot
 
@@ -146,6 +156,8 @@ class ThesisCtrl:
 
         self._connectSignals()
 
+        self._addReturnPressed()
+
     def _connectSignals(self):
 
         btnActions = {"Simulate": self._simulate, "Start/Stop": self._toggleAnimation}
@@ -156,11 +168,19 @@ class ThesisCtrl:
 
             btn.clicked.connect(action)
 
+    def _addReturnPressed(self):
+
+        for field in self._view._inputFields.values():
+
+            field.returnPressed.connect(self._simulate)
+
     def _simulate(self):
 
         simulationInputs = self._getSimulationInputs()
 
-        orbitPlot, corotatingPlot, timer = self._model(*simulationInputs.values())
+        translatedInputs = _translateInputs(simulationInputs)
+
+        orbitPlot, corotatingPlot, timer = self._model(**translatedInputs)
 
         timer.stop()
 
@@ -190,9 +210,7 @@ class ThesisCtrl:
 
         inputs = {}
 
-        inputFields = self._view._inputFields
-
-        for fieldText, field in inputFields.items():
+        for fieldText, field in self._view._inputFields.items():
 
             fieldValue = field.text()
 
@@ -204,22 +222,23 @@ class ThesisCtrl:
 
             try:
 
-                inputs[fieldText] = float(fieldValue)
+                value = safeEval(fieldValue)
 
-            except ValueError:
+            except (ValueError, SyntaxError):
 
-                try:
+                error_dialog = QErrorMessage()
 
-                    inputs[fieldText] = int(safeEval(fieldValue))
+                error_dialog.showMessage(f"Invalid expression in {fieldText}")
 
-                except (ValueError, TypeError):
+                continue
 
-                    inputs[fieldText] = fieldValue
+            if fieldText == "number of steps":
 
-        lagrangeStr = inputs["Lagrange Point"]
-        inputs["Lagrange Point"] = lagrangePoints[lagrangeStr]
+                inputs[fieldText] = int(value)
 
-        del inputs["time step"]
+                continue
+
+            inputs[fieldText] = float(value)
 
         return inputs
 
@@ -234,11 +253,22 @@ class ThesisCtrl:
             self._view._timer.start(self._view._period)
 
 
-def safeEval(expr):
+def _translateInputs(inputs):
 
-    chars = set(expr)
+    return {argNames[label]: v for label, v in inputs.items()}
 
-    if not chars.issubset("0123456789.+-*/()"):
+
+def safeEval(expr: str):
+
+    exprNoConstants = expr
+
+    for constant in constants_names:
+
+        exprNoConstants = exprNoConstants.replace(constant, "")
+
+    chars = set(exprNoConstants)
+
+    if not chars.issubset("0123456789.+-*/()e"):
 
         raise ValueError("invalid expression")
 
@@ -253,7 +283,10 @@ def main():
 
     view.show()
 
-    ctrl = ThesisCtrl(model=thesisMain, view=view)
+    # pylint: disable=unused-variable
+    # this assignment shouldn't be necessary, but it is
+    # TODO: fix this bug
+    ctrl = ThesisCtrl(model=simMain, view=view)  # noqa: F841
 
     sys.exit(thesisGui.exec_())
 
