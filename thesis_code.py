@@ -20,7 +20,7 @@ from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
 
 try:
     # cythonized version of integrate
-    # roughly 4.5x times faster
+    # roughly 5x times faster
     from integrate_cy import integrate  # type: ignore
 
 except ImportError:
@@ -30,7 +30,7 @@ except ImportError:
 try:
 
     # cythonized version of transform_to_corotating
-    # roughly 4.5x times faster
+    # roughly 3.7x times faster
     from transform_cy import transform_to_corotating  # type: ignore
 
 except ImportError:
@@ -820,9 +820,9 @@ def main(
     energy, angular momentum, linear momentum.
     The default is False.
 
-    This function will take ~0.46 seconds per 10**6 steps if
-    the Cythonized extensions are available.
-    1.4 seconds if not.
+    This function will take ~0.5 seconds per 10**6 steps if
+    the .pyd extensions are available.
+    1.5 seconds if not.
     The time may vary depending on your hardware.
     It will take longer than usual on the first call.
     """
