@@ -11,7 +11,7 @@ If you are familiar with Cython then you can use the provided setup.py file to b
 
 ## Usage
 
-The simulation module is meant to be used by calling its main function.
+The simulation.py module is meant to be used by calling its main function.
 
 ```
 main simulates a satellite's orbit corresponding to the following parameters.
@@ -73,7 +73,7 @@ This is the docstring of thesis_code.main which can be seen at any time by using
 
 # collect_data
 
-collect_data is used to collect data by simulating random orbits. The data is then saved to "data.csv".
+thesis/collect_data.py is used to collect data by simulating random orbits. The data is then saved to "data.csv".
 
 ## Usage
 
