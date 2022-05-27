@@ -86,6 +86,7 @@ def main(
     perturbation_size: Size of perturbation in AU. The default is 0.0.
     perturbation_angle: Angle of perturbation relative to positive x axis in degrees.
     The default is None.
+
     If None, then perturbation_size has the effect of
     moving the satellite away or towards the origin.
 
@@ -95,15 +96,20 @@ def main(
 
     vel_angle: Angle of satellite's initial velocity relative to positive x axis in degrees.
     The default is None.
-    If None, then vel_angle is perpendicular to the satellite's default position.
+
+    If None, then vel_angle is perpendicular to the satellite's
+    default position relative to the center of mass.
 
     lagrange_point: Non-perturbed position of satellite. String.
-    The default is 'L4' but 'L1', 'L2', 'L3', 'L5' can also be used.
+    The default is 'L4' but the others can also be used.
 
     #### System parameters
     star_mass: Mass of the star in kilograms. The default is the mass of the Sun.
+
     planet_mass: Mass of the planet in kilograms. The default is the mass of the Earth.
+
     The constants sun_mass and earth_mass may be imported from the file constants.py.
+
     planet_distance: Distance between the planet and the star in AU. The default is 1.0.
 
     plot_conserved: If True, plots the conserved quantities:
@@ -112,7 +118,7 @@ def main(
 
     This function will take ~0.5 seconds per 10**6 steps if
     the .pyd extensions are available.
-    1.5 seconds if not.
+    1.5 seconds if they aren't.
     The time may vary depending on your hardware.
     It will take longer than usual on the first call.
     """
