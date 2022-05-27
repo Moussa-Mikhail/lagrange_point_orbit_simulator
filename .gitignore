@@ -136,10 +136,9 @@ dmypy.json
 *.synctex.gz
 
 # miscellaneous
-.vscode/settings.json
-data.csv
+.vscode
 *.html
 .VSCodeCounter
-data1.csv
 thesis notes.txt
 perf_test.py
+*.csv
