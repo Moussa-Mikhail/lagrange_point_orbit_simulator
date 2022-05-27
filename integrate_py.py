@@ -6,7 +6,7 @@ import numpy as np
 
 from numba import njit  # type: ignore
 
-from thesis_code import G, planet_mass, star_mass
+from constants import G
 
 
 @njit()
@@ -17,6 +17,8 @@ def norm(vector):
 
 @njit()
 def calc_acceleration(
+    star_mass,
+    planet_mass,
     star_pos,
     planet_pos,
     sat_pos,
@@ -59,7 +61,16 @@ def calc_acceleration(
 
 @njit()
 def integrate(
-    time_step, num_steps, star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
+    time_step,
+    num_steps,
+    star_mass,
+    planet_mass,
+    star_pos,
+    star_vel,
+    planet_pos,
+    planet_vel,
+    sat_pos,
+    sat_vel,
 ):
 
     star_accel = np.empty(3, dtype=np.double)
@@ -99,6 +110,8 @@ def integrate(
 
         # acceleration calculation
         calc_acceleration(
+            star_mass,
+            planet_mass,
             star_intermediate_pos,
             planet_intermediate_pos,
             sat_intermediate_pos,

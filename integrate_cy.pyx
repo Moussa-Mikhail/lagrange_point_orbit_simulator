@@ -6,14 +6,9 @@ import cython
 
 from libc.math cimport sqrt
 
-cdef double star_mass
-
-cdef double planet_mass
-
 cdef double G
 
-from thesis_code import G, planet_mass, star_mass
-
+from constants import G
 
 @cython.cdivision(True)
 @cython.nonecheck(False)
@@ -24,12 +19,14 @@ from thesis_code import G, planet_mass, star_mass
 cpdef integrate(
     const double time_step,
     const long num_steps,
+    const double star_mass,
+    const double planet_mass,
     star_pos,
     star_vel,
     planet_pos,
     planet_vel,
     sat_pos,
-    sat_vel
+    sat_vel,
 ):
 
     cdef double[:, ::1] star_pos_view = star_pos
@@ -73,6 +70,8 @@ cpdef integrate(
         # acceleration calculation
         # calc_acceleration changes the values in the accel arrays
         calc_acceleration(
+            star_mass,
+            planet_mass,
             star_intermediate_pos,
             planet_intermediate_pos,
             sat_intermediate_pos,
@@ -105,6 +104,8 @@ cpdef integrate(
 @cython.boundscheck(False)
 @cython.initializedcheck(False)
 cdef void calc_acceleration(
+    const double star_mass,
+    const double planet_mass,
     const double * const star_pos,
     const double * const planet_pos,
     const double * const sat_pos,

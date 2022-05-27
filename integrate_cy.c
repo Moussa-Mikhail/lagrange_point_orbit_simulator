@@ -1816,8 +1816,6 @@ static PyTypeObject *__pyx_array_type = 0;
 static PyTypeObject *__pyx_MemviewEnum_type = 0;
 static PyTypeObject *__pyx_memoryview_type = 0;
 static PyTypeObject *__pyx_memoryviewslice_type = 0;
-static double __pyx_v_12integrate_cy_star_mass;
-static double __pyx_v_12integrate_cy_planet_mass;
 static double __pyx_v_12integrate_cy_G;
 static PyObject *generic = 0;
 static PyObject *strided = 0;
@@ -1826,8 +1824,8 @@ static PyObject *contiguous = 0;
 static PyObject *indirect_contiguous = 0;
 static int __pyx_memoryview_thread_locks_used;
 static PyThread_type_lock __pyx_memoryview_thread_locks[8];
-static PyObject *__pyx_f_12integrate_cy_integrate(double const , long const , PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, int __pyx_skip_dispatch); /*proto*/
-static void __pyx_f_12integrate_cy_calc_acceleration(double const *const , double const *const , double const *const , double *, double *, double *); /*proto*/
+static PyObject *__pyx_f_12integrate_cy_integrate(double const , long const , double const , double const , PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, PyObject *, int __pyx_skip_dispatch); /*proto*/
+static void __pyx_f_12integrate_cy_calc_acceleration(double const , double const , double const *const , double const *const , double const *const , double *, double *, double *); /*proto*/
 static double __pyx_f_12integrate_cy_norm(double const *const ); /*proto*/
 static struct __pyx_array_obj *__pyx_array_new(PyObject *, Py_ssize_t, char *, char *, char *); /*proto*/
 static void *__pyx_align_pointer(void *, size_t); /*proto*/
@@ -1923,6 +1921,7 @@ static const char __pyx_k_setstate[] = "__setstate__";
 static const char __pyx_k_star_pos[] = "star_pos";
 static const char __pyx_k_star_vel[] = "star_vel";
 static const char __pyx_k_TypeError[] = "TypeError";
+static const char __pyx_k_constants[] = "constants";
 static const char __pyx_k_enumerate[] = "enumerate";
 static const char __pyx_k_num_steps[] = "num_steps";
 static const char __pyx_k_pyx_state[] = "__pyx_state";
@@ -1938,7 +1937,6 @@ static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
 static const char __pyx_k_MemoryError[] = "MemoryError";
 static const char __pyx_k_PickleError[] = "PickleError";
 static const char __pyx_k_planet_mass[] = "planet_mass";
-static const char __pyx_k_thesis_code[] = "thesis_code";
 static const char __pyx_k_pyx_checksum[] = "__pyx_checksum";
 static const char __pyx_k_stringsource[] = "stringsource";
 static const char __pyx_k_pyx_getbuffer[] = "__pyx_getbuffer";
@@ -2004,6 +2002,7 @@ static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_u_c;
 static PyObject *__pyx_n_s_class;
 static PyObject *__pyx_n_s_cline_in_traceback;
+static PyObject *__pyx_n_s_constants;
 static PyObject *__pyx_kp_s_contiguous_and_direct;
 static PyObject *__pyx_kp_s_contiguous_and_indirect;
 static PyObject *__pyx_n_s_dict;
@@ -2068,13 +2067,12 @@ static PyObject *__pyx_kp_s_strided_and_indirect;
 static PyObject *__pyx_kp_s_stringsource;
 static PyObject *__pyx_n_s_struct;
 static PyObject *__pyx_n_s_test;
-static PyObject *__pyx_n_s_thesis_code;
 static PyObject *__pyx_n_s_time_step;
 static PyObject *__pyx_kp_s_unable_to_allocate_array_data;
 static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
 static PyObject *__pyx_n_s_update;
-static PyObject *__pyx_pf_12integrate_cy_integrate(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_time_step, long __pyx_v_num_steps, PyObject *__pyx_v_star_pos, PyObject *__pyx_v_star_vel, PyObject *__pyx_v_planet_pos, PyObject *__pyx_v_planet_vel, PyObject *__pyx_v_sat_pos, PyObject *__pyx_v_sat_vel); /* proto */
+static PyObject *__pyx_pf_12integrate_cy_integrate(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_time_step, long __pyx_v_num_steps, double __pyx_v_star_mass, double __pyx_v_planet_mass, PyObject *__pyx_v_star_pos, PyObject *__pyx_v_star_vel, PyObject *__pyx_v_planet_pos, PyObject *__pyx_v_planet_vel, PyObject *__pyx_v_sat_pos, PyObject *__pyx_v_sat_vel); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -2155,7 +2153,7 @@ static PyObject *__pyx_tuple__25;
 static PyObject *__pyx_codeobj__26;
 /* Late includes */
 
-/* "integrate_cy.pyx":24
+/* "integrate_cy.pyx":19
  * @cython.embedsignature(True)
  * @cython.initializedcheck(False)
  * cpdef integrate(             # <<<<<<<<<<<<<<
@@ -2164,7 +2162,7 @@ static PyObject *__pyx_codeobj__26;
  */
 
 static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step, long const __pyx_v_num_steps, PyObject *__pyx_v_star_pos, PyObject *__pyx_v_star_vel, PyObject *__pyx_v_planet_pos, PyObject *__pyx_v_planet_vel, PyObject *__pyx_v_sat_pos, PyObject *__pyx_v_sat_vel, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step, long const __pyx_v_num_steps, double const __pyx_v_star_mass, double const __pyx_v_planet_mass, PyObject *__pyx_v_star_pos, PyObject *__pyx_v_star_vel, PyObject *__pyx_v_planet_pos, PyObject *__pyx_v_planet_vel, PyObject *__pyx_v_sat_pos, PyObject *__pyx_v_sat_vel, CYTHON_UNUSED int __pyx_skip_dispatch) {
   __Pyx_memviewslice __pyx_v_star_pos_view = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_star_vel_view = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_planet_pos_view = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -2196,79 +2194,79 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("integrate", 0);
 
-  /* "integrate_cy.pyx":35
+  /* "integrate_cy.pyx":32
  * ):
  * 
  *     cdef double[:, ::1] star_pos_view = star_pos             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:, ::1] star_vel_view = star_vel
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_star_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 35, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_star_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 32, __pyx_L1_error)
   __pyx_v_star_pos_view = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "integrate_cy.pyx":37
+  /* "integrate_cy.pyx":34
  *     cdef double[:, ::1] star_pos_view = star_pos
  * 
  *     cdef double[:, ::1] star_vel_view = star_vel             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:, ::1] planet_pos_view = planet_pos
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_star_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 37, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_star_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 34, __pyx_L1_error)
   __pyx_v_star_vel_view = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "integrate_cy.pyx":39
+  /* "integrate_cy.pyx":36
  *     cdef double[:, ::1] star_vel_view = star_vel
  * 
  *     cdef double[:, ::1] planet_pos_view = planet_pos             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:, ::1] planet_vel_view = planet_vel
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_planet_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 39, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_planet_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 36, __pyx_L1_error)
   __pyx_v_planet_pos_view = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "integrate_cy.pyx":41
+  /* "integrate_cy.pyx":38
  *     cdef double[:, ::1] planet_pos_view = planet_pos
  * 
  *     cdef double[:, ::1] planet_vel_view = planet_vel             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:, ::1] sat_pos_view = sat_pos
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_planet_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_planet_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 38, __pyx_L1_error)
   __pyx_v_planet_vel_view = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "integrate_cy.pyx":43
+  /* "integrate_cy.pyx":40
  *     cdef double[:, ::1] planet_vel_view = planet_vel
  * 
  *     cdef double[:, ::1] sat_pos_view = sat_pos             # <<<<<<<<<<<<<<
  * 
  *     cdef double[:, ::1] sat_vel_view = sat_vel
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_sat_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_sat_pos, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 40, __pyx_L1_error)
   __pyx_v_sat_pos_view = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "integrate_cy.pyx":45
+  /* "integrate_cy.pyx":42
  *     cdef double[:, ::1] sat_pos_view = sat_pos
  * 
  *     cdef double[:, ::1] sat_vel_view = sat_vel             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_sat_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_d_dc_double(__pyx_v_sat_vel, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 42, __pyx_L1_error)
   __pyx_v_sat_vel_view = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "integrate_cy.pyx":62
+  /* "integrate_cy.pyx":59
  *     cdef Py_ssize_t k, j
  * 
  *     for k in range(1, num_steps + 1):             # <<<<<<<<<<<<<<
@@ -2280,7 +2278,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
   for (__pyx_t_4 = 1; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_v_k = __pyx_t_4;
 
-    /* "integrate_cy.pyx":64
+    /* "integrate_cy.pyx":61
  *     for k in range(1, num_steps + 1):
  * 
  *         for j in range(3):             # <<<<<<<<<<<<<<
@@ -2290,7 +2288,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
     for (__pyx_t_5 = 0; __pyx_t_5 < 3; __pyx_t_5+=1) {
       __pyx_v_j = __pyx_t_5;
 
-      /* "integrate_cy.pyx":67
+      /* "integrate_cy.pyx":64
  * 
  *             # intermediate position calculation
  *             star_intermediate_pos[j] = star_pos_view[k - 1, j] + 0.5 * star_vel_view[k - 1, j] * time_step             # <<<<<<<<<<<<<<
@@ -2303,7 +2301,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
       __pyx_t_9 = __pyx_v_j;
       (__pyx_v_star_intermediate_pos[__pyx_v_j]) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_pos_view.data + __pyx_t_6 * __pyx_v_star_pos_view.strides[0]) )) + __pyx_t_7)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_8 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_9)) )))) * __pyx_v_time_step));
 
-      /* "integrate_cy.pyx":69
+      /* "integrate_cy.pyx":66
  *             star_intermediate_pos[j] = star_pos_view[k - 1, j] + 0.5 * star_vel_view[k - 1, j] * time_step
  * 
  *             planet_intermediate_pos[j] = planet_pos_view[k - 1, j] + 0.5 * planet_vel_view[k - 1, j] * time_step             # <<<<<<<<<<<<<<
@@ -2316,7 +2314,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
       __pyx_t_6 = __pyx_v_j;
       (__pyx_v_planet_intermediate_pos[__pyx_v_j]) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_pos_view.data + __pyx_t_9 * __pyx_v_planet_pos_view.strides[0]) )) + __pyx_t_8)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_7 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_6)) )))) * __pyx_v_time_step));
 
-      /* "integrate_cy.pyx":71
+      /* "integrate_cy.pyx":68
  *             planet_intermediate_pos[j] = planet_pos_view[k - 1, j] + 0.5 * planet_vel_view[k - 1, j] * time_step
  * 
  *             sat_intermediate_pos[j] = sat_pos_view[k - 1, j] + 0.5 * sat_vel_view[k - 1, j] * time_step             # <<<<<<<<<<<<<<
@@ -2330,16 +2328,16 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
       (__pyx_v_sat_intermediate_pos[__pyx_v_j]) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_pos_view.data + __pyx_t_6 * __pyx_v_sat_pos_view.strides[0]) )) + __pyx_t_7)) ))) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_vel_view.data + __pyx_t_8 * __pyx_v_sat_vel_view.strides[0]) )) + __pyx_t_9)) )))) * __pyx_v_time_step));
     }
 
-    /* "integrate_cy.pyx":75
+    /* "integrate_cy.pyx":72
  *         # acceleration calculation
  *         # calc_acceleration changes the values in the accel arrays
  *         calc_acceleration(             # <<<<<<<<<<<<<<
- *             star_intermediate_pos,
- *             planet_intermediate_pos,
+ *             star_mass,
+ *             planet_mass,
  */
-    __pyx_f_12integrate_cy_calc_acceleration(__pyx_v_star_intermediate_pos, __pyx_v_planet_intermediate_pos, __pyx_v_sat_intermediate_pos, __pyx_v_star_accel, __pyx_v_planet_accel, __pyx_v_sat_accel);
+    __pyx_f_12integrate_cy_calc_acceleration(__pyx_v_star_mass, __pyx_v_planet_mass, __pyx_v_star_intermediate_pos, __pyx_v_planet_intermediate_pos, __pyx_v_sat_intermediate_pos, __pyx_v_star_accel, __pyx_v_planet_accel, __pyx_v_sat_accel);
 
-    /* "integrate_cy.pyx":84
+    /* "integrate_cy.pyx":83
  *         )
  * 
  *         for j in range(3):             # <<<<<<<<<<<<<<
@@ -2349,7 +2347,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
     for (__pyx_t_5 = 0; __pyx_t_5 < 3; __pyx_t_5+=1) {
       __pyx_v_j = __pyx_t_5;
 
-      /* "integrate_cy.pyx":87
+      /* "integrate_cy.pyx":86
  * 
  *             # velocity update
  *             star_vel_view[k, j] = star_vel_view[k - 1, j] + star_accel[j] * time_step             # <<<<<<<<<<<<<<
@@ -2362,7 +2360,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
       __pyx_t_6 = __pyx_v_j;
       *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_7 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_6)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_9 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_8)) ))) + ((__pyx_v_star_accel[__pyx_v_j]) * __pyx_v_time_step));
 
-      /* "integrate_cy.pyx":89
+      /* "integrate_cy.pyx":88
  *             star_vel_view[k, j] = star_vel_view[k - 1, j] + star_accel[j] * time_step
  * 
  *             planet_vel_view[k, j] = planet_vel_view[k - 1, j] + planet_accel[j] * time_step             # <<<<<<<<<<<<<<
@@ -2375,7 +2373,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
       __pyx_t_7 = __pyx_v_j;
       *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_6 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_7)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_8 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_9)) ))) + ((__pyx_v_planet_accel[__pyx_v_j]) * __pyx_v_time_step));
 
-      /* "integrate_cy.pyx":91
+      /* "integrate_cy.pyx":90
  *             planet_vel_view[k, j] = planet_vel_view[k - 1, j] + planet_accel[j] * time_step
  * 
  *             sat_vel_view[k, j] = sat_vel_view[k - 1, j] + sat_accel[j] * time_step             # <<<<<<<<<<<<<<
@@ -2388,7 +2386,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
       __pyx_t_6 = __pyx_v_j;
       *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_vel_view.data + __pyx_t_7 * __pyx_v_sat_vel_view.strides[0]) )) + __pyx_t_6)) )) = ((*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_sat_vel_view.data + __pyx_t_9 * __pyx_v_sat_vel_view.strides[0]) )) + __pyx_t_8)) ))) + ((__pyx_v_sat_accel[__pyx_v_j]) * __pyx_v_time_step));
 
-      /* "integrate_cy.pyx":94
+      /* "integrate_cy.pyx":93
  * 
  *             # position update
  *             star_pos_view[k, j] = star_intermediate_pos[j] + 0.5 * star_vel_view[k, j] * time_step             # <<<<<<<<<<<<<<
@@ -2401,7 +2399,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
       __pyx_t_7 = __pyx_v_j;
       *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_pos_view.data + __pyx_t_6 * __pyx_v_star_pos_view.strides[0]) )) + __pyx_t_7)) )) = ((__pyx_v_star_intermediate_pos[__pyx_v_j]) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_star_vel_view.data + __pyx_t_8 * __pyx_v_star_vel_view.strides[0]) )) + __pyx_t_9)) )))) * __pyx_v_time_step));
 
-      /* "integrate_cy.pyx":96
+      /* "integrate_cy.pyx":95
  *             star_pos_view[k, j] = star_intermediate_pos[j] + 0.5 * star_vel_view[k, j] * time_step
  * 
  *             planet_pos_view[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel_view[k, j] * time_step             # <<<<<<<<<<<<<<
@@ -2414,7 +2412,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
       __pyx_t_6 = __pyx_v_j;
       *((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_pos_view.data + __pyx_t_7 * __pyx_v_planet_pos_view.strides[0]) )) + __pyx_t_6)) )) = ((__pyx_v_planet_intermediate_pos[__pyx_v_j]) + ((0.5 * (*((double *) ( /* dim=1 */ ((char *) (((double *) ( /* dim=0 */ (__pyx_v_planet_vel_view.data + __pyx_t_9 * __pyx_v_planet_vel_view.strides[0]) )) + __pyx_t_8)) )))) * __pyx_v_time_step));
 
-      /* "integrate_cy.pyx":98
+      /* "integrate_cy.pyx":97
  *             planet_pos_view[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel_view[k, j] * time_step
  * 
  *             sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step             # <<<<<<<<<<<<<<
@@ -2429,7 +2427,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
     }
   }
 
-  /* "integrate_cy.pyx":100
+  /* "integrate_cy.pyx":99
  *             sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step
  * 
  *     return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel             # <<<<<<<<<<<<<<
@@ -2437,7 +2435,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
  * @cython.cdivision(True)
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_10 = PyTuple_New(6); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 100, __pyx_L1_error)
+  __pyx_t_10 = PyTuple_New(6); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 99, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __Pyx_INCREF(__pyx_v_star_pos);
   __Pyx_GIVEREF(__pyx_v_star_pos);
@@ -2461,7 +2459,7 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
   __pyx_t_10 = 0;
   goto __pyx_L0;
 
-  /* "integrate_cy.pyx":24
+  /* "integrate_cy.pyx":19
  * @cython.embedsignature(True)
  * @cython.initializedcheck(False)
  * cpdef integrate(             # <<<<<<<<<<<<<<
@@ -2489,10 +2487,12 @@ static PyObject *__pyx_f_12integrate_cy_integrate(double const __pyx_v_time_step
 
 /* Python wrapper */
 static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_12integrate_cy_integrate[] = "integrate(double time_step, long num_steps, star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel)";
+static char __pyx_doc_12integrate_cy_integrate[] = "integrate(double time_step, long num_steps, double star_mass, double planet_mass, star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel)";
 static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   double __pyx_v_time_step;
   long __pyx_v_num_steps;
+  double __pyx_v_star_mass;
+  double __pyx_v_planet_mass;
   PyObject *__pyx_v_star_pos = 0;
   PyObject *__pyx_v_star_vel = 0;
   PyObject *__pyx_v_planet_pos = 0;
@@ -2506,12 +2506,16 @@ static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObje
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("integrate (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_time_step,&__pyx_n_s_num_steps,&__pyx_n_s_star_pos,&__pyx_n_s_star_vel,&__pyx_n_s_planet_pos,&__pyx_n_s_planet_vel,&__pyx_n_s_sat_pos,&__pyx_n_s_sat_vel,0};
-    PyObject* values[8] = {0,0,0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_time_step,&__pyx_n_s_num_steps,&__pyx_n_s_star_mass,&__pyx_n_s_planet_mass,&__pyx_n_s_star_pos,&__pyx_n_s_star_vel,&__pyx_n_s_planet_pos,&__pyx_n_s_planet_vel,&__pyx_n_s_sat_pos,&__pyx_n_s_sat_vel,0};
+    PyObject* values[10] = {0,0,0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case 10: values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
+        CYTHON_FALLTHROUGH;
+        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+        CYTHON_FALLTHROUGH;
         case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
         CYTHON_FALLTHROUGH;
         case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
@@ -2540,49 +2544,61 @@ static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObje
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_num_steps)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 1); __PYX_ERR(0, 24, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 10, 10, 1); __PYX_ERR(0, 19, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_star_pos)) != 0)) kw_args--;
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_star_mass)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 2); __PYX_ERR(0, 24, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 10, 10, 2); __PYX_ERR(0, 19, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
-        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_star_vel)) != 0)) kw_args--;
+        if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_planet_mass)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 3); __PYX_ERR(0, 24, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 10, 10, 3); __PYX_ERR(0, 19, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
-        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_planet_pos)) != 0)) kw_args--;
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_star_pos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 4); __PYX_ERR(0, 24, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 10, 10, 4); __PYX_ERR(0, 19, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
-        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_planet_vel)) != 0)) kw_args--;
+        if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_star_vel)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 5); __PYX_ERR(0, 24, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 10, 10, 5); __PYX_ERR(0, 19, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  6:
-        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sat_pos)) != 0)) kw_args--;
+        if (likely((values[6] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_planet_pos)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 6); __PYX_ERR(0, 24, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 10, 10, 6); __PYX_ERR(0, 19, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  7:
-        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sat_vel)) != 0)) kw_args--;
+        if (likely((values[7] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_planet_vel)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, 7); __PYX_ERR(0, 24, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 10, 10, 7); __PYX_ERR(0, 19, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  8:
+        if (likely((values[8] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sat_pos)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 10, 10, 8); __PYX_ERR(0, 19, __pyx_L3_error)
+        }
+        CYTHON_FALLTHROUGH;
+        case  9:
+        if (likely((values[9] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_sat_vel)) != 0)) kw_args--;
+        else {
+          __Pyx_RaiseArgtupleInvalid("integrate", 1, 10, 10, 9); __PYX_ERR(0, 19, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "integrate") < 0)) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "integrate") < 0)) __PYX_ERR(0, 19, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 8) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 10) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -2593,32 +2609,36 @@ static PyObject *__pyx_pw_12integrate_cy_1integrate(PyObject *__pyx_self, PyObje
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
       values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
       values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+      values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+      values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
     }
-    __pyx_v_time_step = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_time_step == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 25, __pyx_L3_error)
-    __pyx_v_num_steps = __Pyx_PyInt_As_long(values[1]); if (unlikely((__pyx_v_num_steps == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 26, __pyx_L3_error)
-    __pyx_v_star_pos = values[2];
-    __pyx_v_star_vel = values[3];
-    __pyx_v_planet_pos = values[4];
-    __pyx_v_planet_vel = values[5];
-    __pyx_v_sat_pos = values[6];
-    __pyx_v_sat_vel = values[7];
+    __pyx_v_time_step = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_time_step == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 20, __pyx_L3_error)
+    __pyx_v_num_steps = __Pyx_PyInt_As_long(values[1]); if (unlikely((__pyx_v_num_steps == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 21, __pyx_L3_error)
+    __pyx_v_star_mass = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_star_mass == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 22, __pyx_L3_error)
+    __pyx_v_planet_mass = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_planet_mass == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 23, __pyx_L3_error)
+    __pyx_v_star_pos = values[4];
+    __pyx_v_star_vel = values[5];
+    __pyx_v_planet_pos = values[6];
+    __pyx_v_planet_vel = values[7];
+    __pyx_v_sat_pos = values[8];
+    __pyx_v_sat_vel = values[9];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("integrate", 1, 8, 8, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 24, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("integrate", 1, 10, 10, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 19, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("integrate_cy.integrate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_12integrate_cy_integrate(__pyx_self, __pyx_v_time_step, __pyx_v_num_steps, __pyx_v_star_pos, __pyx_v_star_vel, __pyx_v_planet_pos, __pyx_v_planet_vel, __pyx_v_sat_pos, __pyx_v_sat_vel);
+  __pyx_r = __pyx_pf_12integrate_cy_integrate(__pyx_self, __pyx_v_time_step, __pyx_v_num_steps, __pyx_v_star_mass, __pyx_v_planet_mass, __pyx_v_star_pos, __pyx_v_star_vel, __pyx_v_planet_pos, __pyx_v_planet_vel, __pyx_v_sat_pos, __pyx_v_sat_vel);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_12integrate_cy_integrate(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_time_step, long __pyx_v_num_steps, PyObject *__pyx_v_star_pos, PyObject *__pyx_v_star_vel, PyObject *__pyx_v_planet_pos, PyObject *__pyx_v_planet_vel, PyObject *__pyx_v_sat_pos, PyObject *__pyx_v_sat_vel) {
+static PyObject *__pyx_pf_12integrate_cy_integrate(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_time_step, long __pyx_v_num_steps, double __pyx_v_star_mass, double __pyx_v_planet_mass, PyObject *__pyx_v_star_pos, PyObject *__pyx_v_star_vel, PyObject *__pyx_v_planet_pos, PyObject *__pyx_v_planet_vel, PyObject *__pyx_v_sat_pos, PyObject *__pyx_v_sat_vel) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2627,7 +2647,7 @@ static PyObject *__pyx_pf_12integrate_cy_integrate(CYTHON_UNUSED PyObject *__pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("integrate", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_12integrate_cy_integrate(__pyx_v_time_step, __pyx_v_num_steps, __pyx_v_star_pos, __pyx_v_star_vel, __pyx_v_planet_pos, __pyx_v_planet_vel, __pyx_v_sat_pos, __pyx_v_sat_vel, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_12integrate_cy_integrate(__pyx_v_time_step, __pyx_v_num_steps, __pyx_v_star_mass, __pyx_v_planet_mass, __pyx_v_star_pos, __pyx_v_star_vel, __pyx_v_planet_pos, __pyx_v_planet_vel, __pyx_v_sat_pos, __pyx_v_sat_vel, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2644,15 +2664,15 @@ static PyObject *__pyx_pf_12integrate_cy_integrate(CYTHON_UNUSED PyObject *__pyx
   return __pyx_r;
 }
 
-/* "integrate_cy.pyx":107
+/* "integrate_cy.pyx":106
  * @cython.boundscheck(False)
  * @cython.initializedcheck(False)
  * cdef void calc_acceleration(             # <<<<<<<<<<<<<<
- *     const double * const star_pos,
- *     const double * const planet_pos,
+ *     const double star_mass,
+ *     const double planet_mass,
  */
 
-static void __pyx_f_12integrate_cy_calc_acceleration(double const *const __pyx_v_star_pos, double const *const __pyx_v_planet_pos, double const *const __pyx_v_sat_pos, double *__pyx_v_star_accel, double *__pyx_v_planet_accel, double *__pyx_v_sat_accel) {
+static void __pyx_f_12integrate_cy_calc_acceleration(double const __pyx_v_star_mass, double const __pyx_v_planet_mass, double const *const __pyx_v_star_pos, double const *const __pyx_v_planet_pos, double const *const __pyx_v_sat_pos, double *__pyx_v_star_accel, double *__pyx_v_planet_accel, double *__pyx_v_sat_accel) {
   double __pyx_v_r_planet_to_star[3];
   double __pyx_v_r_sat_to_star[3];
   double __pyx_v_r_sat_to_planet[3];
@@ -2662,7 +2682,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(double const *const __pyx_v
   double __pyx_v_d_sat_to_planet;
   Py_ssize_t __pyx_t_1;
 
-  /* "integrate_cy.pyx":124
+  /* "integrate_cy.pyx":125
  *     cdef Py_ssize_t j
  * 
  *     for j in range(3):             # <<<<<<<<<<<<<<
@@ -2672,7 +2692,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(double const *const __pyx_v
   for (__pyx_t_1 = 0; __pyx_t_1 < 3; __pyx_t_1+=1) {
     __pyx_v_j = __pyx_t_1;
 
-    /* "integrate_cy.pyx":127
+    /* "integrate_cy.pyx":128
  * 
  *         # vector from planet to star
  *         r_planet_to_star[j] = star_pos[j] - planet_pos[j]             # <<<<<<<<<<<<<<
@@ -2681,7 +2701,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(double const *const __pyx_v
  */
     (__pyx_v_r_planet_to_star[__pyx_v_j]) = ((__pyx_v_star_pos[__pyx_v_j]) - (__pyx_v_planet_pos[__pyx_v_j]));
 
-    /* "integrate_cy.pyx":129
+    /* "integrate_cy.pyx":130
  *         r_planet_to_star[j] = star_pos[j] - planet_pos[j]
  * 
  *         r_sat_to_star[j] = star_pos[j] - sat_pos[j]             # <<<<<<<<<<<<<<
@@ -2690,7 +2710,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(double const *const __pyx_v
  */
     (__pyx_v_r_sat_to_star[__pyx_v_j]) = ((__pyx_v_star_pos[__pyx_v_j]) - (__pyx_v_sat_pos[__pyx_v_j]));
 
-    /* "integrate_cy.pyx":131
+    /* "integrate_cy.pyx":132
  *         r_sat_to_star[j] = star_pos[j] - sat_pos[j]
  * 
  *         r_sat_to_planet[j] = planet_pos[j] - sat_pos[j]             # <<<<<<<<<<<<<<
@@ -2700,7 +2720,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(double const *const __pyx_v
     (__pyx_v_r_sat_to_planet[__pyx_v_j]) = ((__pyx_v_planet_pos[__pyx_v_j]) - (__pyx_v_sat_pos[__pyx_v_j]));
   }
 
-  /* "integrate_cy.pyx":134
+  /* "integrate_cy.pyx":135
  * 
  *     # distance between planet and star
  *     cdef double d_planet_to_star = norm(r_planet_to_star)             # <<<<<<<<<<<<<<
@@ -2709,7 +2729,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(double const *const __pyx_v
  */
   __pyx_v_d_planet_to_star = __pyx_f_12integrate_cy_norm(__pyx_v_r_planet_to_star);
 
-  /* "integrate_cy.pyx":136
+  /* "integrate_cy.pyx":137
  *     cdef double d_planet_to_star = norm(r_planet_to_star)
  * 
  *     cdef double d_sat_to_star = norm(r_sat_to_star)             # <<<<<<<<<<<<<<
@@ -2718,7 +2738,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(double const *const __pyx_v
  */
   __pyx_v_d_sat_to_star = __pyx_f_12integrate_cy_norm(__pyx_v_r_sat_to_star);
 
-  /* "integrate_cy.pyx":138
+  /* "integrate_cy.pyx":139
  *     cdef double d_sat_to_star = norm(r_sat_to_star)
  * 
  *     cdef double d_sat_to_planet = norm(r_sat_to_planet)             # <<<<<<<<<<<<<<
@@ -2727,7 +2747,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(double const *const __pyx_v
  */
   __pyx_v_d_sat_to_planet = __pyx_f_12integrate_cy_norm(__pyx_v_r_sat_to_planet);
 
-  /* "integrate_cy.pyx":140
+  /* "integrate_cy.pyx":141
  *     cdef double d_sat_to_planet = norm(r_sat_to_planet)
  * 
  *     for j in range(3):             # <<<<<<<<<<<<<<
@@ -2737,46 +2757,46 @@ static void __pyx_f_12integrate_cy_calc_acceleration(double const *const __pyx_v
   for (__pyx_t_1 = 0; __pyx_t_1 < 3; __pyx_t_1+=1) {
     __pyx_v_j = __pyx_t_1;
 
-    /* "integrate_cy.pyx":142
+    /* "integrate_cy.pyx":143
  *     for j in range(3):
  * 
  *         star_accel[j] = -G * planet_mass * r_planet_to_star[j] / d_planet_to_star**3             # <<<<<<<<<<<<<<
  * 
  *         # note the lack of negative sign in the following lines
  */
-    (__pyx_v_star_accel[__pyx_v_j]) = ((((-__pyx_v_12integrate_cy_G) * __pyx_v_12integrate_cy_planet_mass) * (__pyx_v_r_planet_to_star[__pyx_v_j])) / pow(__pyx_v_d_planet_to_star, 3.0));
+    (__pyx_v_star_accel[__pyx_v_j]) = ((((-__pyx_v_12integrate_cy_G) * __pyx_v_planet_mass) * (__pyx_v_r_planet_to_star[__pyx_v_j])) / pow(__pyx_v_d_planet_to_star, 3.0));
 
-    /* "integrate_cy.pyx":145
+    /* "integrate_cy.pyx":146
  * 
  *         # note the lack of negative sign in the following lines
  *         planet_accel[j] = G * star_mass * r_planet_to_star[j] / d_planet_to_star**3             # <<<<<<<<<<<<<<
  * 
  *         sat_accel[j] = G * star_mass * r_sat_to_star[j] / d_sat_to_star**3\
  */
-    (__pyx_v_planet_accel[__pyx_v_j]) = (((__pyx_v_12integrate_cy_G * __pyx_v_12integrate_cy_star_mass) * (__pyx_v_r_planet_to_star[__pyx_v_j])) / pow(__pyx_v_d_planet_to_star, 3.0));
+    (__pyx_v_planet_accel[__pyx_v_j]) = (((__pyx_v_12integrate_cy_G * __pyx_v_star_mass) * (__pyx_v_r_planet_to_star[__pyx_v_j])) / pow(__pyx_v_d_planet_to_star, 3.0));
 
-    /* "integrate_cy.pyx":147
+    /* "integrate_cy.pyx":148
  *         planet_accel[j] = G * star_mass * r_planet_to_star[j] / d_planet_to_star**3
  * 
  *         sat_accel[j] = G * star_mass * r_sat_to_star[j] / d_sat_to_star**3\             # <<<<<<<<<<<<<<
  *                      + G * planet_mass * r_sat_to_planet[j] / d_sat_to_planet**3
  * 
  */
-    (__pyx_v_sat_accel[__pyx_v_j]) = ((((__pyx_v_12integrate_cy_G * __pyx_v_12integrate_cy_star_mass) * (__pyx_v_r_sat_to_star[__pyx_v_j])) / pow(__pyx_v_d_sat_to_star, 3.0)) + (((__pyx_v_12integrate_cy_G * __pyx_v_12integrate_cy_planet_mass) * (__pyx_v_r_sat_to_planet[__pyx_v_j])) / pow(__pyx_v_d_sat_to_planet, 3.0)));
+    (__pyx_v_sat_accel[__pyx_v_j]) = ((((__pyx_v_12integrate_cy_G * __pyx_v_star_mass) * (__pyx_v_r_sat_to_star[__pyx_v_j])) / pow(__pyx_v_d_sat_to_star, 3.0)) + (((__pyx_v_12integrate_cy_G * __pyx_v_planet_mass) * (__pyx_v_r_sat_to_planet[__pyx_v_j])) / pow(__pyx_v_d_sat_to_planet, 3.0)));
   }
 
-  /* "integrate_cy.pyx":107
+  /* "integrate_cy.pyx":106
  * @cython.boundscheck(False)
  * @cython.initializedcheck(False)
  * cdef void calc_acceleration(             # <<<<<<<<<<<<<<
- *     const double * const star_pos,
- *     const double * const planet_pos,
+ *     const double star_mass,
+ *     const double planet_mass,
  */
 
   /* function exit code */
 }
 
-/* "integrate_cy.pyx":155
+/* "integrate_cy.pyx":156
  * @cython.boundscheck(False)
  * @cython.initializedcheck(False)
  * cdef double norm(const double * const arr) nogil:             # <<<<<<<<<<<<<<
@@ -2787,7 +2807,7 @@ static void __pyx_f_12integrate_cy_calc_acceleration(double const *const __pyx_v
 static double __pyx_f_12integrate_cy_norm(double const *const __pyx_v_arr) {
   double __pyx_r;
 
-  /* "integrate_cy.pyx":157
+  /* "integrate_cy.pyx":158
  * cdef double norm(const double * const arr) nogil:
  * 
  *     return sqrt(arr[0]*arr[0] + arr[1]*arr[1] + arr[2]*arr[2])             # <<<<<<<<<<<<<<
@@ -2795,7 +2815,7 @@ static double __pyx_f_12integrate_cy_norm(double const *const __pyx_v_arr) {
   __pyx_r = sqrt(((((__pyx_v_arr[0]) * (__pyx_v_arr[0])) + ((__pyx_v_arr[1]) * (__pyx_v_arr[1]))) + ((__pyx_v_arr[2]) * (__pyx_v_arr[2]))));
   goto __pyx_L0;
 
-  /* "integrate_cy.pyx":155
+  /* "integrate_cy.pyx":156
  * @cython.boundscheck(False)
  * @cython.initializedcheck(False)
  * cdef double norm(const double * const arr) nogil:             # <<<<<<<<<<<<<<
@@ -16638,6 +16658,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_u_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 1, 0, 1},
   {&__pyx_n_s_class, __pyx_k_class, sizeof(__pyx_k_class), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
+  {&__pyx_n_s_constants, __pyx_k_constants, sizeof(__pyx_k_constants), 0, 0, 1, 1},
   {&__pyx_kp_s_contiguous_and_direct, __pyx_k_contiguous_and_direct, sizeof(__pyx_k_contiguous_and_direct), 0, 0, 1, 0},
   {&__pyx_kp_s_contiguous_and_indirect, __pyx_k_contiguous_and_indirect, sizeof(__pyx_k_contiguous_and_indirect), 0, 0, 1, 0},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
@@ -16702,7 +16723,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_stringsource, __pyx_k_stringsource, sizeof(__pyx_k_stringsource), 0, 0, 1, 0},
   {&__pyx_n_s_struct, __pyx_k_struct, sizeof(__pyx_k_struct), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
-  {&__pyx_n_s_thesis_code, __pyx_k_thesis_code, sizeof(__pyx_k_thesis_code), 0, 0, 1, 1},
   {&__pyx_n_s_time_step, __pyx_k_time_step, sizeof(__pyx_k_time_step), 0, 0, 1, 1},
   {&__pyx_kp_s_unable_to_allocate_array_data, __pyx_k_unable_to_allocate_array_data, sizeof(__pyx_k_unable_to_allocate_array_data), 0, 0, 1, 0},
   {&__pyx_kp_s_unable_to_allocate_shape_and_str, __pyx_k_unable_to_allocate_shape_and_str, sizeof(__pyx_k_unable_to_allocate_shape_and_str), 0, 0, 1, 0},
@@ -16711,7 +16731,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 62, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 59, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 133, __pyx_L1_error)
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(1, 148, __pyx_L1_error)
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(1, 151, __pyx_L1_error)
@@ -17348,41 +17368,25 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 3, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "integrate_cy.pyx":15
+  /* "integrate_cy.pyx":11
  * cdef double G
  * 
- * from thesis_code import G, planet_mass, star_mass             # <<<<<<<<<<<<<<
+ * from constants import G             # <<<<<<<<<<<<<<
  * 
- * 
+ * @cython.cdivision(True)
  */
-  __pyx_t_1 = PyList_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_G);
   __Pyx_GIVEREF(__pyx_n_s_G);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_G);
-  __Pyx_INCREF(__pyx_n_s_planet_mass);
-  __Pyx_GIVEREF(__pyx_n_s_planet_mass);
-  PyList_SET_ITEM(__pyx_t_1, 1, __pyx_n_s_planet_mass);
-  __Pyx_INCREF(__pyx_n_s_star_mass);
-  __Pyx_GIVEREF(__pyx_n_s_star_mass);
-  PyList_SET_ITEM(__pyx_t_1, 2, __pyx_n_s_star_mass);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_thesis_code, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_constants, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_G); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_G); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 11, __pyx_L1_error)
   __pyx_v_12integrate_cy_G = __pyx_t_3;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_planet_mass); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L1_error)
-  __pyx_v_12integrate_cy_planet_mass = __pyx_t_3;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_star_mass); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 15, __pyx_L1_error)
-  __pyx_v_12integrate_cy_star_mass = __pyx_t_3;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 

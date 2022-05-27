@@ -8,18 +8,13 @@ from libc.math cimport cos, sin
 
 from cython.parallel import prange
 
-cdef double angular_speed
-
-from thesis_code import angular_speed
-
-
 @cython.cdivision(True)
 @cython.nonecheck(False)
 @cython.wraparound(False)
 @cython.boundscheck(False)
 @cython.embedsignature(True)
 @cython.initializedcheck(False)
-cpdef transform_to_corotating(times, pos_trans):
+cpdef transform_to_corotating(times, const double angular_speed, pos_trans):
     # it is necessary to transform our coordinate system to one which
     # rotates with the system
     # we can do this by linearly transforming each position vector by
