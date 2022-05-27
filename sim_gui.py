@@ -1,27 +1,25 @@
 # pylint: disable=no-name-in-module, invalid-name, protected-access, missing-docstring
 import sys
 
+import pyqtgraph as pg  # type: ignore
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QApplication,
+    QErrorMessage,
+    QFormLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QMainWindow,
     QPushButton,
-    QFormLayout,
     QWidget,
-    QErrorMessage,
 )
 
-import pyqtgraph as pg  # type: ignore
-
-from thesis_code import main as simMain
+# pylint: disable=unused-import
+from constants import constants_names, earth_mass, sun_mass  # noqa: F401
+from simulation import main as simMain
 
 simMain = simMain.__wrapped__
-
-# pylint: disable=unused-import
-from constants import sun_mass, earth_mass, constants_names  # noqa: F401
 
 simParams = {
     "number of years": "10",

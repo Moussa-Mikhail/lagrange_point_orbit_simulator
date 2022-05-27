@@ -11,7 +11,7 @@ If you are familiar with Cython then you can use the provided setup.py file to b
 
 ## Usage
 
-The thesis_code module is meant to be used by calling its main function.
+The simulation module is meant to be used by calling its main function.
 
 ```
 main simulates a satellite's orbit corresponding to the following parameters.

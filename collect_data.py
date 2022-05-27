@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd  # type: ignore
 from numpy.linalg import norm
 
-from thesis_code import (
+from simulation import (
     AU,
     G,
     Simulation,
