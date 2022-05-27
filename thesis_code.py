@@ -83,11 +83,6 @@ def calc_lagrange_points(star_mass, planet_mass, planet_distance):
     return {"L1": L1, "L2": L2, "L3": L3, "L4": L4, "L5": L5}
 
 
-def calc_orbital_period(star_mass, planet_mass, planet_distance):
-
-    return calc_period_from_semi_major_axis(planet_distance, star_mass, planet_mass)
-
-
 def calc_period_from_semi_major_axis(semi_major_axis, star_mass, planet_mass):
     # pylint: disable=redefined-outer-name
 
@@ -179,8 +174,8 @@ class Simulation:
             lagrange_point_trans, perturbation_angle, vel_angle
         )
 
-        self.orbital_period = calc_orbital_period(
-            star_mass, planet_mass, planet_distance * AU
+        self.orbital_period = calc_period_from_semi_major_axis(
+            planet_distance * AU, star_mass, planet_mass
         )
 
         self.angular_speed = 2 * pi / self.orbital_period
