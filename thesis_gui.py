@@ -18,6 +18,8 @@ import pyqtgraph as pg  # type: ignore
 
 from thesis_code import main as simMain
 
+simMain = simMain.__wrapped__
+
 # pylint: disable=unused-import
 from constants import sun_mass, earth_mass, constants_names  # noqa: F401
 
