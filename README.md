@@ -1,6 +1,6 @@
 # thesis_code
 
-Module which simulates orbits near Lagrange Points and plots the results.
+Python code used to investigate the stability of orbits near L4.
 
 ## Installation
 
