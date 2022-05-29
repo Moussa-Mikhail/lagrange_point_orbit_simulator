@@ -1,7 +1,5 @@
 # pylint: disable=missing-docstring
 
-from math import sqrt
-
 import numpy as np
 
 from numba import njit  # type: ignore
@@ -12,7 +10,9 @@ from constants import G
 @njit()
 def norm(vector):
 
-    return sqrt(vector[0] ** 2 + vector[1] ** 2 + vector[2] ** 2)
+    return np.sqrt(
+        vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]
+    )
 
 
 @njit()
