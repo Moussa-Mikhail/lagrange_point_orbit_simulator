@@ -16,7 +16,7 @@ from constants import G
 @cython.boundscheck(False)
 @cython.embedsignature(True)
 @cython.initializedcheck(False)
-cpdef integrate(
+cpdef void integrate(
     const double time_step,
     const long num_steps,
     const double star_mass,
@@ -27,7 +27,7 @@ cpdef integrate(
     planet_vel,
     sat_pos,
     sat_vel,
-):
+) nogil:
 
     cdef double[:, ::1] star_pos_view = star_pos
 
@@ -95,8 +95,6 @@ cpdef integrate(
             planet_pos_view[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel_view[k, j] * time_step
 
             sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step
-
-    return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 
 @cython.cdivision(True)
 @cython.nonecheck(False)
