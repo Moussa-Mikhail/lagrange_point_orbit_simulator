@@ -38,7 +38,7 @@ cpdef transform_to_corotating(times, const double angular_speed, pos_trans):
 
     cdef double time, angle, c, s, pos_trans_x, pos_trans_y
 
-    for i in prange(times_view.shape[0], nogil=True, schedule='static'):
+    for i in prange(times_view.shape[0], nogil=True):
 
         time = times_view[i]
 

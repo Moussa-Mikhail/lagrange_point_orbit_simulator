@@ -2244,7 +2244,7 @@ static PyObject *__pyx_f_12transform_cy_transform_to_corotating(PyObject *__pyx_
   /* "transform_cy.pyx":41
  *     cdef double time, angle, c, s, pos_trans_x, pos_trans_y
  * 
- *     for i in prange(times_view.shape[0], nogil=True, schedule='static'):             # <<<<<<<<<<<<<<
+ *     for i in prange(times_view.shape[0], nogil=True):             # <<<<<<<<<<<<<<
  * 
  *         time = times_view[i]
  */
@@ -2272,7 +2272,7 @@ static PyObject *__pyx_f_12transform_cy_transform_to_corotating(PyObject *__pyx_
                 #endif /* _OPENMP */
                 {
                     #ifdef _OPENMP
-                    #pragma omp for lastprivate(__pyx_v_angle) lastprivate(__pyx_v_c) firstprivate(__pyx_v_i) lastprivate(__pyx_v_i) lastprivate(__pyx_v_pos_trans_x) lastprivate(__pyx_v_pos_trans_y) lastprivate(__pyx_v_s) lastprivate(__pyx_v_time) schedule(static)
+                    #pragma omp for lastprivate(__pyx_v_angle) lastprivate(__pyx_v_c) firstprivate(__pyx_v_i) lastprivate(__pyx_v_i) lastprivate(__pyx_v_pos_trans_x) lastprivate(__pyx_v_pos_trans_y) lastprivate(__pyx_v_s) lastprivate(__pyx_v_time)
                     #endif /* _OPENMP */
                     for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_8; __pyx_t_7++){
                         {
@@ -2286,7 +2286,7 @@ static PyObject *__pyx_f_12transform_cy_transform_to_corotating(PyObject *__pyx_
                             __pyx_v_time = ((double)__PYX_NAN());
 
                             /* "transform_cy.pyx":43
- *     for i in prange(times_view.shape[0], nogil=True, schedule='static'):
+ *     for i in prange(times_view.shape[0], nogil=True):
  * 
  *         time = times_view[i]             # <<<<<<<<<<<<<<
  * 
@@ -2381,7 +2381,7 @@ static PyObject *__pyx_f_12transform_cy_transform_to_corotating(PyObject *__pyx_
       /* "transform_cy.pyx":41
  *     cdef double time, angle, c, s, pos_trans_x, pos_trans_y
  * 
- *     for i in prange(times_view.shape[0], nogil=True, schedule='static'):             # <<<<<<<<<<<<<<
+ *     for i in prange(times_view.shape[0], nogil=True):             # <<<<<<<<<<<<<<
  * 
  *         time = times_view[i]
  */
