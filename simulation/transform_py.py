@@ -1,7 +1,7 @@
-# pylint: disable=invalid-name, missing-docstring
+# pylint: disable=invalid-name, missing-docstring, not-an-iterable
 import numpy as np
 
-from numba import njit  # type: ignore
+from numba import njit, prange  # type: ignore
 
 
 @njit(parallel=True)
@@ -19,7 +19,7 @@ def transform_to_corotating(times, angular_speed, pos_trans):
 
     pos_rotated = np.empty_like(pos_trans)
 
-    for i in range(pos_trans.shape[0]):
+    for i in prange(pos_trans.shape[0]):
 
         t = times[i]
 
