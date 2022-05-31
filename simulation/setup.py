@@ -4,12 +4,8 @@ from Cython.Build import cythonize  # type: ignore
 
 ext_modules = [
     Extension(
-        "integrate_cy",
-        ["integrate_cy.pyx"],
-    ),
-    Extension(
-        "transform_cy",
-        ["transform_cy.pyx"],
+        "cython_funcs",
+        ["cython_funcs.pyx"],
         extra_compile_args=["/openmp"],
         extra_link_args=["/openmp"],
     ),
