@@ -23,25 +23,13 @@ cpdef void integrate(
     const long num_steps,
     const double star_mass,
     const double planet_mass,
-    star_pos,
-    star_vel,
-    planet_pos,
-    planet_vel,
-    sat_pos,
-    sat_vel,
+    double [:, ::1] star_pos,
+    double [:, ::1] star_vel,
+    double [:, ::1] planet_pos,
+    double [:, ::1] planet_vel,
+    double [:, ::1] sat_pos,
+    double [:, ::1] sat_vel,
 ) nogil:
-
-    cdef double[:, ::1] star_pos_view = star_pos
-
-    cdef double[:, ::1] star_vel_view = star_vel
-
-    cdef double[:, ::1] planet_pos_view = planet_pos
-
-    cdef double[:, ::1] planet_vel_view = planet_vel
-
-    cdef double[:, ::1] sat_pos_view = sat_pos
-
-    cdef double[:, ::1] sat_vel_view = sat_vel
 
 
     cdef double star_intermediate_pos[3]
@@ -63,11 +51,11 @@ cpdef void integrate(
         for j in range(3):
 
             # intermediate position calculation
-            star_intermediate_pos[j] = star_pos_view[k - 1, j] + 0.5 * star_vel_view[k - 1, j] * time_step
+            star_intermediate_pos[j] = star_pos[k - 1, j] + 0.5 * star_vel[k - 1, j] * time_step
 
-            planet_intermediate_pos[j] = planet_pos_view[k - 1, j] + 0.5 * planet_vel_view[k - 1, j] * time_step
+            planet_intermediate_pos[j] = planet_pos[k - 1, j] + 0.5 * planet_vel[k - 1, j] * time_step
 
-            sat_intermediate_pos[j] = sat_pos_view[k - 1, j] + 0.5 * sat_vel_view[k - 1, j] * time_step
+            sat_intermediate_pos[j] = sat_pos[k - 1, j] + 0.5 * sat_vel[k - 1, j] * time_step
 
         # acceleration calculation
         # calc_acceleration changes the values in the accel arrays
@@ -85,18 +73,18 @@ cpdef void integrate(
         for j in range(3):
             
             # velocity update
-            star_vel_view[k, j] = star_vel_view[k - 1, j] + star_accel[j] * time_step
+            star_vel[k, j] = star_vel[k - 1, j] + star_accel[j] * time_step
 
-            planet_vel_view[k, j] = planet_vel_view[k - 1, j] + planet_accel[j] * time_step
+            planet_vel[k, j] = planet_vel[k - 1, j] + planet_accel[j] * time_step
 
-            sat_vel_view[k, j] = sat_vel_view[k - 1, j] + sat_accel[j] * time_step
+            sat_vel[k, j] = sat_vel[k - 1, j] + sat_accel[j] * time_step
 
             # position update
-            star_pos_view[k, j] = star_intermediate_pos[j] + 0.5 * star_vel_view[k, j] * time_step
+            star_pos[k, j] = star_intermediate_pos[j] + 0.5 * star_vel[k, j] * time_step
 
-            planet_pos_view[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel_view[k, j] * time_step
+            planet_pos[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel[k, j] * time_step
 
-            sat_pos_view[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel_view[k, j] * time_step
+            sat_pos[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel[k, j] * time_step
 
 @cython.cdivision(True)
 @cython.nonecheck(False)
@@ -163,7 +151,7 @@ cdef double norm(const double * const arr) nogil:
 @cython.boundscheck(False)
 @cython.embedsignature(True)
 @cython.initializedcheck(False)
-cpdef transform_to_corotating(times, const double angular_speed, pos_trans):
+cpdef transform_to_corotating(double[::1] times, const double angular_speed, double [:, ::1] pos_trans):
     # it is necessary to transform our coordinate system to one which
     # rotates with the system
     # we can do this by linearly transforming each position vector by
@@ -175,10 +163,6 @@ cpdef transform_to_corotating(times, const double angular_speed, pos_trans):
 
     # The origin of the coordinate system is the Center of Mass
 
-    cdef double[:, ::1] pos_trans_view = pos_trans
-
-    cdef double[::1] times_view = times
-
     pos_rotated = np.empty_like(pos_trans)
 
     cdef double[:, ::1] pos_rotated_view = pos_rotated
@@ -187,9 +171,9 @@ cpdef transform_to_corotating(times, const double angular_speed, pos_trans):
 
     cdef double time, angle, c, s, pos_trans_x, pos_trans_y
 
-    for i in prange(times_view.shape[0], nogil=True):
+    for i in prange(times.shape[0], nogil=True):
 
-        time = times_view[i]
+        time = times[i]
 
         angle = -angular_speed * time
 
@@ -197,12 +181,14 @@ cpdef transform_to_corotating(times, const double angular_speed, pos_trans):
 
         s = sin(angle)
 
-        pos_trans_x = pos_trans_view[i, 0]
+        pos_trans_x = pos_trans[i, 0]
 
-        pos_trans_y = pos_trans_view[i, 1]
+        pos_trans_y = pos_trans[i, 1]
 
         pos_rotated_view[i, 0] = c * pos_trans_x - s * pos_trans_y
 
         pos_rotated_view[i, 1] = s * pos_trans_x + c * pos_trans_y
+    
+    pos_rotated[:, 2] = pos_trans[:, 2]
 
     return pos_rotated
