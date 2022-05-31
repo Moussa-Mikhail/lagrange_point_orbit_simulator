@@ -30,9 +30,8 @@ def calc_acceleration(
     r_planet_to_sat,
 ):
 
-    # vector from star to satellite
-
     for j in range(3):
+        # vector from star to satellite
         r_star_to_sat[j] = sat_pos[j] - star_pos[j]
 
         r_star_to_planet[j] = planet_pos[j] - star_pos[j]
@@ -123,19 +122,23 @@ def integrate(
             r_planet_to_sat,
         )
 
-        # velocity update
-        star_vel[k] = star_vel[k - 1] + star_accel * time_step
+        for j in range(3):
 
-        planet_vel[k] = planet_vel[k - 1] + planet_accel * time_step
+            # velocity update
+            star_vel[k, j] = star_vel[k - 1, j] + star_accel[j] * time_step
 
-        sat_vel[k] = sat_vel[k - 1] + sat_accel * time_step
+            planet_vel[k, j] = planet_vel[k - 1, j] + planet_accel[j] * time_step
 
-        # position update
-        star_pos[k] = star_intermediate_pos + 0.5 * star_vel[k] * time_step
+            sat_vel[k, j] = sat_vel[k - 1, j] + sat_accel[j] * time_step
 
-        planet_pos[k] = planet_intermediate_pos + 0.5 * planet_vel[k] * time_step
+            # position update
+            star_pos[k, j] = star_intermediate_pos[j] + 0.5 * star_vel[k, j] * time_step
 
-        sat_pos[k] = sat_intermediate_pos + 0.5 * sat_vel[k] * time_step
+            planet_pos[k, j] = (
+                planet_intermediate_pos[j] + 0.5 * planet_vel[k, j] * time_step
+            )
+
+            sat_pos[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel[k, j] * time_step
 
 
 @njit(parallel=True)
@@ -149,28 +152,28 @@ def transform_to_corotating(times, angular_speed, pos_trans):
     # the inverse is R(-w*t)
     # at each time t we multiply the position vectors by the matrix R(-w*t)
 
-    # The origin of the coordinate system is the Center of Mass
+    # pos_trans is the position relative to the center of mass
 
     pos_rotated = np.empty_like(pos_trans)
 
     for i in prange(pos_trans.shape[0]):
 
-        t = times[i]
+        time = times[i]
 
-        angle = -angular_speed * t
+        angle = -angular_speed * time
 
-        cos = np.cos(angle)
+        c = np.cos(angle)
 
-        sin = np.sin(angle)
+        s = np.sin(angle)
 
         pos_trans_x = pos_trans[i, 0]
 
         pos_trans_y = pos_trans[i, 1]
 
-        pos_rotated[i, 0] = cos * pos_trans_x - sin * pos_trans_y
+        pos_rotated[i, 0] = c * pos_trans_x - s * pos_trans_y
 
-        pos_rotated[i, 1] = sin * pos_trans_x + cos * pos_trans_y
+        pos_rotated[i, 1] = s * pos_trans_x + c * pos_trans_y
 
-    pos_rotated[:, 2] = 0
+    pos_rotated[:, 2] = pos_trans[:, 2]
 
     return pos_rotated
