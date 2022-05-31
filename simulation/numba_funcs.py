@@ -25,36 +25,37 @@ def calc_acceleration(
     star_accel,
     planet_accel,
     sat_accel,
-    r_star_to_sat,
-    r_star_to_planet,
-    r_planet_to_sat,
+    r_planet_to_star,
+    r_sat_to_star,
+    r_sat_to_planet,
 ):
 
     for j in range(3):
-        # vector from star to satellite
-        r_star_to_sat[j] = sat_pos[j] - star_pos[j]
 
-        r_star_to_planet[j] = planet_pos[j] - star_pos[j]
+        # vector from planet to star
+        r_planet_to_star[j] = star_pos[j] - planet_pos[j]
 
-        r_planet_to_sat[j] = sat_pos[j] - planet_pos[j]
+        r_sat_to_star[j] = star_pos[j] - sat_pos[j]
+
+        r_sat_to_planet[j] = planet_pos[j] - sat_pos[j]
 
     # distance between star to planet
-    d_star_to_planet = norm(r_star_to_planet)
+    d_planet_to_star = norm(r_planet_to_star)
 
-    d_star_to_sat = norm(r_star_to_sat)
+    d_sat_to_star = norm(r_sat_to_star)
 
-    d_planet_to_sat = norm(r_planet_to_sat)
+    d_sat_to_planet = norm(r_sat_to_planet)
 
     for j in range(3):
-        # gravity of satellite can be ignored
-        # note the lack of negative sign in the following line
-        star_accel[j] = G * planet_mass * r_star_to_planet[j] / d_star_to_planet**3
 
-        planet_accel[j] = -G * star_mass * r_star_to_planet[j] / d_star_to_planet**3
+        star_accel[j] = -G * planet_mass * r_planet_to_star[j] / d_planet_to_star**3
+
+        # note the lack of negative sign in the following lines
+        planet_accel[j] = G * star_mass * r_planet_to_star[j] / d_planet_to_star**3
 
         sat_accel[j] = (
-            -G * star_mass * r_star_to_sat[j] / d_star_to_sat**3
-            + -G * planet_mass * r_planet_to_sat[j] / d_planet_to_sat**3
+            G * star_mass * r_sat_to_star[j] / d_sat_to_star**3
+            + G * planet_mass * r_sat_to_planet[j] / d_sat_to_planet**3
         )
 
 
@@ -84,11 +85,11 @@ def integrate(
 
     sat_intermediate_pos = np.empty_like(star_accel)
 
-    r_star_to_sat = np.empty_like(star_accel)
+    r_planet_to_star = np.empty_like(star_accel)
 
-    r_star_to_planet = np.empty_like(star_accel)
+    r_sat_to_star = np.empty_like(star_accel)
 
-    r_planet_to_sat = np.empty_like(star_accel)
+    r_sat_to_planet = np.empty_like(star_accel)
 
     for k in range(1, num_steps + 1):
 
@@ -117,9 +118,9 @@ def integrate(
             star_accel,
             planet_accel,
             sat_accel,
-            r_star_to_sat,
-            r_star_to_planet,
-            r_planet_to_sat,
+            r_planet_to_star,
+            r_sat_to_star,
+            r_sat_to_planet,
         )
 
         for j in range(3):
