@@ -2760,7 +2760,7 @@ static PyObject *__pyx_f_12cython_funcs_transform_to_corotating(__Pyx_memviewsli
   __Pyx_RefNannySetupContext("transform_to_corotating", 0);
 
   /* "cython_funcs.pyx":166
- *     # The origin of the coordinate system is the Center of Mass
+ *     # pos_trans is the position relative to the Center of Mass
  * 
  *     pos_rotated = np.empty_like(pos_trans)             # <<<<<<<<<<<<<<
  * 
