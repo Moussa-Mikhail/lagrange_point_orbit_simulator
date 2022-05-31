@@ -19,23 +19,14 @@ from numpy.linalg import norm
 from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
 
 try:
-    # cythonized version of integrate
-    # roughly 5x times faster
-    from integrate_cy import integrate  # type: ignore
+
+    # cythonized versions of integrate and transform_to_corotating
+    # roughly 5x and 3.7x faster than numba versions
+    from cython_funcs import integrate, transform_to_corotating  # type: ignore
 
 except ImportError:
 
-    from integrate_py import integrate
-
-try:
-
-    # cythonized version of transform_to_corotating
-    # roughly 3.7x times faster
-    from transform_cy import transform_to_corotating  # type: ignore
-
-except ImportError:
-
-    from transform_py import transform_to_corotating
+    from numba_funcs import integrate, transform_to_corotating
 
 from constants import AU, G, earth_mass, pi, sat_mass, sun_mass, years
 
@@ -117,8 +108,8 @@ def main(
     The default is False.
 
     This function will take ~0.5 seconds per 10**6 steps if
-    the .pyd extensions are available.
-    1.5 seconds if they aren't.
+    the .pyd extension is available.
+    1.5 seconds if it isn't.
     The time may vary depending on your hardware.
     It will take longer than usual on the first call.
     """

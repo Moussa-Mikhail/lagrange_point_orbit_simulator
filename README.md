@@ -63,8 +63,8 @@ energy, angular momentum, linear momentum.
 The default is False.
 
 This function will take ~0.5 seconds per 10**6 steps if
-the .pyd extensions are available.
-1.5 seconds if they aren't.
+the .pyd extension is available.
+1.5 seconds if it isn't.
 The time may vary depending on your hardware.
 It will take longer than usual on the first call.
 ```
