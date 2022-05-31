@@ -7,8 +7,6 @@ Python code used to investigate the stability of orbits near L4.
 Download the repository.
 If you use Pip open your command line and enter "pip install -r requirements.txt". This will install all the packages these scripts depend on. If you use Poetry then a .lock file is provided.
 
-If you are familiar with Cython then you can use the provided setup.py file to build the extensions for a speedup. This is optional.
-
 ## Usage
 
 The simulation.py module is meant to be used by calling its main function.
