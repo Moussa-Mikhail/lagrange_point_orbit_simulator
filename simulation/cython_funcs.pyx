@@ -161,7 +161,7 @@ cpdef transform_to_corotating(double[::1] times, const double angular_speed, dou
     # the inverse is R(-w*t)
     # at each time t we multiply the position vectors by the matrix R(-w*t)
 
-    # The origin of the coordinate system is the Center of Mass
+    # pos_trans is the position relative to the center of mass
 
     pos_rotated = np.empty_like(pos_trans)
 
