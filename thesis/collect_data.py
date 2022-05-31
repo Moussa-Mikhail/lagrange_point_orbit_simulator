@@ -86,10 +86,8 @@ def main(
     Note that a large fraction of orbits are rejected because they get too close to the planet.
     This means that the number of samples recorded will be less than num_samples.
 
-    This function will take 4 minutes when called with default arguments
-    assuming the pyd functions are available.
-    10 minutes if they aren't.
-
+    This function will take 3 minutes when called with default arguments
+    
     The time taken is linear in both num_steps and num_samples.
     """
 

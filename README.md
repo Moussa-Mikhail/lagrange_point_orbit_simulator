@@ -62,14 +62,12 @@ plot_conserved: If True, plots the conserved quantities:
 energy, angular momentum, linear momentum.
 The default is False.
 
-This function will take ~0.5 seconds per 10**6 steps if
-the .pyd extension is available.
-1.5 seconds if it isn't.
+This function will take ~0.42 seconds per 10**6 steps if
 The time may vary depending on your hardware.
 It will take longer than usual on the first call.
 ```
 
-This is the docstring of thesis_code.main which can be seen at any time by using "help(thesis_code.main)" in Python.
+This is the docstring of simulation.main which can be seen at any time by using "help(simulation.main)" or "help(main)" in Python.
 
 # collect_data
 
@@ -99,7 +97,7 @@ star_mass: mass of the star in kg. The default is the mass of the Sun.
 
 planet_mass: mass of the planet in kg. The default is the mass of the Earth.
 
-The constants sun_mass and earth_mass are defined in and may be imported from the file constants.py.
+The constants sun_mass and earth_mass may be imported from the file constants.py.
 
 planet_distance: distance from the star to the planet in AU. The default is 1.0.
 
@@ -109,9 +107,7 @@ filename: name of the file to save the data to. The default is "data.csv".
 Note that a large fraction of orbits are rejected because they get too close to the planet.
 This means that the number of samples recorded will be less than num_samples.
 
-This function will take 4 minutes when called with default arguments
-assuming the pyd functions are available.
-10 minutes if they aren't.
+This function will take 3 minutes when called with default arguments
 
 The time taken is linear in both num_steps and num_samples.
 ```
