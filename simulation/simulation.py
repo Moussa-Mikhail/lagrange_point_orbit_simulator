@@ -1,5 +1,5 @@
 # pylint: disable=invalid-name, missing-function-docstring
-"""Simulates orbits near the Lagrange Point L4 using the position Verlet algorithm.
+"""Simulates orbits near Lagrange points using the position Verlet algorithm.
 It assumes that both the star and planet are undergoing uniform circular motion.
 """
 
