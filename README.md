@@ -12,10 +12,8 @@ If you use Pip open your command line and enter "pip install -r requirements.txt
 The simulation.py module is meant to be used by calling its main function.
 
 ```
-main simulates a satellite's orbit corresponding to the following parameters.
+main simulates a satellite's orbit near a Lagrange point.
 It then plots the orbit in inertial and corotating frames.
-
-All parameters have default values.
 
 It takes the following parameters:
 
