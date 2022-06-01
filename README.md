@@ -17,14 +17,14 @@ It then plots the orbit in inertial and corotating frames.
 
 It takes the following parameters:
 
-#### Simulation parameters
+#### Simulation Parameters
 num_years: Number of years to simulate. The default is 100.0.
 num_steps: Number of steps to simulate. Must be an integer. The default is 10**6.
 
 It is recommended that the ratio of num_steps to num_years
 remains close to the ratio of the default values.
 
-#### Satellite parameters
+#### Satellite Parameters
 perturbation_size: Size of perturbation in AU. The default is 0.0.
 perturbation_angle: Angle of perturbation relative to positive x axis in degrees.
 The default is None.
@@ -45,7 +45,7 @@ default position relative to the center of mass.
 lagrange_point: Non-perturbed position of satellite. String.
 The default is 'L4' but the others can also be used.
 
-#### System parameters
+#### System Parameters
 star_mass: Mass of the star in kilograms. The default is the mass of the Sun.
 
 planet_mass: Mass of the planet in kilograms. The default is the mass of the Earth.
@@ -74,21 +74,21 @@ thesis/collect_data.py is used to collect data by simulating random orbits. The 
 collect_data also has a main function.
 
 ```
-main creates samples of random parameters, simulates the
+main creates samples of random Satellite parameters, simulates the
 corresponding orbits, and collects data from them. This data is then saved to "data.csv".
 
 It has the following parameters:
 
 num_samples: number of samples to generate. Must be an integer. The default is 500.
 
-#### Simulation parameters
+#### Simulation Parameters
 num_years: number of years to simulate. The default is 100.0.
 num_steps: number of steps to simulate. Must be an integer. The default is 10**6.
 
 It is recommended that the ratio of num_steps to num_years
 remains close to the ratio of default values.
 
-#### System parameters
+#### System Parameters
 star_mass: mass of the star in kg. The default is the mass of the Sun.
 
 planet_mass: mass of the planet in kg. The default is the mass of the Earth.
