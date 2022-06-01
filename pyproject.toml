@@ -15,6 +15,7 @@ pyqtgraph = "^0.12.4"
 PyQt5 = "^5.15.6"
 numba = "^0.55.2"
 numpy = "^1.22.4"
+XlsxWriter = "^3.0.3"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.942"
@@ -23,7 +24,6 @@ flake8 = "^4.0.1"
 flake8-comprehensions = "^3.8.0"
 flake8-bugbear = "^22.3.23"
 black = "^22.3.0"
-XlsxWriter = "^3.0.3"
 pyinstaller = "^5.1"
 
 [build-system]

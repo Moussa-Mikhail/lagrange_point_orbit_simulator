@@ -445,14 +445,14 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 name = "xlsxwriter"
 version = "3.0.3"
 description = "A Python module for creating Excel XLSX files."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.4"
 
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.11"
-content-hash = "607fa9358089f0d99cfb85800604aa75fe66fd18ef5c5cf645c86bcdc46af0f0"
+content-hash = "8697e4c8fe405c9e1c7634cfadd1cec6e77612e03a125ec1900ee227c9c44e9f"
 
 [metadata.files]
 altgraph = [
