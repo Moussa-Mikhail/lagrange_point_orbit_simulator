@@ -1,4 +1,4 @@
-# thesis_code
+# simulation
 
 Python code used to simulate orbits near Lagrange points.
 
