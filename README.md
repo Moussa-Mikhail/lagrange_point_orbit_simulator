@@ -3,6 +3,9 @@
 Python code used to simulate orbits near Lagrange points.
 
 ## Installation
+Go to Releases and download the latest release. No further action is needed to run the application.
+
+## Installation of source code
 
 Download the repository.
 If you use Pip open your command line and enter "pip install -r requirements.txt". This will install all the packages these scripts depend on. If you use Poetry then a .lock file is provided.
