@@ -14,6 +14,7 @@ The simulation.py module is meant to be used by calling its main function.
 ```
 main simulates a satellite's orbit near a Lagrange point.
 It then plots the orbit in inertial and corotating frames.
+The plots created are interactive.
 
 It takes the following parameters:
 
