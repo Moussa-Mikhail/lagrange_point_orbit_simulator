@@ -4,6 +4,9 @@ version = "1.0.0"
 description = "Simulates orbits near Lagrange Points"
 authors = ["Moussa Mikhail <moussamikhail56@gmail.com>"]
 license = "MIT"
+packages = [
+	{include = "simulation"}
+]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.11"
