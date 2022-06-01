@@ -1,6 +1,6 @@
 # thesis_code
 
-Python code used to investigate the stability of orbits near L4.
+Python code used to simulate orbits near Lagrange points.
 
 ## Installation
 
