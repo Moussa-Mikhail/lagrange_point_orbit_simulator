@@ -69,7 +69,7 @@ def main(
     num_steps: number of steps to simulate. Must be an integer. The default is 10**6.
 
     It is recommended that the ratio of num_steps to num_years
-    remains close to the ratio of default values.
+    remains close to the ratio of the default values.
 
     #### System parameters
     star_mass: mass of the star in kg. The default is the mass of the Sun.

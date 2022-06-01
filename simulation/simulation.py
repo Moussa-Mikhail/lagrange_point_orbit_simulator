@@ -53,6 +53,7 @@ def main(
 ):
     """main simulates a satellite's orbit corresponding to the following parameters.
     It then plots the orbit in inertial and corotating frames.
+    The plots created are interactive.
 
     All parameters have default values.
 
@@ -63,7 +64,7 @@ def main(
     num_steps: Number of steps to simulate. Must be an integer. The default is 10**6.
 
     It is recommended that the ratio of num_steps to num_years
-    remains close to the ratio of default values.
+    remains close to the ratio of the default values.
 
     #### Satellite parameters
     perturbation_size: Size of perturbation in AU. The default is 0.0.
