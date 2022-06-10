@@ -17,6 +17,14 @@ import pyqtgraph as pg  # type: ignore
 # shortens function call
 from numpy.linalg import norm
 from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
+from descriptors import (
+    distance,
+    mass,
+    numsteps,
+    real,
+    # lagrange_label,
+    bool_desc,
+)
 
 from numba_funcs import integrate, transform_to_corotating
 
@@ -29,7 +37,10 @@ def time_func(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         start = perf_counter()
-        result = func(*args, **kwargs)
+        try:
+            result = func(*args, **kwargs)
+        except (TypeError, ValueError):
+            return
         end = perf_counter()
         print(f"{func.__name__} took {end - start} seconds")
         return result
@@ -50,7 +61,7 @@ def main(
     planet_distance=1.0,
     lagrange_point="L4",
     plot_conserved=False,
-):
+):  # sourcery skip: raise-specific-error
     """main simulates a satellite's orbit corresponding to the following parameters.
     It then plots the orbit in inertial and corotating frames.
     The plots created are interactive.
@@ -182,11 +193,23 @@ def calc_default_angles(lagrange_point, perturbation_angle, vel_angle):
 class Simulation:
     """Holds parameters and methods for simulation"""
 
+    num_years = real()
+    num_steps = numsteps()
+    perturbation_size = real()
+    perturbation_angle = real()
+    speed = real()
+    vel_angle = real()
+    star_mass = mass()
+    planet_mass = mass()
+    planet_distance = distance()
+    # lagrange_point = lagrange_label()
+    plot_conserved = bool_desc()
+
     def __init__(
         self,
         num_years=100.0,
         num_steps=10**6,
-        perturbation_size=0,
+        perturbation_size=0.0,
         perturbation_angle=None,
         speed=1.0,
         vel_angle=None,
@@ -211,11 +234,7 @@ class Simulation:
 
         self.perturbation_size = perturbation_size
 
-        self.perturbation_angle = perturbation_angle
-
         self.speed = speed
-
-        self.vel_angle = vel_angle
 
         self.star_mass = star_mass
 
@@ -246,6 +265,8 @@ class Simulation:
             planet_distance * AU, star_mass, planet_mass
         )
 
+        # star and planet orbit about the Center of Mass
+        # at an angular_speed = 2 pi radians/orbital_period
         self.angular_speed = 2 * pi / self.orbital_period
 
         self.plot_conserved = plot_conserved
@@ -377,8 +398,6 @@ class Simulation:
         # perturbing the initial position of the satellite
         sat_pos[0] = self.lagrange_point + perturbation
 
-        # star and planet orbit about the Center of Mass
-        # at an angular_speed = 2 pi radians/orbital_period
         # we setup conditions so that the star and planet have circular orbits
         # velocities have to be defined relative to the CM
         init_CM_pos = self.calc_center_of_mass(star_pos[0], planet_pos[0], sat_pos[0])
@@ -400,8 +419,7 @@ class Simulation:
         # in this case the Center of Mass
         star_vel[0] = np.cross(angular_vel, star_pos[0] - init_CM_pos)
 
-        # * 1.2 is used for testing purposes.
-        planet_vel[0] = np.cross(angular_vel, planet_pos[0] - init_CM_pos)  # * 1.2
+        planet_vel[0] = np.cross(angular_vel, planet_pos[0] - init_CM_pos)
 
         return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 
