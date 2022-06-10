@@ -396,6 +396,21 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "validateddescriptor"
+version = "1.0.1"
+description = "Class used as an alternative to setter methods that validate inputs."
+category = "main"
+optional = false
+python-versions = "^3.9"
+develop = false
+
+[package.source]
+type = "git"
+url = "https://github.com/Moussa-Mikhail/validated-descriptor.git"
+reference = "main"
+resolved_reference = "3b179aeb09c2793e11796ba67b54257e815c944f"
+
+[[package]]
 name = "wrapt"
 version = "1.14.1"
 description = "Module for decorators, wrappers and monkey patching."
@@ -406,7 +421,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.11"
-content-hash = "b82f17d6766a3e2e67e7fb3474acd718d16db26df90e2b98f438e149a622d68e"
+content-hash = "e974922552f02fdb1d4290ed0fed43a1da035b9e30df59f52ac7c1efe1e4c077"
 
 [metadata.files]
 altgraph = [
@@ -729,6 +744,7 @@ typing-extensions = [
     {file = "typing_extensions-4.2.0-py3-none-any.whl", hash = "sha256:6657594ee297170d19f67d55c05852a874e7eb634f4f753dbd667855e07c1708"},
     {file = "typing_extensions-4.2.0.tar.gz", hash = "sha256:f1c24655a0da0d1b67f07e17a5e6b2a105894e6824b92096378bb3668ef02376"},
 ]
+validateddescriptor = []
 wrapt = [
     {file = "wrapt-1.14.1-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:1b376b3f4896e7930f1f772ac4b064ac12598d1c38d04907e696cc4d794b43d3"},
     {file = "wrapt-1.14.1-cp27-cp27m-manylinux1_i686.whl", hash = "sha256:903500616422a40a98a5a3c4ff4ed9d0066f3b4c951fa286018ecdf0750194ef"},
