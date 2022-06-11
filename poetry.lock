@@ -397,7 +397,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "validateddescriptor"
-version = "1.0.1"
+version = "1.0.2"
 description = "Class used as an alternative to setter methods that validate inputs."
 category = "main"
 optional = false
@@ -408,7 +408,7 @@ develop = false
 type = "git"
 url = "https://github.com/Moussa-Mikhail/validated-descriptor.git"
 reference = "main"
-resolved_reference = "3b179aeb09c2793e11796ba67b54257e815c944f"
+resolved_reference = "1a3c0a5a1145f8a1c7a1f892173ff6de64c7c2c0"
 
 [[package]]
 name = "wrapt"
