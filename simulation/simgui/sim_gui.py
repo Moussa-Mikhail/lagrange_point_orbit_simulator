@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import (
 
 # pylint: disable=unused-import
 from simulation.constants import safe_eval as safeEval  # noqa: F401
-from simulation.simulation import main as simMain
+from simulation import main as simMain
 
 simMain = simMain.__wrapped__
 
