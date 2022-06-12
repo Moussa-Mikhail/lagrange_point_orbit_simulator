@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, missing-docstring
 
 # universal gravitational constant in meters^3*1/kilograms*1/seconds^2
 G = 6.67430 * 10**-11
@@ -12,11 +12,10 @@ AU = 1.495978707 * 10**11
 years = 365.25 * 24 * 60 * 60
 
 # mass of Sun in kilograms
-sun_mass = 1.98847 * 10**30
+sun_mass: float = 1.98847 * 10**30
 
 # mass of Earth in kilograms
 earth_mass = 5.9722 * 10**24
-# planet_mass = star_mass
 
 # mass of satellite in kilograms
 # must be negligible compared to other masses
@@ -29,7 +28,7 @@ constants_names = {
 }
 
 
-def safe_eval(expr: str):
+def safe_eval(expr: str) -> int | float:
     """safe eval function used on expressions that contain the above constants"""
 
     exprNoConstants = expr

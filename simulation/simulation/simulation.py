@@ -19,8 +19,15 @@ from numpy import pi
 from numpy.linalg import norm
 from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
 
-from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
-from .descriptors import bool_desc, distance, mass, numsteps, real  # lagrange_label,
+from ..constants import AU, G, earth_mass, sat_mass, sun_mass, years
+from .descriptors import (
+    bool_desc,
+    distance_desc,
+    mass_desc,
+    num_steps_desc,
+    real_desc,
+    lagrange_label_desc,
+)
 from .numba_funcs import integrate, transform_to_corotating
 
 
@@ -29,13 +36,15 @@ def time_func(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
+
         start = perf_counter()
-        try:
-            result = func(*args, **kwargs)
-        except (TypeError, ValueError):
-            return
+
+        result = func(*args, **kwargs)
+
         end = perf_counter()
+
         print(f"{func.__name__} took {end - start} seconds")
+
         return result
 
     return wrapper
@@ -52,7 +61,7 @@ def main(
     star_mass=sun_mass,
     planet_mass=earth_mass,
     planet_distance=1.0,
-    lagrange_point="L4",
+    lagrange_label="L4",
     plot_conserved=False,
 ):  # sourcery skip: raise-specific-error
     """main simulates a satellite's orbit corresponding to the following parameters.
@@ -88,7 +97,7 @@ def main(
     If None, then vel_angle is perpendicular to the satellite's
     default position relative to the center of mass.
 
-    lagrange_point: Non-perturbed position of satellite. String.
+    lagrange_label: Non-perturbed position of satellite. String.
     The default is 'L4' but the others can also be used.
 
     #### System parameters
@@ -119,7 +128,7 @@ def main(
         star_mass,
         planet_mass,
         planet_distance,
-        lagrange_point,
+        lagrange_label,
         plot_conserved,
     )
 
@@ -186,16 +195,16 @@ def calc_default_angles(lagrange_point, perturbation_angle, vel_angle):
 class Simulation:
     """Holds parameters and methods for simulation"""
 
-    num_years = real()
-    num_steps = numsteps()
-    perturbation_size = real()
-    perturbation_angle = real()
-    speed = real()
-    vel_angle = real()
-    star_mass = mass()
-    planet_mass = mass()
-    planet_distance = distance()
-    # lagrange_point = lagrange_label()
+    num_years = real_desc()
+    num_steps = num_steps_desc()
+    perturbation_size = real_desc()
+    perturbation_angle = real_desc()
+    speed = real_desc()
+    vel_angle = real_desc()
+    star_mass = mass_desc()
+    planet_mass = mass_desc()
+    planet_distance = distance_desc()
+    lagrange_label = lagrange_label_desc()
     plot_conserved = bool_desc()
 
     def __init__(
@@ -209,7 +218,7 @@ class Simulation:
         star_mass=sun_mass,
         planet_mass=earth_mass,
         planet_distance=1.0,
-        lagrange_point="L4",
+        lagrange_label="L4",
         plot_conserved=False,
     ):
 
@@ -235,18 +244,18 @@ class Simulation:
 
         self.planet_distance = planet_distance
 
+        self.lagrange_label = lagrange_label
+
         lagrange_points = calc_lagrange_points(
             star_mass, planet_mass, planet_distance * AU
         )
 
-        self.lagrange_point = lagrange_points[lagrange_point]
+        self.lagrange_point = lagrange_points[lagrange_label]
 
         # star starts at origin
-        CM_x_coord = (
-            planet_distance * planet_mass / (star_mass + planet_mass + sat_mass)
-        )
+        CM_x_coord = planet_distance * planet_mass / (star_mass + planet_mass)
 
-        CM_pos = [CM_x_coord, 0, 0]
+        CM_pos = np.array([CM_x_coord, 0, 0])
 
         lagrange_point_trans = self.lagrange_point - CM_pos
 
