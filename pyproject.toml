@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "simulation"
-version = "1.0.0"
+version = "1.0.1"
 description = "Simulates orbits near Lagrange Points"
 authors = ["Moussa Mikhail <moussamikhail56@gmail.com>"]
 license = "MIT"
