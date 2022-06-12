@@ -31,7 +31,7 @@ satParams = {
     "perturbation angle": "60",
     "initial speed": "1",
     "initial velocity angle": "150",
-    "Lagrange Point": "L4",
+    "Lagrange label": "L4",
 }
 
 sysParams = {
@@ -52,7 +52,7 @@ argNames = {
     "star mass": "star_mass",
     "planet mass": "planet_mass",
     "planet distance": "planet_distance",
-    "Lagrange Point": "lagrange_point",
+    "Lagrange label": "lagrange_label",
 }
 
 
@@ -192,7 +192,13 @@ class ThesisCtrl:
 
         except (TypeError, ValueError) as e:
 
-            errorMessage(str(e))
+            msg = str(e)
+
+            for k, v in argNames.items():
+
+                msg = msg.replace(v, k)
+
+            errorMessage(msg)
 
             return
 
@@ -228,7 +234,7 @@ class ThesisCtrl:
 
             fieldValue = field.text()
 
-            if fieldText == "Lagrange Point":
+            if fieldText == "Lagrange label":
 
                 inputs[fieldText] = fieldValue
 
