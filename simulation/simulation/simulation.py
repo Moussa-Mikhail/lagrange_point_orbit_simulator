@@ -19,7 +19,7 @@ from numpy import pi
 from numpy.linalg import norm
 from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
 
-from ..constants import AU, G, earth_mass, sat_mass, sun_mass, years
+from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
 from .descriptors import (
     bool_desc,
     distance_desc,

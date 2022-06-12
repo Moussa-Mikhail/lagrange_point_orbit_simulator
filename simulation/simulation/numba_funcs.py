@@ -4,7 +4,7 @@ import numpy as np
 
 from numba import njit, prange  # type: ignore
 
-from ..constants import G
+from simulation.constants import G
 
 
 @njit()
