@@ -13,22 +13,15 @@ import numpy as np
 
 # plotting module.
 import pyqtgraph as pg  # type: ignore
+from numpy import pi
 
 # shortens function call
 from numpy.linalg import norm
 from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
-from descriptors import (
-    distance,
-    mass,
-    numsteps,
-    real,
-    # lagrange_label,
-    bool_desc,
-)
 
-from numba_funcs import integrate, transform_to_corotating
-
-from constants import AU, G, earth_mass, pi, sat_mass, sun_mass, years
+from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
+from .descriptors import bool_desc, distance, mass, numsteps, real  # lagrange_label,
+from .numba_funcs import integrate, transform_to_corotating
 
 
 def time_func(func):

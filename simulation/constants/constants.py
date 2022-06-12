@@ -1,5 +1,4 @@
-# pylint: disable=unused-import, missing-docstring, invalid-name
-from numpy import pi  # noqa: F401
+# pylint: disable=invalid-name
 
 # universal gravitational constant in meters^3*1/kilograms*1/seconds^2
 G = 6.67430 * 10**-11
@@ -28,3 +27,21 @@ constants_names = {
     "earth_mass",
     "sat_mass",
 }
+
+
+def safe_eval(expr: str):
+    """safe eval function used on expressions that contain the above constants"""
+
+    exprNoConstants = expr
+
+    for constant in constants_names:
+
+        exprNoConstants = exprNoConstants.replace(constant, "")
+
+    chars = set(exprNoConstants)
+
+    if not chars.issubset("0123456789.+-*/()e"):
+
+        raise ValueError(f"{expr} is an invalid expression")
+
+    return eval(expr)  # pylint: disable=eval-used
