@@ -30,7 +30,7 @@ from simulation.constants import (
     years,
 )
 
-from simulation.typing import DoubleArray
+from .typing import DoubleArray
 
 from .descriptors import (
     bool_desc,
@@ -155,13 +155,39 @@ def main(
     return simulation.main()
 
 
-def calc_period_from_semi_major_axis(semi_major_axis, star_mass, planet_mass):
+def calc_period_from_semi_major_axis(
+    semi_major_axis: float, star_mass: float, planet_mass: float
+) -> float:
 
     period_squared = (
         4 * pi**2 * semi_major_axis**3 / (G * (star_mass + planet_mass))
     )
 
     return np.sqrt(period_squared)
+
+
+def calc_default_angles(
+    lagrange_point_trans: DoubleArray,
+    perturbation_angle: float | None,
+    vel_angle: float | None,
+) -> tuple[float, float]:
+    """Calculates the default angles for the satellite in degrees"""
+
+    default_pertubation_angle_rad: float = np.arctan2(
+        lagrange_point_trans[1], lagrange_point_trans[0]
+    )
+
+    default_pertubation_angle: float = np.degrees(default_pertubation_angle_rad)
+
+    if perturbation_angle is None:
+
+        perturbation_angle = default_pertubation_angle
+
+    if vel_angle is None:
+
+        vel_angle = default_pertubation_angle + 90
+
+    return perturbation_angle, vel_angle
 
 
 class Simulation:
@@ -221,17 +247,17 @@ class Simulation:
         self.lagrange_point = self.calc_lagrange_point()
 
         # star starts at origin
-        CM_x_coord = planet_distance * planet_mass / (star_mass + planet_mass)
+        CM_x_coord = self.planet_distance * planet_mass / (star_mass + planet_mass)
 
         CM_pos = np.array([CM_x_coord, 0, 0], dtype=np.double)
 
         lagrange_point_trans: DoubleArray = self.lagrange_point - CM_pos
 
-        self.set_default_angles(lagrange_point_trans, perturbation_angle, vel_angle)
-
-        self.orbital_period = calc_period_from_semi_major_axis(
-            planet_distance * AU, star_mass, planet_mass
+        self.perturbation_angle, self.vel_angle = calc_default_angles(
+            lagrange_point_trans, perturbation_angle, vel_angle
         )
+
+        self.orbital_period = self.calc_orbital_period()
 
         # star and planet orbit about the Center of Mass
         # at an angular_speed = 2 pi radians/orbital_period
@@ -243,67 +269,47 @@ class Simulation:
 
     def calc_lagrange_point(self) -> DoubleArray:
 
-        hill_radius = self.planet_distance * (
-            self.planet_mass / (3 * self.star_mass)
-        ) ** (1 / 3)
+        planet_distance = self.planet_distance * AU
+
+        hill_radius = planet_distance * (self.planet_mass / (3 * self.star_mass)) ** (
+            1 / 3
+        )
 
         match self.lagrange_label:
 
             case "L1":
-                return self.planet_distance * np.array((1, 0, 0)) - np.array(
+                return planet_distance * np.array((1, 0, 0)) - np.array(
                     (hill_radius, 0, 0)
                 )
 
             case "L2":
-                return self.planet_distance * np.array((1, 0, 0)) + np.array(
+                return planet_distance * np.array((1, 0, 0)) + np.array(
                     (hill_radius, 0, 0)
                 )
 
             case "L3":
-                L3_dist = (
-                    self.planet_distance * 7 / 12 * self.planet_mass / self.star_mass
-                )
+                L3_dist = planet_distance * 7 / 12 * self.planet_mass / self.star_mass
 
-                return -self.planet_distance * np.array((1, 0, 0)) - np.array(
+                return -planet_distance * np.array((1, 0, 0)) - np.array(
                     (L3_dist, 0, 0)
                 )
 
             case "L4":
 
-                return self.planet_distance * np.array(
-                    (np.cos(pi / 3), np.sin(pi / 3), 0)
-                )
+                return planet_distance * np.array((np.cos(pi / 3), np.sin(pi / 3), 0))
 
             case "L5":
 
-                return self.planet_distance * np.array(
-                    (np.cos(pi / 3), -np.sin(pi / 3), 0)
-                )
+                return planet_distance * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
 
             case _:
                 raise AssertionError
 
-    def set_default_angles(
-        self,
-        lagrange_point_trans: DoubleArray,
-        perturbation_angle: float | None,
-        vel_angle: float | None,
-    ) -> None:
-        """Calculates the default angles for the satellite in degrees"""
+    def calc_orbital_period(self) -> float:
 
-        default_pertubation_angle = np.arctan2(
-            lagrange_point_trans[1], lagrange_point_trans[0]
+        return calc_period_from_semi_major_axis(
+            self.planet_distance * AU, self.star_mass, self.planet_mass
         )
-
-        default_pertubation_angle = np.degrees(default_pertubation_angle)
-
-        if perturbation_angle is None:
-
-            self.perturbation_angle = default_pertubation_angle
-
-        if vel_angle is None:
-
-            self.vel_angle = default_pertubation_angle + 90
 
     def main(self):
 
