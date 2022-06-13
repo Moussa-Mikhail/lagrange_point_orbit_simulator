@@ -5,10 +5,11 @@ import numpy as np
 from numba import njit, prange  # type: ignore
 
 from simulation.constants import G
+from simulation.typing import DoubleArray
 
 
 @njit()
-def norm(vector):
+def norm(vector: DoubleArray) -> float:
 
     return np.sqrt(
         vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]
@@ -17,17 +18,17 @@ def norm(vector):
 
 @njit()
 def calc_acceleration(
-    star_mass,
-    planet_mass,
-    star_pos,
-    planet_pos,
-    sat_pos,
-    star_accel,
-    planet_accel,
-    sat_accel,
-    r_planet_to_star,
-    r_sat_to_star,
-    r_sat_to_planet,
+    star_mass: float,
+    planet_mass: float,
+    star_pos: DoubleArray,
+    planet_pos: DoubleArray,
+    sat_pos: DoubleArray,
+    star_accel: DoubleArray,
+    planet_accel: DoubleArray,
+    sat_accel: DoubleArray,
+    r_planet_to_star: DoubleArray,
+    r_sat_to_star: DoubleArray,
+    r_sat_to_planet: DoubleArray,
 ):
 
     for j in range(3):
@@ -61,16 +62,16 @@ def calc_acceleration(
 
 @njit()
 def integrate(
-    time_step,
-    num_steps,
-    star_mass,
-    planet_mass,
-    star_pos,
-    star_vel,
-    planet_pos,
-    planet_vel,
-    sat_pos,
-    sat_vel,
+    time_step: float,
+    num_steps: int,
+    star_mass: float,
+    planet_mass: float,
+    star_pos: DoubleArray,
+    star_vel: DoubleArray,
+    planet_pos: DoubleArray,
+    planet_vel: DoubleArray,
+    sat_pos: DoubleArray,
+    sat_vel: DoubleArray,
 ):
 
     star_accel = np.empty(3, dtype=np.double)
@@ -143,7 +144,9 @@ def integrate(
 
 
 @njit(parallel=True)
-def transform_to_corotating(times, angular_speed, pos_trans):
+def transform_to_corotating(
+    times: DoubleArray, angular_speed: float, pos_trans: DoubleArray
+):
     # it is necessary to transform our coordinate system to one which
     # rotates with the system
     # we can do this by linearly transforming each position vector by
@@ -159,17 +162,17 @@ def transform_to_corotating(times, angular_speed, pos_trans):
 
     for i in prange(pos_trans.shape[0]):
 
-        time = times[i]
+        time: float = times[i]
 
         angle = -angular_speed * time
 
-        c = np.cos(angle)
+        c: float = np.cos(angle)
 
-        s = np.sin(angle)
+        s: float = np.sin(angle)
 
-        pos_trans_x = pos_trans[i, 0]
+        pos_trans_x: float = pos_trans[i, 0]
 
-        pos_trans_y = pos_trans[i, 1]
+        pos_trans_y: float = pos_trans[i, 1]
 
         pos_rotated[i, 0] = c * pos_trans_x - s * pos_trans_y
 

@@ -7,6 +7,7 @@ It assumes that both the star and planet are undergoing uniform circular motion.
 from functools import wraps
 from math import ceil
 from time import perf_counter
+from typing import Callable
 
 # numpy allows us to compute common math functions and work with arrays.
 import numpy as np
@@ -17,21 +18,38 @@ from numpy import pi
 
 # shortens function call
 from numpy.linalg import norm
+from numpy.typing import NDArray
 from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
 
-from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
+from simulation.constants import (
+    AU,
+    G,
+    earth_mass,
+    sat_mass,
+    sun_mass,
+    years,
+)
+
+from simulation.typing import DoubleArray
+
 from .descriptors import (
     bool_desc,
     distance_desc,
+    lagrange_label_desc,
     mass_desc,
     num_steps_desc,
     real_desc,
-    lagrange_label_desc,
 )
 from .numba_funcs import integrate, transform_to_corotating
 
 
-def time_func(func):
+def array_of_norms(arr_2d: NDArray) -> DoubleArray:
+    """Returns an array of the norm of each element of the input array"""
+
+    return norm(arr_2d, axis=1)
+
+
+def time_func(func: Callable):
     """Measures the time taken by a function"""
 
     @wraps(func)
@@ -52,18 +70,18 @@ def time_func(func):
 
 @time_func
 def main(
-    num_years=100.0,
-    num_steps=10**6,
-    perturbation_size=0.0,
-    perturbation_angle=None,
-    speed=1.0,
-    vel_angle=None,
-    star_mass=sun_mass,
-    planet_mass=earth_mass,
-    planet_distance=1.0,
-    lagrange_label="L4",
-    plot_conserved=False,
-):  # sourcery skip: raise-specific-error
+    num_years: float = 100.0,
+    num_steps: int | float = 10**6,
+    perturbation_size: float = 0.0,
+    perturbation_angle: float | None = None,
+    speed: float = 1.0,
+    vel_angle: float | None = None,
+    star_mass: float = sun_mass,
+    planet_mass: float = earth_mass,
+    planet_distance: float = 1.0,
+    lagrange_label: str = "L4",
+    plot_conserved: bool = False,
+):
     """main simulates a satellite's orbit corresponding to the following parameters.
     It then plots the orbit in inertial and corotating frames.
     The plots created are interactive.
@@ -118,6 +136,8 @@ def main(
     It will take longer than usual on the first call.
     """
 
+    num_steps = int(num_steps)
+
     simulation = Simulation(
         num_years,
         num_steps,
@@ -135,61 +155,13 @@ def main(
     return simulation.main()
 
 
-def calc_lagrange_points(star_mass, planet_mass, planet_distance):
-
-    hill_radius = planet_distance * (planet_mass / (3 * star_mass)) ** (1 / 3)
-
-    # Position of L1
-    L1 = planet_distance * np.array((1, 0, 0)) - np.array((hill_radius, 0, 0))
-
-    # Position of L2
-    L2 = planet_distance * np.array((1, 0, 0)) + np.array((hill_radius, 0, 0))
-
-    L3_dist = planet_distance * 7 / 12 * planet_mass / star_mass
-
-    # Located opposite of the planet and slightly further away from the star
-    # than the planet
-    L3 = -planet_distance * np.array((1, 0, 0)) - np.array((L3_dist, 0, 0))
-
-    # Position of L4 Lagrange point.
-    # It is equidistant from both star and planet.
-    # It forms a 60 degree=pi/3 radians angle with the positive x-axis.
-    L4 = planet_distance * np.array((np.cos(pi / 3), np.sin(pi / 3), 0))
-
-    # Position of L5 Lagrange point.
-    # It is equidistant from both star and planet.
-    # It forms a 60 degree=pi/3 radians angle with the positive x-axis.
-    L5 = planet_distance * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
-
-    return {"L1": L1, "L2": L2, "L3": L3, "L4": L4, "L5": L5}
-
-
 def calc_period_from_semi_major_axis(semi_major_axis, star_mass, planet_mass):
-    # pylint: disable=redefined-outer-name
 
     period_squared = (
         4 * pi**2 * semi_major_axis**3 / (G * (star_mass + planet_mass))
     )
 
     return np.sqrt(period_squared)
-
-
-def calc_default_angles(lagrange_point, perturbation_angle, vel_angle):
-    """Calculates the default angles for the satellite in degrees"""
-
-    default_pertubation_angle = np.arctan2(lagrange_point[1], lagrange_point[0])
-
-    default_pertubation_angle = np.degrees(default_pertubation_angle)
-
-    if perturbation_angle is None:
-
-        perturbation_angle = default_pertubation_angle
-
-    if vel_angle is None:
-
-        vel_angle = default_pertubation_angle + 90
-
-    return perturbation_angle, vel_angle
 
 
 class Simulation:
@@ -209,17 +181,17 @@ class Simulation:
 
     def __init__(
         self,
-        num_years=100.0,
-        num_steps=10**6,
-        perturbation_size=0.0,
-        perturbation_angle=None,
-        speed=1.0,
-        vel_angle=None,
-        star_mass=sun_mass,
-        planet_mass=earth_mass,
-        planet_distance=1.0,
-        lagrange_label="L4",
-        plot_conserved=False,
+        num_years: float = 100.0,
+        num_steps: int = 10**6,
+        perturbation_size: float = 0.0,
+        perturbation_angle: float | None = None,
+        speed: float = 1.0,
+        vel_angle: float | None = None,
+        star_mass: float = sun_mass,
+        planet_mass: float = earth_mass,
+        planet_distance: float = 1.0,
+        lagrange_label: str = "L4",
+        plot_conserved: bool = False,
     ):
 
         self.num_years = num_years
@@ -232,7 +204,7 @@ class Simulation:
         self.time_step = self.sim_stop / num_steps
 
         # array of num_steps+1 time points evenly spaced between 0 and sim_stop
-        self.times = np.linspace(0, self.sim_stop, num_steps + 1)
+        self.times: DoubleArray = np.linspace(0, self.sim_stop, num_steps + 1)
 
         self.perturbation_size = perturbation_size
 
@@ -246,22 +218,16 @@ class Simulation:
 
         self.lagrange_label = lagrange_label
 
-        lagrange_points = calc_lagrange_points(
-            star_mass, planet_mass, planet_distance * AU
-        )
-
-        self.lagrange_point = lagrange_points[lagrange_label]
+        self.lagrange_point = self.calc_lagrange_point()
 
         # star starts at origin
         CM_x_coord = planet_distance * planet_mass / (star_mass + planet_mass)
 
-        CM_pos = np.array([CM_x_coord, 0, 0])
+        CM_pos = np.array([CM_x_coord, 0, 0], dtype=np.double)
 
-        lagrange_point_trans = self.lagrange_point - CM_pos
+        lagrange_point_trans: DoubleArray = self.lagrange_point - CM_pos
 
-        self.perturbation_angle, self.vel_angle = calc_default_angles(
-            lagrange_point_trans, perturbation_angle, vel_angle
-        )
+        self.set_default_angles(lagrange_point_trans, perturbation_angle, vel_angle)
 
         self.orbital_period = calc_period_from_semi_major_axis(
             planet_distance * AU, star_mass, planet_mass
@@ -274,6 +240,70 @@ class Simulation:
         self.plot_conserved = plot_conserved
 
         self.timer = QTimer()
+
+    def calc_lagrange_point(self) -> DoubleArray:
+
+        hill_radius = self.planet_distance * (
+            self.planet_mass / (3 * self.star_mass)
+        ) ** (1 / 3)
+
+        match self.lagrange_label:
+
+            case "L1":
+                return self.planet_distance * np.array((1, 0, 0)) - np.array(
+                    (hill_radius, 0, 0)
+                )
+
+            case "L2":
+                return self.planet_distance * np.array((1, 0, 0)) + np.array(
+                    (hill_radius, 0, 0)
+                )
+
+            case "L3":
+                L3_dist = (
+                    self.planet_distance * 7 / 12 * self.planet_mass / self.star_mass
+                )
+
+                return -self.planet_distance * np.array((1, 0, 0)) - np.array(
+                    (L3_dist, 0, 0)
+                )
+
+            case "L4":
+
+                return self.planet_distance * np.array(
+                    (np.cos(pi / 3), np.sin(pi / 3), 0)
+                )
+
+            case "L5":
+
+                return self.planet_distance * np.array(
+                    (np.cos(pi / 3), -np.sin(pi / 3), 0)
+                )
+
+            case _:
+                raise AssertionError
+
+    def set_default_angles(
+        self,
+        lagrange_point_trans: DoubleArray,
+        perturbation_angle: float | None,
+        vel_angle: float | None,
+    ) -> None:
+        """Calculates the default angles for the satellite in degrees"""
+
+        default_pertubation_angle = np.arctan2(
+            lagrange_point_trans[1], lagrange_point_trans[0]
+        )
+
+        default_pertubation_angle = np.degrees(default_pertubation_angle)
+
+        if perturbation_angle is None:
+
+            self.perturbation_angle = default_pertubation_angle
+
+        if vel_angle is None:
+
+            self.vel_angle = default_pertubation_angle + 90
 
     def main(self):
 
@@ -336,7 +366,7 @@ class Simulation:
 
         return orbit_plot, corotating_plot, self.timer
 
-    def calc_orbit(self):
+    def calc_orbit(self) -> tuple[DoubleArray, ...]:
 
         # Initialize the positions and velocities of the bodies
         (
@@ -427,12 +457,12 @@ class Simulation:
 
     def integrate(
         self,
-        star_pos,
-        star_vel,
-        planet_pos,
-        planet_vel,
-        sat_pos,
-        sat_vel,
+        star_pos: DoubleArray,
+        star_vel: DoubleArray,
+        planet_pos: DoubleArray,
+        planet_vel: DoubleArray,
+        sat_pos: DoubleArray,
+        sat_vel: DoubleArray,
     ):
 
         integrate(
@@ -448,7 +478,12 @@ class Simulation:
             sat_vel,
         )
 
-    def calc_center_of_mass(self, star_pos, planet_pos, sat_pos):
+    def calc_center_of_mass(
+        self,
+        star_pos: DoubleArray,
+        planet_pos: DoubleArray,
+        sat_pos: DoubleArray,
+    ) -> DoubleArray:
 
         return (
             self.star_mass * star_pos
@@ -456,7 +491,12 @@ class Simulation:
             + sat_mass * sat_pos
         ) / (self.star_mass + self.planet_mass + sat_mass)
 
-    def plot_orbit(self, star_pos_trans, planet_pos_trans, sat_pos_trans):
+    def plot_orbit(
+        self,
+        star_pos_trans: DoubleArray,
+        planet_pos_trans: DoubleArray,
+        sat_pos_trans: DoubleArray,
+    ):
 
         orbit_plot = pg.plot(title="Orbits of Masses")
         orbit_plot.setLabel("bottom", "x", units="AU")
@@ -556,16 +596,16 @@ class Simulation:
 
         return orbit_plot, update_plot
 
-    def transform_to_corotating(self, pos_trans):
+    def transform_to_corotating(self, pos_trans: DoubleArray):
 
         return transform_to_corotating(self.times, self.angular_speed, pos_trans)
 
     def plot_corotating_orbit(
         self,
-        star_pos_rotated,
-        planet_pos_rotated,
-        sat_pos_rotated,
-        lagrange_point_trans,
+        star_pos_rotated: DoubleArray,
+        planet_pos_rotated: DoubleArray,
+        sat_pos_rotated: DoubleArray,
+        lagrange_point_trans: DoubleArray,
     ):
 
         # Animated plot of satellites orbit in co-rotating frame.
@@ -689,7 +729,7 @@ class Simulation:
 
         return corotating_plot, update_corotating
 
-    def plot_array_step(self, num_points_to_plot=10**5):
+    def plot_array_step(self, num_points_to_plot: int = 10**5) -> int:
 
         # no need to plot all points
 
@@ -726,8 +766,14 @@ class Simulation:
             yield i
 
     def conservation_calculations(
-        self, star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
-    ):
+        self,
+        star_pos: DoubleArray,
+        star_vel: DoubleArray,
+        planet_pos: DoubleArray,
+        planet_vel: DoubleArray,
+        sat_pos: DoubleArray,
+        sat_vel: DoubleArray,
+    ) -> tuple[DoubleArray, DoubleArray, DoubleArray]:
 
         total_momentum = (
             self.star_mass * star_vel
@@ -746,11 +792,11 @@ class Simulation:
         )
 
         # array of the distance between planet and star at each timestep
-        d_planet_to_star = norm(star_pos - planet_pos, axis=1)
+        d_planet_to_star = array_of_norms(star_pos - planet_pos)
 
-        d_planet_to_sat = norm(sat_pos - planet_pos, axis=1)
+        d_planet_to_sat = array_of_norms(sat_pos - planet_pos)
 
-        d_star_to_sat = norm(sat_pos - star_pos, axis=1)
+        d_star_to_sat = array_of_norms(sat_pos - star_pos)
 
         potential_energy = (
             -G * self.star_mass * self.planet_mass / d_planet_to_star
@@ -759,11 +805,11 @@ class Simulation:
         )
 
         # array of the magnitude of the velocity of star at each timestep
-        mag_star_vel = norm(star_vel, axis=1)
+        mag_star_vel = array_of_norms(star_vel)
 
-        mag_planet_vel = norm(planet_vel, axis=1)
+        mag_planet_vel = array_of_norms(planet_vel)
 
-        mag_sat_vel = norm(sat_vel, axis=1)
+        mag_sat_vel = array_of_norms(sat_vel)
 
         kinetic_energy = (
             0.5 * self.star_mass * mag_star_vel**2
@@ -778,9 +824,9 @@ class Simulation:
     def plot_conserved_quantities(
         self,
         init_planet_momentum,
-        total_momentum,
-        total_angular_momentum,
-        total_energy,
+        total_momentum: DoubleArray,
+        total_angular_momentum: DoubleArray,
+        total_energy: DoubleArray,
     ):
 
         linear_momentum_plot = pg.plot(title="Normalized Linear Momentum vs Time")
