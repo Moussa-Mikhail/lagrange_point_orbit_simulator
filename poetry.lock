@@ -8,7 +8,7 @@ python-versions = "*"
 
 [[package]]
 name = "astroid"
-version = "2.11.5"
+version = "2.11.6"
 description = "An abstract syntax tree for Python with inference support."
 category = "dev"
 optional = false
@@ -397,7 +397,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "validateddescriptor"
-version = "1.0.2"
+version = "1.1.2"
 description = "Class used as an alternative to setter methods that validate inputs."
 category = "main"
 optional = false
@@ -408,7 +408,7 @@ develop = false
 type = "git"
 url = "https://github.com/Moussa-Mikhail/validated-descriptor.git"
 reference = "main"
-resolved_reference = "1a3c0a5a1145f8a1c7a1f892173ff6de64c7c2c0"
+resolved_reference = "7f6649888583ca1f07b406d54eeee440aa29401a"
 
 [[package]]
 name = "wrapt"
@@ -429,8 +429,8 @@ altgraph = [
     {file = "altgraph-0.17.2.tar.gz", hash = "sha256:ebf2269361b47d97b3b88e696439f6e4cbc607c17c51feb1754f90fb79839158"},
 ]
 astroid = [
-    {file = "astroid-2.11.5-py3-none-any.whl", hash = "sha256:14ffbb4f6aa2cf474a0834014005487f7ecd8924996083ab411e7fa0b508ce0b"},
-    {file = "astroid-2.11.5.tar.gz", hash = "sha256:f4e4ec5294c4b07ac38bab9ca5ddd3914d4bf46f9006eb5c0ae755755061044e"},
+    {file = "astroid-2.11.6-py3-none-any.whl", hash = "sha256:ba33a82a9a9c06a5ceed98180c5aab16e29c285b828d94696bf32d6015ea82a9"},
+    {file = "astroid-2.11.6.tar.gz", hash = "sha256:4f933d0bf5e408b03a6feb5d23793740c27e07340605f236496cd6ce552043d6"},
 ]
 attrs = [
     {file = "attrs-21.4.0-py2.py3-none-any.whl", hash = "sha256:2d27e3784d7a565d36ab851fe94887c5eccd6a463168875832a1be79c82828b4"},
