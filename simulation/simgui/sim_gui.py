@@ -180,7 +180,7 @@ class ThesisCtrl:
 
             simulationInputs = self._getSimulationInputs()
 
-        except (ValueError, SyntaxError, ZeroDivisionError):
+        except (ValueError, SyntaxError, ZeroDivisionError, TypeError):
 
             return
 
@@ -256,7 +256,17 @@ class ThesisCtrl:
 
                 continue
 
-            inputs[fieldText] = float(value)
+            try:
+
+                inputs[fieldText] = float(value)
+
+            except TypeError as e:
+
+                errorMessage(
+                    f"{fieldText} must be a real number, not {type(value).__name__}"
+                )
+
+                raise e
 
         return inputs
 
