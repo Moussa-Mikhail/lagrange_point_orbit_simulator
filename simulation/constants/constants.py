@@ -39,7 +39,7 @@ def safe_eval(expr: str) -> int | float:
 
     chars = set(exprNoConstants)
 
-    if not chars.issubset("0123456789.+-*/()e"):
+    if not chars.issubset("0123456789.+-*/()ej"):
 
         raise ValueError(f"{expr} is an invalid expression")
 
