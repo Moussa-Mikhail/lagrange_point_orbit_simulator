@@ -21,26 +21,18 @@ from numpy.linalg import norm
 from numpy.typing import NDArray
 from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
 
-from simulation.constants import (
-    AU,
-    G,
-    earth_mass,
-    sat_mass,
-    sun_mass,
-    years,
-)
-
-from .typing import DoubleArray
+from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
 
 from .descriptors import (
     bool_desc,
-    distance_desc,
+    float_desc,
     lagrange_label_desc,
-    mass_desc,
-    num_steps_desc,
-    real_desc,
+    non_negative_float,
+    positive_float,
+    positive_int,
 )
 from .numba_funcs import integrate, transform_to_corotating
+from .typing import DoubleArray
 
 
 def array_of_norms(arr_2d: NDArray) -> DoubleArray:
@@ -193,15 +185,15 @@ def calc_default_angles(
 class Simulation:
     """Holds parameters and methods for simulation"""
 
-    num_years = real_desc()
-    num_steps = num_steps_desc()
-    perturbation_size = real_desc()
-    perturbation_angle = real_desc()
-    speed = real_desc()
-    vel_angle = real_desc()
-    star_mass = mass_desc()
-    planet_mass = mass_desc()
-    planet_distance = distance_desc()
+    num_years = float_desc()
+    num_steps = positive_int()
+    perturbation_size = float_desc()
+    perturbation_angle = float_desc()
+    speed = float_desc()
+    vel_angle = float_desc()
+    star_mass = non_negative_float()
+    planet_mass = non_negative_float()
+    planet_distance = positive_float()
     lagrange_label = lagrange_label_desc()
     plot_conserved = bool_desc()
 

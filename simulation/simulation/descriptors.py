@@ -1,53 +1,46 @@
-# pylint: disable=attribute-defined-outside-init, missing-docstring
-from numbers import Real
-from typing import Any
+# pylint: disable=missing-function-docstring
+"""Holds descriptor factory functions"""
 
-from validateddescriptor import (
-    ValidatedDescriptor,
-    is_bool,
-    is_integer,
-    is_non_negative,
-    is_positive,
-    type_check_factory,
+from validateddescriptor import ValidatedDescriptor, value_check_factory
+
+is_positive = value_check_factory(lambda x: x > 0, "positive")
+
+is_non_negative = value_check_factory(lambda x: x >= 0, "non-negative")
+
+
+def positive_int() -> ValidatedDescriptor[int]:
+
+    return ValidatedDescriptor([is_positive], int)
+
+
+def non_negative_float() -> ValidatedDescriptor[float]:
+
+    return ValidatedDescriptor([is_non_negative], float)
+
+
+def positive_float() -> ValidatedDescriptor[float]:
+
+    return ValidatedDescriptor([is_positive], float)
+
+
+def bool_desc() -> ValidatedDescriptor[bool]:
+
+    return ValidatedDescriptor(type_=bool)
+
+
+def float_desc() -> ValidatedDescriptor[float]:
+
+    return ValidatedDescriptor(type_=float)
+
+
+lagrange_labels = ("L1", "L2", "L3", "L4", "L5")
+
+
+is_lagrange_label = value_check_factory(
+    lambda x: x in lagrange_labels, f"one of {lagrange_labels}"
 )
 
 
-def num_steps_desc():
+def lagrange_label_desc() -> ValidatedDescriptor[str]:
 
-    return ValidatedDescriptor([is_integer, is_positive])
-
-
-def mass_desc():
-
-    return ValidatedDescriptor([is_non_negative])
-
-
-def distance_desc():
-
-    return ValidatedDescriptor([is_positive])
-
-
-def bool_desc():
-
-    return ValidatedDescriptor([is_bool])
-
-
-is_real = type_check_factory(Real)
-
-
-def real_desc():
-
-    return ValidatedDescriptor([is_real])
-
-
-def is_lagrange_label(descriptor: ValidatedDescriptor, value: Any) -> None:
-
-    lagrange_labels = ("L1", "L2", "L3", "L4", "L5")
-
-    if value not in lagrange_labels:
-        raise ValueError(f"{descriptor.public_name} must be one of {lagrange_labels}")
-
-
-def lagrange_label_desc():
-
-    return ValidatedDescriptor([is_lagrange_label])
+    return ValidatedDescriptor([is_lagrange_label], str)
