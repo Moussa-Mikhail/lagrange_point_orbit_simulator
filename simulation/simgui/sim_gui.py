@@ -272,6 +272,12 @@ class ThesisCtrl:
 
     def _toggleAnimation(self):
 
+        if self._view._timer is None:
+
+            errorMessage("No simulation to animate")
+
+            return
+
         if self._view._timer.isActive():
 
             self._view._timer.stop()
