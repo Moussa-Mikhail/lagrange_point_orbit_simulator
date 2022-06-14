@@ -773,21 +773,57 @@ class Simulation:
         sat_vel: DoubleArray,
     ) -> tuple[DoubleArray, DoubleArray, DoubleArray]:
 
-        total_momentum = (
+        total_momentum = self.calc_total_linear_momentum(star_vel, planet_vel, sat_vel)
+
+        total_angular_momentum = self.calc_total_angular_momentum(
+            star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
+        )
+
+        total_energy = self.calc_total_energy(
+            star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
+        )
+
+        return total_momentum, total_angular_momentum, total_energy
+
+    def calc_total_linear_momentum(
+        self, star_vel: DoubleArray, planet_vel: DoubleArray, sat_vel: DoubleArray
+    ) -> DoubleArray:
+
+        return (
             self.star_mass * star_vel
             + self.planet_mass * planet_vel
             + sat_mass * sat_vel
         )
 
-        angular_momentum_star = np.cross(star_pos, self.star_mass * star_vel)
+    def calc_total_angular_momentum(
+        self,
+        star_pos: DoubleArray,
+        star_vel: DoubleArray,
+        planet_pos: DoubleArray,
+        planet_vel: DoubleArray,
+        sat_pos: DoubleArray,
+        sat_vel: DoubleArray,
+    ) -> DoubleArray:
+
+        angular_momentum_star: DoubleArray = np.cross(
+            star_pos, self.star_mass * star_vel
+        )
 
         angular_momentum_planet = np.cross(planet_pos, self.planet_mass * planet_vel)
 
         angular_momentum_sat = np.cross(sat_pos, sat_mass * sat_vel)
 
-        total_angular_momentum = (
-            angular_momentum_star + angular_momentum_planet + angular_momentum_sat
-        )
+        return angular_momentum_star + angular_momentum_planet + angular_momentum_sat
+
+    def calc_total_energy(
+        self,
+        star_pos: DoubleArray,
+        star_vel: DoubleArray,
+        planet_pos: DoubleArray,
+        planet_vel: DoubleArray,
+        sat_pos: DoubleArray,
+        sat_vel: DoubleArray,
+    ) -> DoubleArray:
 
         # array of the distance between planet and star at each timestep
         d_planet_to_star = array_of_norms(star_pos - planet_pos)
@@ -815,9 +851,7 @@ class Simulation:
             + 0.5 * sat_mass * mag_sat_vel**2
         )
 
-        total_energy = potential_energy + kinetic_energy
-
-        return total_momentum, total_angular_momentum, total_energy
+        return potential_energy + kinetic_energy
 
     def plot_conserved_quantities(
         self,
