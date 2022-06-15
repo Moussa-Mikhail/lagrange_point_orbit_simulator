@@ -303,7 +303,7 @@ def _translateInputs(inputs):
 
 def main():
 
-    simGui = QApplication(sys.argv)
+    simApp = QApplication(sys.argv)
 
     view = SimUi()
 
@@ -314,7 +314,7 @@ def main():
     # TODO: fix this bug
     ctrl = SimCtrl(model=simMain, view=view)  # noqa: F841
 
-    sys.exit(simGui.exec())
+    sys.exit(simApp.exec())
 
 
 if __name__ == "__main__":
