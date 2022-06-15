@@ -2,8 +2,8 @@
 import sys
 
 import pyqtgraph as pg  # type: ignore
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (
     QApplication,
     QErrorMessage,
     QFormLayout,
@@ -293,7 +293,7 @@ def errorMessage(message):
 
     errorMsg.showMessage(message)
 
-    errorMsg.exec_()
+    errorMsg.exec()
 
 
 def _translateInputs(inputs):
@@ -314,7 +314,7 @@ def main():
     # TODO: fix this bug
     ctrl = ThesisCtrl(model=simMain, view=view)  # noqa: F841
 
-    sys.exit(thesisGui.exec_())
+    sys.exit(thesisGui.exec())
 
 
 if __name__ == "__main__":
