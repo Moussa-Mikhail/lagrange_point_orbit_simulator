@@ -19,7 +19,7 @@ from numpy import pi
 # shortens function call
 from numpy.linalg import norm
 from numpy.typing import NDArray
-from pyqtgraph.Qt.QtCore import QTimer  # type: ignore
+from PyQt6.QtCore import QTimer
 
 from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
 
