@@ -3,6 +3,7 @@ import sys
 
 import pyqtgraph as pg  # type: ignore
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QApplication,
     QErrorMessage,
@@ -14,10 +15,10 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QWidget,
 )
+from simulation import main as simMain
 
 # pylint: disable=unused-import
 from simulation.constants import safe_eval as safeEval  # noqa: F401
-from simulation import main as simMain
 
 simMain = simMain.__wrapped__
 
@@ -304,6 +305,8 @@ def _translateInputs(inputs):
 def main():
 
     simApp = QApplication(sys.argv)
+
+    simApp.setFont(QFont("Arial", 10))
 
     view = SimUi()
 
