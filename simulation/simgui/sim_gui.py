@@ -56,7 +56,7 @@ argNames = {
 }
 
 
-class ThesisUi(QMainWindow):
+class SimUi(QMainWindow):
     def __init__(self):
 
         super().__init__()
@@ -147,7 +147,7 @@ class ThesisUi(QMainWindow):
         self._timer = None
 
 
-class ThesisCtrl:
+class SimCtrl:
     def __init__(self, model, view):
 
         self._model = model
@@ -303,18 +303,18 @@ def _translateInputs(inputs):
 
 def main():
 
-    thesisGui = QApplication(sys.argv)
+    simGui = QApplication(sys.argv)
 
-    view = ThesisUi()
+    view = SimUi()
 
     view.show()
 
     # pylint: disable=unused-variable
     # this assignment shouldn't be necessary, but it is
     # TODO: fix this bug
-    ctrl = ThesisCtrl(model=simMain, view=view)  # noqa: F841
+    ctrl = SimCtrl(model=simMain, view=view)  # noqa: F841
 
-    sys.exit(thesisGui.exec())
+    sys.exit(simGui.exec())
 
 
 if __name__ == "__main__":
