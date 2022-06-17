@@ -32,7 +32,6 @@ from .descriptors import (
     positive_float,
     positive_int,
 )
-
 from .numba_funcs import integrate, transform_to_corotating
 from .typing import DoubleArray
 
