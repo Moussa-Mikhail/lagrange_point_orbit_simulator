@@ -3,7 +3,7 @@ import sys
 from typing import Callable, TypeVar
 
 import pyqtgraph as pg  # type: ignore
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QApplication,
@@ -16,8 +16,6 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QWidget,
 )
-
-from PyQt6.QtCore import QTimer
 from simulation import main as simMain
 
 # pylint: disable=unused-import
