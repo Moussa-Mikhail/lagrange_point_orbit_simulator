@@ -33,7 +33,7 @@ from .descriptors import (
     positive_int,
 )
 from .numba_funcs import integrate, transform_to_corotating
-from .typing import DoubleArray
+from .sim_types import DoubleArray
 
 
 def array_of_norms(arr_2d: DoubleArray) -> DoubleArray:

@@ -6,7 +6,7 @@ import numpy as np
 from numba import njit, prange  # type: ignore
 
 from simulation.constants import G
-from .typing import DoubleArray
+from .sim_types import DoubleArray
 
 
 @njit()
