@@ -1,5 +1,5 @@
 # About
-Python code used to simulate orbits near Lagrange points. Used in my Undergraduate Thesis.
+Python code used to simulate orbits near Lagrange points. Used in my undergraduate thesis.
 
 ## Installation of application
 The application is meant to be a user friendly interface to the code.
