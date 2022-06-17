@@ -4,7 +4,8 @@ Python code used to simulate orbits near Lagrange points. Used in my undergradua
 ## Installation of application
 The application is meant to be a user friendly interface to the code.
 
-Go to Releases and download the latest release. It is made for 64 bit Windows, and may not work on other OS's or 32 bit systems. The executable's large size is due to the fact that it contains all of its dependencies. This means that no further installation is required after downloading it.
+Go to Releases and download the latest release. The application is started through the file 'sim_gui.exe'.
+It is made for 64 bit Windows, and may not work on other OSs or 32 bit systems. The application's large size is due to the fact that it contains all of its dependencies. This means that no further installation is required after downloading it.
 
 ## Installation of source code
 Download the repository.
@@ -66,3 +67,5 @@ It will take longer than usual on the first call.
 ```
 
 This is the docstring of simulation.main which can be seen at any time by using "help(simulation.main)" or "help(main)" in Python.
+
+With the exception of plotting conserved quantities, the application has all the features of simulation.py and is the recommended way to use this code.
