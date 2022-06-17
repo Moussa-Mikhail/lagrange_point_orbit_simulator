@@ -1,5 +1,6 @@
 # pylint: disable=no-name-in-module, invalid-name, protected-access, missing-docstring
 import sys
+from typing import Callable, TypeVar
 
 import pyqtgraph as pg  # type: ignore
 from PyQt6.QtCore import Qt
@@ -15,6 +16,8 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QWidget,
 )
+
+from PyQt6.QtCore import QTimer
 from simulation import main as simMain
 
 # pylint: disable=unused-import
@@ -72,7 +75,7 @@ class SimUi(QMainWindow):
 
         self._centralWidget.setLayout(self._generalLayout)
 
-        self._inputFields = {}
+        self._inputFields: dict[str, QLineEdit] = {}
 
         self._addInputFields()
 
@@ -82,7 +85,7 @@ class SimUi(QMainWindow):
 
         self._inputsLayout = QFormLayout()
 
-        self._buttons = {}
+        self._buttons: dict[str, QPushButton] = {}
 
         self._addButtons()
 
@@ -108,7 +111,7 @@ class SimUi(QMainWindow):
 
         self._inputsLayout.addRow(buttonsLayout)
 
-    def _addParams(self, argLabelText, Params):
+    def _addParams(self, argLabelText: str, Params: dict[str, str]):
 
         argLabel = QLabel(argLabelText)
 
@@ -145,11 +148,11 @@ class SimUi(QMainWindow):
         # time in milliseconds between plot updates
         self._period = 33
 
-        self._timer = None
+        self._timer: QTimer | None = None
 
 
 class SimCtrl:
-    def __init__(self, model, view):
+    def __init__(self, model: Callable, view: SimUi):
 
         self._model = model
 
@@ -227,9 +230,9 @@ class SimCtrl:
 
         del currCorotatingPlot
 
-    def _getSimulationInputs(self):
+    def _getSimulationInputs(self) -> dict[str, str | int | float]:
 
-        inputs = {}
+        inputs: dict[str, str | int | float] = {}
 
         for fieldText, field in self._view._inputFields.items():
 
@@ -288,7 +291,7 @@ class SimCtrl:
             self._view._timer.start(self._view._period)
 
 
-def errorMessage(message):
+def errorMessage(message: str):
 
     errorMsg = QErrorMessage()
 
@@ -297,7 +300,10 @@ def errorMessage(message):
     errorMsg.exec()
 
 
-def _translateInputs(inputs):
+T = TypeVar("T")
+
+
+def _translateInputs(inputs: dict[str, T]) -> dict[str, T]:
 
     return {argNames[label]: v for label, v in inputs.items()}
 
