@@ -18,9 +18,9 @@ from PyQt6.QtWidgets import (
 from simulation import main as simMain
 
 # pylint: disable=unused-import
-from simulation.constants import safe_eval as safeEval  # noqa: F401
+from simulation.constants import safe_eval as safeEval
 
-simMain = simMain.__wrapped__
+simMain = simMain.__wrapped__  # type: ignore
 
 simParams = {
     "number of years": "10",
