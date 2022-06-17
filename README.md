@@ -2,8 +2,8 @@
 
 Python code used to simulate orbits near Lagrange points.
 
-## Installation of GUI
-The GUI is an application to make using simulation.py more user friendly.
+## Installation of application
+The application is meant to be a user friendly interface to the code.
 
 Go to Releases and download the latest release. It is made for 64 bit Windows, and may not work on other OS's or 32 bit systems. The executable's large size is due to the fact that it contains all of its dependencies. This means that no further installation is required after downloading it.
 
