@@ -28,7 +28,7 @@ def calc_acceleration(
     r_planet_to_star: DoubleArray,
     r_sat_to_star: DoubleArray,
     r_sat_to_planet: DoubleArray,
-) -> None:
+):
 
     for j in range(3):
 
@@ -71,7 +71,7 @@ def integrate(
     planet_vel: DoubleArray,
     sat_pos: DoubleArray,
     sat_vel: DoubleArray,
-) -> None:
+):
 
     star_accel = np.empty(3, dtype=np.double)
 

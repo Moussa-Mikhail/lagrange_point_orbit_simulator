@@ -470,7 +470,7 @@ class Simulation:
         planet_vel: DoubleArray,
         sat_pos: DoubleArray,
         sat_vel: DoubleArray,
-    ) -> None:
+    ):
 
         integrate(
             self.time_step,
@@ -568,7 +568,7 @@ class Simulation:
 
         idx_gen = self.idx_gen()
 
-        def update_plot() -> None:
+        def update_plot():
 
             i = next(idx_gen)
 
@@ -689,7 +689,7 @@ class Simulation:
 
         idx_gen = self.idx_gen()
 
-        def update_corotating() -> None:
+        def update_corotating():
 
             j = next(idx_gen)
 
@@ -868,7 +868,7 @@ class Simulation:
         total_momentum: DoubleArray,
         total_angular_momentum: DoubleArray,
         total_energy: DoubleArray,
-    ) -> None:
+    ):
 
         linear_momentum_plot = pg.plot(title="Normalized Linear Momentum vs Time")
         linear_momentum_plot.setLabel("bottom", "Time", units="years")
