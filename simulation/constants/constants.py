@@ -43,4 +43,8 @@ def safe_eval(expr: str) -> int | float:
 
         raise ValueError(f"{expr} is an invalid expression")
 
-    return eval(expr)  # pylint: disable=eval-used
+    res = eval(expr)  # pylint: disable=eval-used
+
+    assert isinstance(res, (int, float))
+
+    return res

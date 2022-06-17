@@ -1,5 +1,6 @@
 # pylint: disable=missing-docstring, not-an-iterable, invalid-name
 
+from math import sqrt
 import numpy as np
 
 from numba import njit, prange  # type: ignore
@@ -11,9 +12,7 @@ from .typing import DoubleArray
 @njit()
 def norm(vector: DoubleArray) -> float:
 
-    return np.sqrt(
-        vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]
-    )
+    return sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2])
 
 
 @njit()
@@ -29,7 +28,7 @@ def calc_acceleration(
     r_planet_to_star: DoubleArray,
     r_sat_to_star: DoubleArray,
     r_sat_to_planet: DoubleArray,
-):
+) -> None:
 
     for j in range(3):
 
@@ -72,7 +71,7 @@ def integrate(
     planet_vel: DoubleArray,
     sat_pos: DoubleArray,
     sat_vel: DoubleArray,
-):
+) -> None:
 
     star_accel = np.empty(3, dtype=np.double)
 
@@ -146,7 +145,7 @@ def integrate(
 @njit(parallel=True)
 def transform_to_corotating(
     times: DoubleArray, angular_speed: float, pos_trans: DoubleArray
-):
+) -> DoubleArray:
     # it is necessary to transform our coordinate system to one which
     # rotates with the system
     # we can do this by linearly transforming each position vector by

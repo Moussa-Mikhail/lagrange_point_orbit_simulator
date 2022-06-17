@@ -3,11 +3,13 @@
 It assumes that both the star and planet are undergoing uniform circular motion.
 """
 
-# to measure time taken in computing. for testing purposes only.
+
 from functools import wraps
-from math import ceil
+from math import ceil, sqrt
+
+# to measure time taken in computing. for testing purposes only.
 from time import perf_counter
-from typing import Callable
+from typing import Any, Callable, Generator, TypeVar
 
 # numpy allows us to compute common math functions and work with arrays.
 import numpy as np
@@ -18,7 +20,6 @@ from numpy import pi
 
 # shortens function call
 from numpy.linalg import norm
-from numpy.typing import NDArray
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
 
 from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
@@ -31,21 +32,29 @@ from .descriptors import (
     positive_float,
     positive_int,
 )
+
 from .numba_funcs import integrate, transform_to_corotating
 from .typing import DoubleArray
 
 
-def array_of_norms(arr_2d: NDArray) -> DoubleArray:
+def array_of_norms(arr_2d: DoubleArray) -> DoubleArray:
     """Returns an array of the norm of each element of the input array"""
 
-    return norm(arr_2d, axis=1)
+    res = norm(arr_2d, axis=1)
+
+    assert isinstance(res, np.ndarray)
+
+    return res
 
 
-def time_func(func: Callable):
+T = TypeVar("T")
+
+
+def time_func(func: Callable[..., T]) -> Callable[..., T]:
     """Measures the time taken by a function"""
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> T:
 
         start = perf_counter()
 
@@ -73,7 +82,7 @@ def main(
     planet_distance: float = 1.0,
     lagrange_label: str = "L4",
     plot_conserved: bool = False,
-):
+) -> tuple[pg.PlotWidget, pg.PlotWidget, QTimer]:
     """main simulates a satellite's orbit corresponding to the following parameters.
     It then plots the orbit in inertial and corotating frames.
     The plots created are interactive.
@@ -155,7 +164,7 @@ def calc_period_from_semi_major_axis(
         4 * pi**2 * semi_major_axis**3 / (G * (star_mass + planet_mass))
     )
 
-    return np.sqrt(period_squared)
+    return sqrt(period_squared)
 
 
 def calc_default_angles(
@@ -263,9 +272,9 @@ class Simulation:
 
         planet_distance = self.planet_distance * AU
 
-        hill_radius = planet_distance * (self.planet_mass / (3 * self.star_mass)) ** (
-            1 / 3
-        )
+        hill_radius: float = planet_distance * (
+            self.planet_mass / (3 * self.star_mass)
+        ) ** (1 / 3)
 
         match self.lagrange_label:
 
@@ -303,7 +312,7 @@ class Simulation:
             self.planet_distance * AU, self.star_mass, self.planet_mass
         )
 
-    def main(self):
+    def main(self) -> tuple[pg.PlotWidget, pg.PlotWidget, QTimer]:
 
         star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel = self.calc_orbit()
 
@@ -320,7 +329,7 @@ class Simulation:
             star_pos_trans, planet_pos_trans, sat_pos_trans
         )
 
-        self.timer.timeout.connect(update_plot)
+        self.timer.timeout.connect(update_plot)  # type: ignore
 
         star_pos_rotated = self.transform_to_corotating(star_pos_trans)
 
@@ -337,7 +346,7 @@ class Simulation:
             lagrange_point_trans,
         )
 
-        self.timer.timeout.connect(update_corotating)
+        self.timer.timeout.connect(update_corotating)  # type: ignore
 
         # time in milliseconds between plot updates
         period = 33
@@ -387,7 +396,7 @@ class Simulation:
 
         return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
 
-    def initialization(self):
+    def initialization(self) -> tuple[DoubleArray, ...]:
 
         """Initializes the arrays of positions and velocities
         so that their initial values correspond to the input parameters
@@ -461,7 +470,7 @@ class Simulation:
         planet_vel: DoubleArray,
         sat_pos: DoubleArray,
         sat_vel: DoubleArray,
-    ):
+    ) -> None:
 
         integrate(
             self.time_step,
@@ -494,7 +503,7 @@ class Simulation:
         star_pos_trans: DoubleArray,
         planet_pos_trans: DoubleArray,
         sat_pos_trans: DoubleArray,
-    ):
+    ) -> tuple[pg.PlotWidget, Callable[[], None]]:
 
         orbit_plot = pg.plot(title="Orbits of Masses")
         orbit_plot.setLabel("bottom", "x", units="AU")
@@ -557,11 +566,11 @@ class Simulation:
 
         orbit_plot.addItem(anim_plot)
 
-        idx = self.update_idx()
+        idx_gen = self.idx_gen()
 
-        def update_plot():
+        def update_plot() -> None:
 
-            i = next(idx)
+            i = next(idx_gen)
 
             anim_plot.clear()
 
@@ -594,7 +603,7 @@ class Simulation:
 
         return orbit_plot, update_plot
 
-    def transform_to_corotating(self, pos_trans: DoubleArray):
+    def transform_to_corotating(self, pos_trans: DoubleArray) -> DoubleArray:
 
         return transform_to_corotating(self.times, self.angular_speed, pos_trans)
 
@@ -604,7 +613,7 @@ class Simulation:
         planet_pos_rotated: DoubleArray,
         sat_pos_rotated: DoubleArray,
         lagrange_point_trans: DoubleArray,
-    ):
+    ) -> tuple[pg.PlotWidget, Callable[[], None]]:
 
         # Animated plot of satellites orbit in co-rotating frame.
         corotating_plot = pg.plot(title="Orbits in Co-Rotating Coordinate System")
@@ -678,11 +687,11 @@ class Simulation:
             symbolBrush="w",
         )
 
-        idx = self.update_idx()
+        idx_gen = self.idx_gen()
 
-        def update_corotating():
+        def update_corotating() -> None:
 
-            j = next(idx)
+            j = next(idx_gen)
 
             anim_rotated_plot.clear()
 
@@ -740,7 +749,7 @@ class Simulation:
 
         return points_plotted_step
 
-    def update_idx(self):
+    def idx_gen(self) -> Generator[int, None, None]:
         """This function is used to update the index of the plots"""
 
         i = 0
@@ -855,11 +864,11 @@ class Simulation:
 
     def plot_conserved_quantities(
         self,
-        init_planet_momentum,
+        init_planet_momentum: np.double,
         total_momentum: DoubleArray,
         total_angular_momentum: DoubleArray,
         total_energy: DoubleArray,
-    ):
+    ) -> None:
 
         linear_momentum_plot = pg.plot(title="Normalized Linear Momentum vs Time")
         linear_momentum_plot.setLabel("bottom", "Time", units="years")
