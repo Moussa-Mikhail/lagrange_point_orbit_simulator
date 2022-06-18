@@ -7,6 +7,8 @@ The application is meant to be a user friendly interface to the code.
 Go to Releases and download the latest release. The application is started through the file 'sim_gui.exe'.
 It is made for 64 bit Windows, and may not work on other OSs or 32 bit systems. The application's large size is due to the fact that it contains all of its dependencies. This means that no further installation is required after downloading it.
 
+With the exception of plotting conserved quantities, the application has all the features of the underlying python code and is the recommended way to use it.
+
 ## Installation of source code
 Download the repository.
 If you use Pip open your command line and enter "pip install -r requirements.txt". This will install all the packages these scripts depend on. If you use Poetry then a .lock file is provided.
@@ -26,8 +28,7 @@ num_years: Number of years to simulate. The default is 100.0.
 
 num_steps: Number of steps to simulate. The default is 10**6.
 
-It is recommended that the ratio of num_steps to num_years
-remains close to 10**4 steps per year.
+a ratio of 10**4 steps per year provides enough accuracy for 
 
 #### Initial Conditions
 perturbation_size: Size of perturbation away from the Lagrange point in AU. The default is 0.0.
@@ -67,5 +68,3 @@ It will take longer than usual on the first call.
 ```
 
 This is the docstring of simulation.main which can be seen at any time by using "help(simulation.main)" or "help(main)" in Python.
-
-With the exception of plotting conserved quantities, the application has all the features of simulation.py and is the recommended way to use this code.
