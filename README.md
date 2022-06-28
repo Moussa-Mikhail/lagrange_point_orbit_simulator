@@ -28,7 +28,7 @@ num_years: Number of years to simulate. The default is 100.0.
 
 num_steps: Number of steps to simulate. The default is 10**6.
 
-a ratio of 10**4 steps per year provides enough accuracy for 
+a ratio of 10**4 steps per year is recommended.
 
 #### Initial Conditions
 perturbation_size: Size of perturbation away from the Lagrange point in AU. The default is 0.0.
