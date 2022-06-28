@@ -1,7 +1,9 @@
 # About
+
 Python code used to simulate orbits near Lagrange points.
 
 ## Installation of application
+
 The application is meant to be a user friendly interface to the code.
 
 Go to Releases and download the latest release. The application is started through the file 'sim_gui.exe'.
@@ -10,10 +12,12 @@ It is made for 64 bit Windows, and may not work on other OSs or 32 bit systems. 
 With the exception of plotting conserved quantities, the application has all the features of the underlying python code and is the recommended way to use it.
 
 ## Installation of source code
+
 Download the repository.
 If you use Pip open your command line and enter "pip install -r requirements.txt". This will install all the packages these scripts depend on. If you use Poetry then a .lock file is provided.
 
 ## Usage of simulation.py
+
 The simulation.py module is meant to be used by calling its main function.
 
 ```
@@ -24,6 +28,7 @@ The plots created are interactive.
 It takes the following parameters:
 
 #### Simulation Parameters
+
 num_years: Number of years to simulate. The default is 100.0.
 
 num_steps: Number of steps to simulate. The default is 10**6.
@@ -31,6 +36,7 @@ num_steps: Number of steps to simulate. The default is 10**6.
 a ratio of 10**4 steps per year is recommended.
 
 #### Initial Conditions
+
 perturbation_size: Size of perturbation away from the Lagrange point in AU. The default is 0.0.
 
 perturbation_angle: Angle of perturbation relative to positive x axis in degrees.
@@ -51,6 +57,7 @@ lagrange_point: Non-perturbed position of satellite. Must be a string.
 The default is 'L4' but 'L1', 'L2', 'L3', and 'L5' can also be used.
 
 #### System Parameters
+
 star_mass: Mass of the star in kilograms. The default is the mass of the Sun.
 
 planet_mass: Mass of the planet in kilograms. The default is the mass of the Earth.
