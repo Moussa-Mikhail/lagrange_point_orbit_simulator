@@ -3,22 +3,11 @@ import sys
 from typing import Callable, TypeVar
 
 import pyqtgraph as pg  # type: ignore
+from PySide6 import QtWidgets
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
-from PySide6.QtWidgets import (
-    QApplication,
-    QErrorMessage,
-    QFormLayout,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QMainWindow,
-    QPushButton,
-    QWidget,
-)
 from simulation import main as simMain
 
-# pylint: disable=unused-import
 from simulation.constants import safe_eval as safeEval
 
 simParams = {
@@ -56,22 +45,22 @@ argNames = {
 }
 
 
-class SimUi(QMainWindow):
+class SimUi(QtWidgets.QMainWindow):
     def __init__(self):
 
         super().__init__()
 
         self.setWindowTitle("Simulation of Orbits near Lagrange Points")
 
-        self._generalLayout = QHBoxLayout()
+        self._generalLayout = QtWidgets.QHBoxLayout()
 
-        self._centralWidget = QWidget(self)
+        self._centralWidget = QtWidgets.QWidget(self)
 
         self.setCentralWidget(self._centralWidget)
 
         self._centralWidget.setLayout(self._generalLayout)
 
-        self.inputFields: dict[str, QLineEdit] = {}
+        self.inputFields: dict[str, QtWidgets.QLineEdit] = {}
 
         self._addInputFields()
 
@@ -79,9 +68,9 @@ class SimUi(QMainWindow):
 
     def _addInputFields(self):
 
-        self._inputsLayout = QFormLayout()
+        self._inputsLayout = QtWidgets.QFormLayout()
 
-        self.buttons: dict[str, QPushButton] = {}
+        self.buttons: dict[str, QtWidgets.QPushButton] = {}
 
         self._addButtons()
 
@@ -97,11 +86,11 @@ class SimUi(QMainWindow):
 
         buttons = ("Simulate", "Start/Stop")
 
-        buttonsLayout = QHBoxLayout()
+        buttonsLayout = QtWidgets.QHBoxLayout()
 
         for btnText in buttons:
 
-            self.buttons[btnText] = QPushButton(btnText)
+            self.buttons[btnText] = QtWidgets.QPushButton(btnText)
 
             buttonsLayout.addWidget(self.buttons[btnText])
 
@@ -109,7 +98,7 @@ class SimUi(QMainWindow):
 
     def _addParams(self, argLabelText: str, Params: dict[str, str]):
 
-        argLabel = QLabel(argLabelText)
+        argLabel = QtWidgets.QLabel(argLabelText)
 
         argLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -117,7 +106,7 @@ class SimUi(QMainWindow):
 
         for fieldText, defaultValue in Params.items():
 
-            fieldLine = QLineEdit(defaultValue)
+            fieldLine = QtWidgets.QLineEdit(defaultValue)
 
             self.inputFields[fieldText] = fieldLine
 
@@ -303,7 +292,7 @@ class SimCtrl:
 
 def errorMessage(message: str):
 
-    errorMsg = QErrorMessage()
+    errorMsg = QtWidgets.QErrorMessage()
 
     errorMsg.showMessage(message)
 
@@ -320,7 +309,7 @@ def _translateInputs(inputs: dict[str, T]) -> dict[str, T]:
 
 def main():
 
-    simApp = QApplication(sys.argv)
+    simApp = QtWidgets.QApplication(sys.argv)
 
     simApp.setFont(QFont("Arial", 10))
 
