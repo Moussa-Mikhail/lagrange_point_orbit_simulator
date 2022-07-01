@@ -52,26 +52,26 @@ def main(
     lagrange_label: str = "L4",
     plot_conserved: bool = False,
 ) -> tuple[pg.PlotWidget, pg.PlotWidget, QTimer]:
-    """main simulates a satellite's orbit corresponding to the following parameters.
+    """main simulates a satellite's orbit.
     It then plots the orbit in inertial and corotating frames.
     The plots created are interactive.
 
-    All parameters have default values.
-
     It takes the following parameters:
 
-    #### Simulation parameters
+    #### Simulation Parameters
+
     num_years: Number of years to simulate. The default is 100.0.
-    num_steps: Number of steps to simulate. Must be an integer. The default is 10**6.
 
-    It is recommended that the ratio of num_steps to num_years
-    remains close to the ratio of the default values.
+    num_steps: Number of steps to simulate. The default is 10**6.
 
-    #### Satellite parameters
-    perturbation_size: Size of perturbation in AU. The default is 0.0.
+    a ratio of 10**4 steps per year is recommended.
+
+    #### Initial Conditions
+
+    perturbation_size: Size of perturbation away from the Lagrange point in AU. The default is 0.0.
+
     perturbation_angle: Angle of perturbation relative to positive x axis in degrees.
     The default is None.
-
     If None, then perturbation_size has the effect of
     moving the satellite away or towards the origin.
 
@@ -81,18 +81,17 @@ def main(
 
     vel_angle: Angle of satellite's initial velocity relative to positive x axis in degrees.
     The default is None.
-
     If None, then vel_angle is perpendicular to the satellite's
     default position relative to the center of mass.
 
-    lagrange_label: Non-perturbed position of satellite. String.
-    The default is 'L4' but the others can also be used.
+    lagrange_point: Non-perturbed position of satellite. Must be a string.
+    The default is 'L4' but 'L1', 'L2', 'L3', and 'L5' can also be used.
 
-    #### System parameters
+    #### System Parameters
+
     star_mass: Mass of the star in kilograms. The default is the mass of the Sun.
 
     planet_mass: Mass of the planet in kilograms. The default is the mass of the Earth.
-
     The constants sun_mass and earth_mass may be imported from the file constants.py.
 
     planet_distance: Distance between the planet and the star in AU. The default is 1.0.
@@ -101,7 +100,7 @@ def main(
     energy, angular momentum, linear momentum.
     The default is False.
 
-    This function will take ~0.42 seconds per 10**6 steps if
+    This function will take ~0.42 seconds per 10**6 steps.
     The time may vary depending on your hardware.
     It will take longer than usual on the first call.
     """
