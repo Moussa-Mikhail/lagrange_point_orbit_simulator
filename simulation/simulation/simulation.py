@@ -194,12 +194,10 @@ class Simulation:
 
         self.num_steps = num_steps
 
-        # converting num_years to seconds
         self.sim_stop = num_years * years
 
         self.time_step = self.sim_stop / num_steps
 
-        # array of num_steps+1 time points evenly spaced between 0 and sim_stop
         self.times: DoubleArray = np.linspace(0, self.sim_stop, num_steps + 1)
 
         self.perturbation_size = perturbation_size
@@ -216,7 +214,8 @@ class Simulation:
 
         self.lagrange_point = self.calc_lagrange_point()
 
-        # star starts at origin
+        # star starts at origin so it doesn't need to be included
+        # satellite has negligible mass so it doesn't need to be included
         CM_x_coord = self.planet_distance * planet_mass / (star_mass + planet_mass)
 
         CM_pos = np.array([CM_x_coord, 0, 0], dtype=np.double)
@@ -229,8 +228,6 @@ class Simulation:
 
         self.orbital_period = self.calc_orbital_period()
 
-        # star and planet orbit about the Center of Mass
-        # at an angular_speed = 2 pi radians/orbital_period
         self.angular_speed = 2 * pi / self.orbital_period
 
         self.plot_conserved = plot_conserved
@@ -344,7 +341,6 @@ class Simulation:
 
     def calc_orbit(self) -> tuple[DoubleArray, ...]:
 
-        # Initialize the positions and velocities of the bodies
         (
             star_pos,
             star_vel,
@@ -371,12 +367,8 @@ class Simulation:
         so that their initial values correspond to the input parameters
         """
 
-        # creating position and velocity vector arrays
-
-        # array of position vectors for star
         star_pos = np.empty((self.num_steps + 1, 3), dtype=np.double)
 
-        # array of velocity vectors for star
         star_vel = np.empty_like(star_pos)
 
         planet_pos = np.empty_like(star_pos)
@@ -387,10 +379,8 @@ class Simulation:
 
         sat_vel = np.empty_like(star_pos)
 
-        # star is initially at origin but its position is not fixed
         star_pos[0] = np.array((0, 0, 0))
 
-        # planet starts planet_distance from the star (and origin) and lies on the positive x-axis
         planet_pos[0] = np.array((self.planet_distance * AU, 0, 0))
 
         # Perturbation #
@@ -403,7 +393,6 @@ class Simulation:
             (np.cos(perturbation_angle), np.sin(perturbation_angle), 0)
         )
 
-        # perturbing the initial position of the satellite
         sat_pos[0] = self.lagrange_point + perturbation
 
         # we setup conditions so that the star and planet have circular orbits
@@ -691,18 +680,6 @@ class Simulation:
                 name="Satellite",
             )
 
-            # steps_per_year = int(self.num_steps / self.num_years)
-
-            # plots where the satellite is after 1 year
-            # anim_rotated_plot.addPoints(
-            #     [sat_pos_rotated[steps_per_year, 0] / AU],
-            #     [sat_pos_rotated[steps_per_year, 1] / AU],
-            #     pen="g",
-            #     brush="w",
-            #     size=10,
-            #     name="Satellite 1 yr",
-            # )
-
         return corotating_plot, update_corotating
 
     def plot_array_step(self, num_points_to_plot: int = 10**5) -> int:
@@ -726,7 +703,7 @@ class Simulation:
         time_step_default = 10 * years / 10**5
 
         # maximum rate of plot update is too slow
-        # so instead step through arrays at a step of rate
+        # so instead step through arrays
         # inversely proportional to time_step so that
         # animated motion is the same regardless of
         # num_steps or num_years
@@ -803,7 +780,6 @@ class Simulation:
         sat_vel: DoubleArray,
     ) -> DoubleArray:
 
-        # array of the distance between planet and star at each timestep
         d_planet_to_star = array_of_norms(star_pos - planet_pos)
 
         d_planet_to_sat = array_of_norms(sat_pos - planet_pos)
@@ -816,7 +792,6 @@ class Simulation:
             + -G * sat_mass * self.star_mass / d_star_to_sat
         )
 
-        # array of the magnitude of the velocity of star at each timestep
         mag_star_vel = array_of_norms(star_vel)
 
         mag_planet_vel = array_of_norms(planet_vel)
