@@ -707,7 +707,9 @@ class Simulation:
         # inversely proportional to time_step so that
         # animated motion is the same regardless of
         # num_steps or num_years
-        rate = 50 * ceil(time_step_default / self.time_step)
+        rate = ceil(50 * time_step_default / self.time_step)
+
+        print(rate)
 
         while True:
 
