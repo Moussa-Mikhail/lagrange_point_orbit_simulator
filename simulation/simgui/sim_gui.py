@@ -274,7 +274,7 @@ class SimCtrl:
 
         if self._view._timer is None:
 
-            errorMessage("No simulation to animate")
+            errorMessage("No plot to animate")
 
             return
 
