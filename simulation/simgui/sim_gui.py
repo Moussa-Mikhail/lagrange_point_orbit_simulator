@@ -21,8 +21,6 @@ from simulation import main as simMain
 # pylint: disable=unused-import
 from simulation.constants import safe_eval as safeEval
 
-simMain = simMain.__wrapped__  # type: ignore
-
 simParams = {
     "number of years": "10",
     "number of steps": "10**5",
