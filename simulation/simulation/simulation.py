@@ -4,12 +4,9 @@ It assumes that both the star and planet are undergoing uniform circular motion.
 """
 
 
-from functools import wraps
 from math import ceil, sqrt
 
-# to measure time taken in computing. for testing purposes only.
-from time import perf_counter
-from typing import Any, Callable, Generator, TypeVar
+from typing import Callable, Generator
 
 # numpy allows us to compute common math functions and work with arrays.
 import numpy as np
@@ -42,29 +39,6 @@ def array_of_norms(arr_2d: DoubleArray) -> DoubleArray:
     return norm(arr_2d, axis=1)
 
 
-T = TypeVar("T")
-
-
-def time_func(func: Callable[..., T]) -> Callable[..., T]:
-    """Measures the time taken by a function"""
-
-    @wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> T:
-
-        start = perf_counter()
-
-        result = func(*args, **kwargs)
-
-        end = perf_counter()
-
-        print(f"{func.__name__} took {end - start} seconds")
-
-        return result
-
-    return wrapper
-
-
-@time_func
 def main(
     num_years: float = 100.0,
     num_steps: int | float = 10**6,
