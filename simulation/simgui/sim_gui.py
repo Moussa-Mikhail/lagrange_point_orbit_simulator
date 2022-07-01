@@ -1,4 +1,4 @@
-# pylint: disable=no-name-in-module, invalid-name, missing-docstring
+# pylint: disable=no-name-in-module, invalid-name, missing-docstring, attribute-defined-outside-init
 import sys
 from typing import Callable, TypeVar
 
@@ -71,7 +71,7 @@ class SimUi(QMainWindow):
 
         self._centralWidget.setLayout(self._generalLayout)
 
-        self._inputFields: dict[str, QLineEdit] = {}
+        self.inputFields: dict[str, QLineEdit] = {}
 
         self._addInputFields()
 
@@ -81,7 +81,7 @@ class SimUi(QMainWindow):
 
         self._inputsLayout = QFormLayout()
 
-        self._buttons: dict[str, QPushButton] = {}
+        self.buttons: dict[str, QPushButton] = {}
 
         self._addButtons()
 
@@ -101,9 +101,9 @@ class SimUi(QMainWindow):
 
         for btnText in buttons:
 
-            self._buttons[btnText] = QPushButton(btnText)
+            self.buttons[btnText] = QPushButton(btnText)
 
-            buttonsLayout.addWidget(self._buttons[btnText])
+            buttonsLayout.addWidget(self.buttons[btnText])
 
         self._inputsLayout.addRow(buttonsLayout)
 
@@ -119,7 +119,7 @@ class SimUi(QMainWindow):
 
             fieldLine = QLineEdit(defaultValue)
 
-            self._inputFields[fieldText] = fieldLine
+            self.inputFields[fieldText] = fieldLine
 
             self._inputsLayout.addRow(fieldText, fieldLine)
 
@@ -144,7 +144,33 @@ class SimUi(QMainWindow):
         # time in milliseconds between plot updates
         self._period = 33
 
-        self._timer: QTimer | None = None
+        self._timer = QTimer()
+
+    def setPlots(
+        self, orbitPlot: pg.PlotWidget, corotatingPlot: pg.PlotWidget, timer: QTimer
+    ):
+
+        self._timer = timer
+
+        currOrbitPlot = self._orbitPlot
+
+        currCorotatingPlot = self._corotatingPlot
+
+        self._generalLayout.replaceWidget(currOrbitPlot, orbitPlot)
+
+        self._generalLayout.replaceWidget(currCorotatingPlot, corotatingPlot)
+
+        self._orbitPlot = orbitPlot
+
+        self._corotatingPlot = corotatingPlot
+
+        currOrbitPlot.hide()
+
+        currCorotatingPlot.hide()
+
+        del currOrbitPlot
+
+        del currCorotatingPlot
 
     def toggleAnimation(self):
 
@@ -164,7 +190,11 @@ class SimUi(QMainWindow):
 
 
 class SimCtrl:
-    def __init__(self, model: Callable, view: SimUi):
+    def __init__(
+        self,
+        model: Callable[..., tuple[pg.PlotWidget, pg.PlotWidget, QTimer]],
+        view: SimUi,
+    ):
 
         self._model = model
 
@@ -178,7 +208,7 @@ class SimCtrl:
 
         btnActions = {"Simulate": self._simulate, "Start/Stop": self._toggleAnimation}
 
-        for btnText, btn in self._view._buttons.items():
+        for btnText, btn in self._view.buttons.items():
 
             action = btnActions[btnText]
 
@@ -186,7 +216,7 @@ class SimCtrl:
 
     def _addReturnPressed(self):
 
-        for field in self._view._inputFields.values():
+        for field in self._view.inputFields.values():
 
             field.returnPressed.connect(self._simulate)  # type: ignore
 
@@ -220,33 +250,13 @@ class SimCtrl:
 
         timer.stop()
 
-        self._view._timer = timer
-
-        currOrbitPlot = self._view._orbitPlot
-
-        currCorotatingPlot = self._view._corotatingPlot
-
-        self._view._generalLayout.replaceWidget(currOrbitPlot, orbitPlot)
-
-        self._view._generalLayout.replaceWidget(currCorotatingPlot, corotatingPlot)
-
-        self._view._orbitPlot = orbitPlot
-
-        self._view._corotatingPlot = corotatingPlot
-
-        currOrbitPlot.hide()
-
-        currCorotatingPlot.hide()
-
-        del currOrbitPlot
-
-        del currCorotatingPlot
+        self._view.setPlots(orbitPlot, corotatingPlot, timer)
 
     def _getSimulationInputs(self) -> dict[str, str | int | float]:
 
         inputs: dict[str, str | int | float] = {}
 
-        for fieldText, field in self._view._inputFields.items():
+        for fieldText, field in self._view.inputFields.items():
 
             fieldValue = field.text()
 
