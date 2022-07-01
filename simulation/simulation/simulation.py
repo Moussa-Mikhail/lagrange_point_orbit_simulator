@@ -135,6 +135,7 @@ def main(
     The time may vary depending on your hardware.
     It will take longer than usual on the first call.
     """
+    num_years = float(num_years)
 
     num_steps = int(num_steps)
 
