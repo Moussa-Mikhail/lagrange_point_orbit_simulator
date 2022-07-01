@@ -3,9 +3,9 @@ import sys
 from typing import Callable, TypeVar
 
 import pyqtgraph as pg  # type: ignore
-from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import (
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
     QApplication,
     QErrorMessage,
     QFormLayout,
@@ -168,13 +168,13 @@ class SimCtrl:
 
             action = btnActions[btnText]
 
-            btn.clicked.connect(action)
+            btn.clicked.connect(action)  # type: ignore
 
     def _addReturnPressed(self):
 
         for field in self._view._inputFields.values():
 
-            field.returnPressed.connect(self._simulate)
+            field.returnPressed.connect(self._simulate)  # type: ignore
 
     def _simulate(self):
 
