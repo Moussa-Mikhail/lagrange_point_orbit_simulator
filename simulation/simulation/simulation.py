@@ -39,11 +39,7 @@ from .sim_types import DoubleArray
 def array_of_norms(arr_2d: DoubleArray) -> DoubleArray:
     """Returns an array of the norm of each element of the input array"""
 
-    res = norm(arr_2d, axis=1)
-
-    assert isinstance(res, np.ndarray)
-
-    return res
+    return norm(arr_2d, axis=1)
 
 
 T = TypeVar("T")
