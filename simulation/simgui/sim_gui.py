@@ -1,4 +1,4 @@
-# pylint: disable=no-name-in-module, invalid-name, protected-access, missing-docstring
+# pylint: disable=no-name-in-module, invalid-name, missing-docstring
 import sys
 from typing import Callable, TypeVar
 
@@ -146,6 +146,22 @@ class SimUi(QMainWindow):
 
         self._timer: QTimer | None = None
 
+    def toggleAnimation(self):
+
+        if self._timer is None:
+
+            errorMessage("No plot to animate")
+
+            return
+
+        if self._timer.isActive():
+
+            self._timer.stop()
+
+        else:
+
+            self._timer.start(self._period)
+
 
 class SimCtrl:
     def __init__(self, model: Callable, view: SimUi):
@@ -272,19 +288,7 @@ class SimCtrl:
 
     def _toggleAnimation(self):
 
-        if self._view._timer is None:
-
-            errorMessage("No plot to animate")
-
-            return
-
-        if self._view._timer.isActive():
-
-            self._view._timer.stop()
-
-        else:
-
-            self._view._timer.start(self._view._period)
+        self._view.toggleAnimation()
 
 
 def errorMessage(message: str):
