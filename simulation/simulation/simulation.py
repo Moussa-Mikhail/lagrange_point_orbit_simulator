@@ -813,9 +813,11 @@ class Simulation:
         total_energy: DoubleArray,
     ):
 
-        linear_momentum_plot = pg.plot(title="Normalized Linear Momentum vs Time")
+        linear_momentum_plot = pg.plot(
+            title="Relative Change in Linear Momentum vs Time"
+        )
         linear_momentum_plot.setLabel("bottom", "Time", units="years")
-        linear_momentum_plot.setLabel("left", "Normalized Linear Momentum")
+        linear_momentum_plot.setLabel("left", "Relative Change in Linear Momentum")
 
         linear_momentum_plot.addLegend()
 
@@ -847,9 +849,11 @@ class Simulation:
             name="z",
         )
 
-        angular_momentum_plot = pg.plot(title="Normalized Angular Momenta vs Time")
+        angular_momentum_plot = pg.plot(
+            title="Relative Change in Angular Momenta vs Time"
+        )
         angular_momentum_plot.setLabel("bottom", "Time", units="years")
-        angular_momentum_plot.setLabel("left", "Normalized Angular Momentum")
+        angular_momentum_plot.setLabel("left", "Relative Change in Angular Momentum")
 
         angular_momentum_plot.addLegend()
 
@@ -875,8 +879,8 @@ class Simulation:
             name="z",
         )
 
-        energy_plot = pg.plot(title="Normalized Energy vs Time")
+        energy_plot = pg.plot(title="Relative Change in Energy vs Time")
         energy_plot.setLabel("bottom", "Time", units="years")
-        energy_plot.setLabel("left", "Normalized Energy")
+        energy_plot.setLabel("left", "Relative Change in Energy")
 
         energy_plot.plot(times_in_years, total_energy[::arr_step] / total_energy[0] - 1)
