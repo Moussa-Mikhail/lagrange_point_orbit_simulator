@@ -73,7 +73,7 @@ def main(
     perturbation_angle: Angle of perturbation relative to positive x axis in degrees.
     The default is None.
     If None, then perturbation_size has the effect of
-    moving the satellite away or towards the origin.
+    moving the satellite away or towards the star.
 
     speed: Initial speed of satellite as a factor of the planet's speed.
     i.e. speed = 1.0 -> satellite has the same speed as the planet.
@@ -193,12 +193,6 @@ class Simulation:
 
         self.num_steps = num_steps
 
-        self.sim_stop = num_years * years
-
-        self.time_step = self.sim_stop / num_steps
-
-        self.times: DoubleArray = np.linspace(0, self.sim_stop, num_steps + 1)
-
         self.perturbation_size = perturbation_size
 
         self.speed = speed
@@ -210,8 +204,6 @@ class Simulation:
         self.planet_distance = planet_distance
 
         self.lagrange_label = lagrange_label
-
-        self.lagrange_point = self.calc_lagrange_point()
 
         # star starts at origin so it doesn't need to be included
         # satellite has negligible mass so it doesn't need to be included
@@ -225,13 +217,29 @@ class Simulation:
             lagrange_point_trans, perturbation_angle, vel_angle
         )
 
-        self.orbital_period = self.calc_orbital_period()
-
-        self.angular_speed = 2 * pi / self.orbital_period
-
         self.plot_conserved = plot_conserved
 
         self.timer = QTimer()
+
+    @property
+    def sim_stop(self):
+
+        return self.num_years * years
+
+    @property
+    def time_step(self):
+
+        return self.sim_stop / self.num_steps
+
+    @property
+    def times(self):
+
+        return np.linspace(0, self.sim_stop, self.num_steps + 1)
+
+    @property
+    def lagrange_point(self):
+
+        return self.calc_lagrange_point()
 
     def calc_lagrange_point(self) -> DoubleArray:
 
@@ -269,13 +277,25 @@ class Simulation:
                 return planet_distance * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
 
             case _:
-                raise AssertionError
+                raise ValueError(
+                    "Invalid Lagrange point label. Must be one of ('L1', 'L2', 'L3', 'L4', 'L5')"
+                )
+
+    @property
+    def orbital_period(self):
+
+        return self.calc_orbital_period()
 
     def calc_orbital_period(self) -> float:
 
         return calc_period_from_semi_major_axis(
             self.planet_distance * AU, self.star_mass, self.planet_mass
         )
+
+    @property
+    def angular_speed(self):
+
+        return 2 * pi / self.orbital_period
 
     def main(self) -> tuple[pg.PlotWidget, pg.PlotWidget, QTimer]:
 
