@@ -21,14 +21,7 @@ from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
 
 from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
 
-from .descriptors import (
-    bool_desc,
-    float_desc,
-    lagrange_label_desc,
-    non_negative_float,
-    positive_float,
-    positive_int,
-)
+from . import descriptors
 from .numba_funcs import integrate, transform_to_corotating
 from .sim_types import DoubleArray
 
@@ -135,44 +128,20 @@ def calc_period_from_semi_major_axis(
     return sqrt(period_squared)
 
 
-def calc_default_angles(
-    lagrange_point_trans: DoubleArray,
-    perturbation_angle: float | None,
-    vel_angle: float | None,
-) -> tuple[float, float]:
-    """Calculates the default angles for the satellite in degrees"""
-
-    default_pertubation_angle_rad: float = np.arctan2(
-        lagrange_point_trans[1], lagrange_point_trans[0]
-    )
-
-    default_pertubation_angle: float = np.degrees(default_pertubation_angle_rad)
-
-    if perturbation_angle is None:
-
-        perturbation_angle = default_pertubation_angle
-
-    if vel_angle is None:
-
-        vel_angle = default_pertubation_angle + 90
-
-    return perturbation_angle, vel_angle
-
-
 class Simulation:
     """Holds parameters and methods for simulation"""
 
-    num_years = float_desc()
-    num_steps = positive_int()
-    perturbation_size = float_desc()
-    perturbation_angle = float_desc()
-    speed = float_desc()
-    vel_angle = float_desc()
-    star_mass = non_negative_float()
-    planet_mass = non_negative_float()
-    planet_distance = positive_float()
-    lagrange_label = lagrange_label_desc()
-    plot_conserved = bool_desc()
+    num_years = descriptors.float_desc()
+    num_steps = descriptors.positive_int()
+    perturbation_size = descriptors.float_desc()
+    perturbation_angle = descriptors.optional_float_desc()
+    speed = descriptors.float_desc()
+    vel_angle = descriptors.optional_float_desc()
+    star_mass = descriptors.non_negative_float()
+    planet_mass = descriptors.non_negative_float()
+    planet_distance = descriptors.positive_float()
+    lagrange_label = descriptors.lagrange_label_desc()
+    plot_conserved = descriptors.bool_desc()
 
     def __init__(
         self,
@@ -205,17 +174,9 @@ class Simulation:
 
         self.lagrange_label = lagrange_label
 
-        # star starts at origin so it doesn't need to be included
-        # satellite has negligible mass so it doesn't need to be included
-        CM_x_coord = self.planet_distance * planet_mass / (star_mass + planet_mass)
+        self.perturbation_angle = perturbation_angle
 
-        CM_pos = np.array([CM_x_coord, 0, 0], dtype=np.double)
-
-        lagrange_point_trans: DoubleArray = self.lagrange_point - CM_pos
-
-        self.perturbation_angle, self.vel_angle = calc_default_angles(
-            lagrange_point_trans, perturbation_angle, vel_angle
-        )
+        self.vel_angle = vel_angle
 
         self.plot_conserved = plot_conserved
 
@@ -280,6 +241,23 @@ class Simulation:
                 raise ValueError(
                     "Invalid Lagrange point label. Must be one of ('L1', 'L2', 'L3', 'L4', 'L5')"
                 )
+
+    @property
+    def default_perturbation_angle(self):
+
+        return {"L1": 0.0, "L2": 0.0, "L3": 180.0, "L4": 60.0, "L5": -60.0}[
+            self.lagrange_label
+        ]
+
+    @property
+    def actual_perturbation_angle(self):
+
+        return self.perturbation_angle or self.default_perturbation_angle
+
+    @property
+    def actual_vel_angle(self):
+
+        return self.vel_angle or self.default_perturbation_angle + 90
 
     @property
     def orbital_period(self):
@@ -406,7 +384,7 @@ class Simulation:
 
         perturbation_size = self.perturbation_size * AU
 
-        perturbation_angle = np.radians(self.perturbation_angle)
+        perturbation_angle = np.radians(self.actual_perturbation_angle)
 
         perturbation = perturbation_size * np.array(
             (np.cos(perturbation_angle), np.sin(perturbation_angle), 0)
@@ -424,7 +402,7 @@ class Simulation:
 
         speed = self.speed * norm(np.cross(angular_vel, planet_pos[0] - init_CM_pos))
 
-        vel_angle = np.radians(self.vel_angle)
+        vel_angle = np.radians(self.actual_vel_angle)
 
         sat_vel[0] = speed * np.array((np.cos(vel_angle), np.sin(vel_angle), 0))
 
