@@ -33,6 +33,10 @@ def float_desc() -> ValidatedDescriptor[float]:
     return ValidatedDescriptor(float)
 
 
+def optional_float_desc() -> ValidatedDescriptor[float | None]:
+    return ValidatedDescriptor(float | None)
+
+
 lagrange_labels = ("L1", "L2", "L3", "L4", "L5")
 
 
