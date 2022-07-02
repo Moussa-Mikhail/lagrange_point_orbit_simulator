@@ -17,7 +17,7 @@ from numpy import pi
 
 # shortens function call
 from numpy.linalg import norm
-from PySide6.QtCore import QTimer  # pylint: disable=no-name-in-module
+from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
 
 from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
 
@@ -706,9 +706,7 @@ class Simulation:
         # inversely proportional to time_step so that
         # animated motion is the same regardless of
         # num_steps or num_years
-        rate = ceil(50 * time_step_default / self.time_step)
-
-        print(rate)
+        rate = ceil(50 * time_step_default / abs(self.time_step))
 
         while True:
 
