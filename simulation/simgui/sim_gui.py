@@ -3,9 +3,9 @@ import sys
 from typing import Callable, TypeVar
 
 import pyqtgraph as pg  # type: ignore
-from PySide6 import QtWidgets
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QFont
+from PyQt6 import QtWidgets
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QFont
 from simulation import main as simMain
 
 from simulation.constants import safe_eval as safeEval
@@ -133,7 +133,7 @@ class SimUi(QtWidgets.QMainWindow):
         # time in milliseconds between plot updates
         self._period = 33
 
-        self._timer = QTimer()
+        self._timer: QTimer | None = None
 
     def setPlots(
         self, orbitPlot: pg.PlotWidget, corotatingPlot: pg.PlotWidget, timer: QTimer
