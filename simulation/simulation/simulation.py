@@ -294,7 +294,7 @@ class Simulation:
             star_pos_trans, planet_pos_trans, sat_pos_trans
         )
 
-        self.timer.timeout.connect(update_plot)  # type: ignore
+        self.timer.timeout.connect(update_plot)  # type: ignore # pylint: disable=no-member
 
         star_pos_rotated = self.transform_to_corotating(star_pos_trans)
 
@@ -311,7 +311,7 @@ class Simulation:
             lagrange_point_trans,
         )
 
-        self.timer.timeout.connect(update_corotating)  # type: ignore
+        self.timer.timeout.connect(update_corotating)  # type: ignore # pylint: disable=no-member
 
         # time in milliseconds between plot updates
         period = 33
