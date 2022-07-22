@@ -6,11 +6,11 @@ import numpy as np
 from numba import njit, prange  # type: ignore
 
 from simulation.constants import G
-from .sim_types import DoubleArray
+from .sim_types import Array2D, Array1D
 
 
 @njit()
-def norm(vector: DoubleArray) -> float:
+def norm(vector: Array2D) -> float:
 
     return sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2])
 
@@ -19,15 +19,15 @@ def norm(vector: DoubleArray) -> float:
 def calc_acceleration(
     star_mass: float,
     planet_mass: float,
-    star_pos: DoubleArray,
-    planet_pos: DoubleArray,
-    sat_pos: DoubleArray,
-    star_accel: DoubleArray,
-    planet_accel: DoubleArray,
-    sat_accel: DoubleArray,
-    r_planet_to_star: DoubleArray,
-    r_sat_to_star: DoubleArray,
-    r_sat_to_planet: DoubleArray,
+    star_pos: Array1D,
+    planet_pos: Array1D,
+    sat_pos: Array1D,
+    star_accel: Array1D,
+    planet_accel: Array1D,
+    sat_accel: Array1D,
+    r_planet_to_star: Array1D,
+    r_sat_to_star: Array1D,
+    r_sat_to_planet: Array1D,
 ):
 
     for j in range(3):
@@ -65,12 +65,12 @@ def integrate(
     num_steps: int,
     star_mass: float,
     planet_mass: float,
-    star_pos: DoubleArray,
-    star_vel: DoubleArray,
-    planet_pos: DoubleArray,
-    planet_vel: DoubleArray,
-    sat_pos: DoubleArray,
-    sat_vel: DoubleArray,
+    star_pos: Array2D,
+    star_vel: Array2D,
+    planet_pos: Array2D,
+    planet_vel: Array2D,
+    sat_pos: Array2D,
+    sat_vel: Array2D,
 ):
 
     star_accel = np.empty(3, dtype=np.double)
@@ -144,8 +144,8 @@ def integrate(
 
 @njit(parallel=True)
 def transform_to_corotating(
-    times: DoubleArray, angular_speed: float, pos_trans: DoubleArray
-) -> DoubleArray:
+    times: Array2D, angular_speed: float, pos_trans: Array2D
+) -> Array2D:
     # it is necessary to transform our coordinate system to one which
     # rotates with the system
     # we can do this by linearly transforming each position vector by

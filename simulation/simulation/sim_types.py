@@ -2,4 +2,6 @@
 from numpy import double
 from numpy.typing import NDArray
 
-DoubleArray = NDArray[double]
+Array1D = NDArray[double]
+
+Array2D = NDArray[double]

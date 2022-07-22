@@ -17,16 +17,17 @@ from numpy import pi
 
 # shortens function call
 from numpy.linalg import norm
+from numpy.typing import NDArray
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
 
 from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
 
 from . import descriptors
 from .numba_funcs import integrate, transform_to_corotating
-from .sim_types import DoubleArray
+from .sim_types import Array2D, Array1D
 
 
-def array_of_norms(arr_2d: DoubleArray) -> DoubleArray:
+def array_of_norms(arr_2d: Array2D) -> Array1D:
     """Returns an array of the norm of each element of the input array"""
 
     return norm(arr_2d, axis=1)
@@ -214,7 +215,7 @@ class Simulation:
 
         return self.calc_lagrange_point()
 
-    def calc_lagrange_point(self) -> DoubleArray:
+    def calc_lagrange_point(self) -> Array1D:
 
         planet_distance = self.planet_distance * AU
 
@@ -430,10 +431,10 @@ class Simulation:
 
     def calc_center_of_mass_pos_or_vel(
         self,
-        star_pos_or_vel: DoubleArray,
-        planet_pos_or_vel: DoubleArray,
-        sat_pos_or_vel: DoubleArray,
-    ) -> DoubleArray:
+        star_pos_or_vel: NDArray,
+        planet_pos_or_vel: NDArray,
+        sat_pos_or_vel: NDArray,
+    ) -> NDArray:
 
         return (
             self.star_mass * star_pos_or_vel
@@ -543,16 +544,16 @@ class Simulation:
 
         return orbit_plot, update_plot
 
-    def transform_to_corotating(self, pos_trans: DoubleArray) -> DoubleArray:
+    def transform_to_corotating(self, pos_trans: Array2D) -> Array2D:
 
         return transform_to_corotating(self.times, self.angular_speed, pos_trans)
 
     def plot_corotating_orbit(
         self,
-        star_pos_rotated: DoubleArray,
-        planet_pos_rotated: DoubleArray,
-        sat_pos_rotated: DoubleArray,
-        lagrange_point_trans: DoubleArray,
+        star_pos_rotated: Array2D,
+        planet_pos_rotated: Array2D,
+        sat_pos_rotated: Array2D,
+        lagrange_point_trans: Array1D,
     ) -> tuple[pg.PlotWidget, Callable[[], None]]:
 
         # Animated plot of satellites orbit in co-rotating frame.
@@ -700,7 +701,7 @@ class Simulation:
 
             yield i
 
-    def conservation_calculations(self) -> tuple[DoubleArray, DoubleArray, DoubleArray]:
+    def conservation_calculations(self) -> tuple[Array2D, Array2D, Array1D]:
 
         total_momentum = self.calc_total_linear_momentum()
 
@@ -710,7 +711,7 @@ class Simulation:
 
         return total_momentum, total_angular_momentum, total_energy
 
-    def calc_total_linear_momentum(self) -> DoubleArray:
+    def calc_total_linear_momentum(self) -> Array2D:
 
         return (
             self.star_mass * self.star_vel
@@ -720,9 +721,9 @@ class Simulation:
 
     def calc_total_angular_momentum(
         self,
-    ) -> DoubleArray:
+    ) -> Array2D:
 
-        angular_momentum_star: DoubleArray = np.cross(
+        angular_momentum_star: Array2D = np.cross(
             self.star_pos, self.star_mass * self.star_vel
         )
 
@@ -734,7 +735,7 @@ class Simulation:
 
         return angular_momentum_star + angular_momentum_planet + angular_momentum_sat
 
-    def calc_total_energy(self) -> DoubleArray:
+    def calc_total_energy(self) -> Array1D:
 
         d_planet_to_star = array_of_norms(self.star_pos - self.planet_pos)
 
@@ -765,9 +766,9 @@ class Simulation:
     def plot_conserved_quantities(
         self,
         init_planet_momentum: np.double,
-        total_momentum: DoubleArray,
-        total_angular_momentum: DoubleArray,
-        total_energy: DoubleArray,
+        total_momentum: Array2D,
+        total_angular_momentum: Array2D,
+        total_energy: Array1D,
     ):
 
         linear_momentum_plot = pg.plot(
