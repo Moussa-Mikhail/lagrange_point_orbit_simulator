@@ -178,6 +178,18 @@ class Simulation:
 
         self.vel_angle = vel_angle
 
+        self.star_pos = np.empty((0, 3), dtype=np.double)
+
+        self.star_vel = np.empty_like(self.star_pos)
+
+        self.planet_pos = np.empty_like(self.star_pos)
+
+        self.planet_vel = np.empty_like(self.star_pos)
+
+        self.sat_pos = np.empty_like(self.star_pos)
+
+        self.sat_vel = np.empty_like(self.star_pos)
+
         self.plot_conserved = plot_conserved
 
         self.timer = QTimer()
@@ -277,20 +289,20 @@ class Simulation:
 
     def main(self) -> tuple[pg.PlotWidget, pg.PlotWidget, QTimer]:
 
-        star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel = self.calc_orbit()
+        self.calc_orbit()
 
-        CM_pos = self.calc_center_of_mass(star_pos, planet_pos, sat_pos)
+        CM_pos = self.calc_center_of_mass_pos_or_vel(
+            self.star_pos, self.planet_pos, self.sat_pos
+        )
 
         # Transform to coordinate system where the Center of Mass is the origin
-        star_pos_trans = star_pos - CM_pos
+        star_pos_trans = self.star_pos - CM_pos
 
-        planet_pos_trans = planet_pos - CM_pos
+        planet_pos_trans = self.planet_pos - CM_pos
 
-        sat_pos_trans = sat_pos - CM_pos
+        sat_pos_trans = self.sat_pos - CM_pos
 
-        orbit_plot, update_plot = self.plot_orbit(
-            star_pos_trans, planet_pos_trans, sat_pos_trans
-        )
+        orbit_plot, update_plot = self.plot_orbit()
 
         self.timer.timeout.connect(update_plot)  # type: ignore # pylint: disable=no-member
 
@@ -321,11 +333,9 @@ class Simulation:
                 total_momentum,
                 total_angular_momentum,
                 total_energy,
-            ) = self.conservation_calculations(
-                star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
-            )
+            ) = self.conservation_calculations()
 
-            init_planet_momentum = norm(self.planet_mass * planet_vel[0])
+            init_planet_momentum = norm(self.planet_mass * self.planet_vel[0])
 
             self.plot_conserved_quantities(
                 init_planet_momentum,
@@ -336,49 +346,33 @@ class Simulation:
 
         return orbit_plot, corotating_plot, self.timer
 
-    def calc_orbit(self) -> tuple[DoubleArray, ...]:
+    def calc_orbit(self):
 
-        (
-            star_pos,
-            star_vel,
-            planet_pos,
-            planet_vel,
-            sat_pos,
-            sat_vel,
-        ) = self.initialization()
+        self.initialization()
 
-        self.integrate(
-            star_pos,
-            star_vel,
-            planet_pos,
-            planet_vel,
-            sat_pos,
-            sat_vel,
-        )
+        self.integrate()
 
-        return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
-
-    def initialization(self) -> tuple[DoubleArray, ...]:
+    def initialization(self):
 
         """Initializes the arrays of positions and velocities
         so that their initial values correspond to the input parameters
         """
 
-        star_pos = np.empty((self.num_steps + 1, 3), dtype=np.double)
+        self.star_pos = np.empty((self.num_steps + 1, 3), dtype=np.double)
 
-        star_vel = np.empty_like(star_pos)
+        self.star_vel = np.empty_like(self.star_pos)
 
-        planet_pos = np.empty_like(star_pos)
+        self.planet_pos = np.empty_like(self.star_pos)
 
-        planet_vel = np.empty_like(star_pos)
+        self.planet_vel = np.empty_like(self.star_pos)
 
-        sat_pos = np.empty_like(star_pos)
+        self.sat_pos = np.empty_like(self.star_pos)
 
-        sat_vel = np.empty_like(star_pos)
+        self.sat_vel = np.empty_like(self.star_pos)
 
-        star_pos[0] = np.array((0, 0, 0))
+        self.star_pos[0] = np.array((0, 0, 0))
 
-        planet_pos[0] = np.array((self.planet_distance * AU, 0, 0))
+        self.planet_pos[0] = np.array((self.planet_distance * AU, 0, 0))
 
         # Perturbation #
 
@@ -390,74 +384,65 @@ class Simulation:
             (np.cos(perturbation_angle), np.sin(perturbation_angle), 0)
         )
 
-        sat_pos[0] = self.lagrange_point + perturbation
+        self.sat_pos[0] = self.lagrange_point + perturbation
 
         # we setup conditions so that the star and planet have circular orbits
         # velocities have to be defined relative to the CM
-        init_CM_pos = self.calc_center_of_mass(star_pos[0], planet_pos[0], sat_pos[0])
+        init_CM_pos = self.calc_center_of_mass_pos_or_vel(
+            self.star_pos[0], self.planet_pos[0], self.sat_pos[0]
+        )
 
         # orbits are counter clockwise so
         # angular velocity is in the positive z direction
         angular_vel = np.array((0, 0, self.angular_speed))
 
-        speed = self.speed * norm(np.cross(angular_vel, planet_pos[0] - init_CM_pos))
+        speed = self.speed * norm(
+            np.cross(angular_vel, self.planet_pos[0] - init_CM_pos)
+        )
 
         vel_angle = np.radians(self.actual_vel_angle)
 
-        sat_vel[0] = speed * np.array((np.cos(vel_angle), np.sin(vel_angle), 0))
+        self.sat_vel[0] = speed * np.array((np.cos(vel_angle), np.sin(vel_angle), 0))
 
         # End Perturbation #
 
         # for a circular orbit velocity = cross_product(angular velocity, position)
         # where vec(position) is the position relative to the point being orbited
         # in this case the Center of Mass
-        star_vel[0] = np.cross(angular_vel, star_pos[0] - init_CM_pos)
+        self.star_vel[0] = np.cross(angular_vel, self.star_pos[0] - init_CM_pos)
 
-        planet_vel[0] = np.cross(angular_vel, planet_pos[0] - init_CM_pos)
+        self.planet_vel[0] = np.cross(angular_vel, self.planet_pos[0] - init_CM_pos)
 
-        return star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
-
-    def integrate(
-        self,
-        star_pos: DoubleArray,
-        star_vel: DoubleArray,
-        planet_pos: DoubleArray,
-        planet_vel: DoubleArray,
-        sat_pos: DoubleArray,
-        sat_vel: DoubleArray,
-    ):
+    def integrate(self):
 
         integrate(
             self.time_step,
             self.num_steps,
             self.star_mass,
             self.planet_mass,
-            star_pos,
-            star_vel,
-            planet_pos,
-            planet_vel,
-            sat_pos,
-            sat_vel,
+            self.star_pos,
+            self.star_vel,
+            self.planet_pos,
+            self.planet_vel,
+            self.sat_pos,
+            self.sat_vel,
         )
 
-    def calc_center_of_mass(
+    def calc_center_of_mass_pos_or_vel(
         self,
-        star_pos: DoubleArray,
-        planet_pos: DoubleArray,
-        sat_pos: DoubleArray,
+        star_pos_or_vel: DoubleArray,
+        planet_pos_or_vel: DoubleArray,
+        sat_pos_or_vel: DoubleArray,
     ) -> DoubleArray:
 
         return (
-            self.star_mass * star_pos
-            + self.planet_mass * planet_pos
-            + sat_mass * sat_pos
+            self.star_mass * star_pos_or_vel
+            + self.planet_mass * planet_pos_or_vel
+            + sat_mass * sat_pos_or_vel
         ) / (self.star_mass + self.planet_mass + sat_mass)
 
     def plot_orbit(
         self,
-        star_pos_trans: DoubleArray,
-        planet_pos_trans: DoubleArray,
-        sat_pos_trans: DoubleArray,
     ) -> tuple[pg.PlotWidget, Callable[[], None]]:
 
         orbit_plot = pg.plot(title="Orbits of Masses")
@@ -474,19 +459,19 @@ class Simulation:
         # Sun has an orbit on the scale of micro-AU under normal Earth-Sun conditions
         # Zoom in to see it
         orbit_plot.plot(
-            star_pos_trans[::arr_step, :2] / AU,
+            self.star_pos[::arr_step, :2] / AU,
             pen="y",
             name="Star",
         )
 
         orbit_plot.plot(
-            planet_pos_trans[::arr_step, :2] / AU,
+            self.planet_pos[::arr_step, :2] / AU,
             pen="b",
             name="Planet",
         )
 
         orbit_plot.plot(
-            sat_pos_trans[::arr_step, :2] / AU,
+            self.sat_pos[::arr_step, :2] / AU,
             pen="g",
             name="Satellite",
         )
@@ -496,24 +481,24 @@ class Simulation:
         # The purpose of this is to add the bodies to the plot legend
         # and plot their initial positions
         anim_plot.addPoints(
-            [star_pos_trans[0, 0] / AU],
-            [star_pos_trans[0, 1] / AU],
+            [self.star_pos[0, 0] / AU],
+            [self.star_pos[0, 1] / AU],
             pen="y",
             brush="y",
             size=10,
         )
 
         anim_plot.addPoints(
-            [planet_pos_trans[0, 0] / AU],
-            [planet_pos_trans[0, 1] / AU],
+            [self.planet_pos[0, 0] / AU],
+            [self.planet_pos[0, 1] / AU],
             pen="b",
             brush="b",
             size=10,
         )
 
         anim_plot.addPoints(
-            [sat_pos_trans[0, 0] / AU],
-            [sat_pos_trans[0, 1] / AU],
+            [self.sat_pos[0, 0] / AU],
+            [self.sat_pos[0, 1] / AU],
             pen="g",
             brush="g",
             size=10,
@@ -530,8 +515,8 @@ class Simulation:
             anim_plot.clear()
 
             anim_plot.addPoints(
-                [star_pos_trans[i, 0] / AU],
-                [star_pos_trans[i, 1] / AU],
+                [self.star_pos[i, 0] / AU],
+                [self.star_pos[i, 1] / AU],
                 pen="y",
                 brush="y",
                 size=10,
@@ -539,8 +524,8 @@ class Simulation:
             )
 
             anim_plot.addPoints(
-                [planet_pos_trans[i, 0] / AU],
-                [planet_pos_trans[i, 1] / AU],
+                [self.planet_pos[i, 0] / AU],
+                [self.planet_pos[i, 1] / AU],
                 pen="b",
                 brush="b",
                 size=10,
@@ -548,8 +533,8 @@ class Simulation:
             )
 
             anim_plot.addPoints(
-                [sat_pos_trans[i, 0] / AU],
-                [sat_pos_trans[i, 1] / AU],
+                [self.sat_pos[i, 0] / AU],
+                [self.sat_pos[i, 1] / AU],
                 pen="g",
                 brush="g",
                 size=10,
@@ -715,73 +700,47 @@ class Simulation:
 
             yield i
 
-    def conservation_calculations(
-        self,
-        star_pos: DoubleArray,
-        star_vel: DoubleArray,
-        planet_pos: DoubleArray,
-        planet_vel: DoubleArray,
-        sat_pos: DoubleArray,
-        sat_vel: DoubleArray,
-    ) -> tuple[DoubleArray, DoubleArray, DoubleArray]:
+    def conservation_calculations(self) -> tuple[DoubleArray, DoubleArray, DoubleArray]:
 
-        total_momentum = self.calc_total_linear_momentum(star_vel, planet_vel, sat_vel)
+        total_momentum = self.calc_total_linear_momentum()
 
-        total_angular_momentum = self.calc_total_angular_momentum(
-            star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
-        )
+        total_angular_momentum = self.calc_total_angular_momentum()
 
-        total_energy = self.calc_total_energy(
-            star_pos, star_vel, planet_pos, planet_vel, sat_pos, sat_vel
-        )
+        total_energy = self.calc_total_energy()
 
         return total_momentum, total_angular_momentum, total_energy
 
-    def calc_total_linear_momentum(
-        self, star_vel: DoubleArray, planet_vel: DoubleArray, sat_vel: DoubleArray
-    ) -> DoubleArray:
+    def calc_total_linear_momentum(self) -> DoubleArray:
 
         return (
-            self.star_mass * star_vel
-            + self.planet_mass * planet_vel
-            + sat_mass * sat_vel
+            self.star_mass * self.star_vel
+            + self.planet_mass * self.planet_vel
+            + sat_mass * self.sat_vel
         )
 
     def calc_total_angular_momentum(
         self,
-        star_pos: DoubleArray,
-        star_vel: DoubleArray,
-        planet_pos: DoubleArray,
-        planet_vel: DoubleArray,
-        sat_pos: DoubleArray,
-        sat_vel: DoubleArray,
     ) -> DoubleArray:
 
         angular_momentum_star: DoubleArray = np.cross(
-            star_pos, self.star_mass * star_vel
+            self.star_pos, self.star_mass * self.star_vel
         )
 
-        angular_momentum_planet = np.cross(planet_pos, self.planet_mass * planet_vel)
+        angular_momentum_planet = np.cross(
+            self.planet_pos, self.planet_mass * self.planet_vel
+        )
 
-        angular_momentum_sat = np.cross(sat_pos, sat_mass * sat_vel)
+        angular_momentum_sat = np.cross(self.sat_pos, sat_mass * self.sat_vel)
 
         return angular_momentum_star + angular_momentum_planet + angular_momentum_sat
 
-    def calc_total_energy(
-        self,
-        star_pos: DoubleArray,
-        star_vel: DoubleArray,
-        planet_pos: DoubleArray,
-        planet_vel: DoubleArray,
-        sat_pos: DoubleArray,
-        sat_vel: DoubleArray,
-    ) -> DoubleArray:
+    def calc_total_energy(self) -> DoubleArray:
 
-        d_planet_to_star = array_of_norms(star_pos - planet_pos)
+        d_planet_to_star = array_of_norms(self.star_pos - self.planet_pos)
 
-        d_planet_to_sat = array_of_norms(sat_pos - planet_pos)
+        d_planet_to_sat = array_of_norms(self.sat_pos - self.planet_pos)
 
-        d_star_to_sat = array_of_norms(sat_pos - star_pos)
+        d_star_to_sat = array_of_norms(self.sat_pos - self.star_pos)
 
         potential_energy = (
             -G * self.star_mass * self.planet_mass / d_planet_to_star
@@ -789,11 +748,11 @@ class Simulation:
             + -G * sat_mass * self.star_mass / d_star_to_sat
         )
 
-        mag_star_vel = array_of_norms(star_vel)
+        mag_star_vel = array_of_norms(self.star_vel)
 
-        mag_planet_vel = array_of_norms(planet_vel)
+        mag_planet_vel = array_of_norms(self.planet_vel)
 
-        mag_sat_vel = array_of_norms(sat_vel)
+        mag_sat_vel = array_of_norms(self.sat_vel)
 
         kinetic_energy = (
             0.5 * self.star_mass * mag_star_vel**2
