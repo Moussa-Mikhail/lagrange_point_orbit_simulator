@@ -4,7 +4,7 @@ import cProfile
 
 import simulation
 
-_ = simulation.main()
+_ = simulation.simulate()
 
 cProfile.runctx("simulation.main()", globals(), locals(), "Profile.prof")
 

@@ -33,7 +33,7 @@ def array_of_norms(arr_2d: Array2D) -> Array1D:
     return norm(arr_2d, axis=1)
 
 
-def main(
+def simulate(
     num_years: float = 100.0,
     num_steps: int | float = 10**6,
     perturbation_size: float = 0.0,
@@ -115,7 +115,7 @@ def main(
         plot_conserved,
     )
 
-    return simulation.main()
+    return simulation.simulate()
 
 
 def calc_period_from_semi_major_axis(
@@ -288,7 +288,7 @@ class Simulation:
 
         return 2 * pi / self.orbital_period
 
-    def main(self) -> tuple[pg.PlotWidget, pg.PlotWidget, QTimer]:
+    def simulate(self) -> tuple[pg.PlotWidget, pg.PlotWidget, QTimer]:
 
         self.calc_orbit()
 
