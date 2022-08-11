@@ -1,5 +1,6 @@
 # pylint: disable=invalid-name, missing-function-docstring
-"""Simulates orbits near Lagrange points using the position Verlet algorithm.
+"""This module contains the simulation class which simulates
+orbits near Lagrange points using the position Verlet algorithm.
 It assumes that both the star and planet are undergoing uniform circular motion.
 """
 
