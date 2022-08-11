@@ -179,17 +179,17 @@ class Simulation:
 
         self.vel_angle = vel_angle
 
-        self.star_pos = np.empty((0, 3), dtype=np.double)
+        self.star_pos: Array2D = np.empty((0, 3), dtype=np.double)
 
-        self.star_vel = np.empty_like(self.star_pos)
+        self.star_vel: Array2D = np.empty_like(self.star_pos)
 
-        self.planet_pos = np.empty_like(self.star_pos)
+        self.planet_pos: Array2D = np.empty_like(self.star_pos)
 
-        self.planet_vel = np.empty_like(self.star_pos)
+        self.planet_vel: Array2D = np.empty_like(self.star_pos)
 
-        self.sat_pos = np.empty_like(self.star_pos)
+        self.sat_pos: Array2D = np.empty_like(self.star_pos)
 
-        self.sat_vel = np.empty_like(self.star_pos)
+        self.sat_vel: Array2D = np.empty_like(self.star_pos)
 
         self.plot_conserved = plot_conserved
 
@@ -395,13 +395,13 @@ class Simulation:
 
         # orbits are counter clockwise so
         # angular velocity is in the positive z direction
-        angular_vel = np.array((0, 0, self.angular_speed))
+        angular_vel = np.array((0, 0, self.angular_speed), dtype=np.double)
 
         speed = self.speed * norm(
             np.cross(angular_vel, self.planet_pos[0] - init_CM_pos)
         )
 
-        vel_angle = np.radians(self.actual_vel_angle)
+        vel_angle: float = np.radians(self.actual_vel_angle)
 
         self.sat_vel[0] = speed * np.array((np.cos(vel_angle), np.sin(vel_angle), 0))
 
@@ -431,10 +431,10 @@ class Simulation:
 
     def calc_center_of_mass_pos_or_vel(
         self,
-        star_pos_or_vel: NDArray,
-        planet_pos_or_vel: NDArray,
-        sat_pos_or_vel: NDArray,
-    ) -> NDArray:
+        star_pos_or_vel: NDArray[np.floating],
+        planet_pos_or_vel: NDArray[np.floating],
+        sat_pos_or_vel: NDArray[np.floating],
+    ) -> NDArray[np.floating]:
 
         return (
             self.star_mass * star_pos_or_vel
