@@ -6,7 +6,7 @@ import pyqtgraph as pg  # type: ignore
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
-from simulation import main as simMain
+from simulation import simulate as simulate
 
 from simulation.constants import safe_eval as safeEval
 
@@ -320,7 +320,7 @@ def main():
     # pylint: disable=unused-variable
     # this assignment shouldn't be necessary, but it is
     # TODO: fix this bug
-    ctrl = SimCtrl(model=simMain, view=view)  # noqa: F841
+    ctrl = SimCtrl(model=simulate, view=view)  # noqa: F841
 
     sys.exit(simApp.exec())
 
