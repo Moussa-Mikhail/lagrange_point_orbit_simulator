@@ -1,29 +1,28 @@
- [tool.poetry]
+[tool.poetry]
 name = "simulation"
 version = "1.0.4"
 description = "Simulates orbits near Lagrange Points"
 authors = ["Moussa Mikhail <moussamikhail56@gmail.com>"]
-license = "MIT"
+license = "GPL3"
 packages = [
-	{include = "simulation"}
+	{ include = "simulation" }
 ]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.11"
 pyqtgraph = "^0.12.4"
-numba = "^0.55.2"
-numpy = "^1.22.4"
 validateddescriptor = {git = "https://github.com/Moussa-Mikhail/validated-descriptor.git", rev = "main"}
 PyQt6 = "^6.3.1"
+numba = "^0.55.2"
+numpy = "^1.22.4"
 
 [tool.poetry.dev-dependencies]
-pylint = "^2.14.1"
+pylint = "^2.14.5"
 flake8 = "^4.0.1"
 flake8-comprehensions = "^3.8.0"
 flake8-bugbear = "^22.3.23"
-black = "^22.3.0"
 pyinstaller = "^5.1"
-mypy = "^0.961"
+mypy = "^0.971"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
