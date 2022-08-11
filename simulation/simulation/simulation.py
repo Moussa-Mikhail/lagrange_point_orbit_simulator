@@ -6,7 +6,7 @@ It assumes that both the star and planet are undergoing uniform circular motion.
 
 from math import ceil, sqrt
 
-from typing import Callable, Generator
+from typing import Callable
 
 # numpy allows us to compute common math functions and work with arrays.
 import numpy as np
@@ -130,7 +130,56 @@ def calc_period_from_semi_major_axis(
 
 
 class Simulation:
-    """Holds parameters and methods for simulation"""
+    """Simulates orbits near Lagrange points using the position Verlet algorithm.
+
+    Takes the following parameters:
+
+    #### Simulation Parameters
+
+    num_years: float. Number of years to simulate. The default is 100.0.
+
+    num_steps: int. Number of steps to simulate. The default is 10**6.
+
+    a ratio of 10**4 steps per year is recommended.
+
+    #### Initial Conditions
+
+    perturbation_size: float. Size of perturbation away from the Lagrange point in AU.
+    The default is 0.0.
+
+    perturbation_angle: float Angle of perturbation relative to positive x axis in degrees.
+    The default is None.
+    If None, then perturbations are away or toward the origin.
+
+    speed: float. Initial speed of satellite as a factor of the planet's speed.
+    i.e. speed = 1.0 -> satellite has the same speed as the planet.
+    the default is 1.0.
+
+    vel_angle: float. Angle of satellite's initial velocity relative to positive x axis in degrees.
+    The default is None.
+    If None, then vel_angle is perpendicular to the satellite's
+    default position relative to the star.
+
+    lagrange_point: string. Non-perturbed position of satellite. Must be a string.
+    The default is 'L4' but 'L1', 'L2', 'L3', and 'L5' can also be used.
+
+    #### System Parameters
+
+    star_mass: float. Mass of the star in kilograms. The default is the mass of the Sun.
+
+    planet_mass: float. Mass of the planet in kilograms. The default is the mass of the Earth.
+    The constants sun_mass and earth_mass may be imported from the file constants.py.
+
+    planet_distance: float. Distance between the planet and the star in AU. The default is 1.0.
+
+    plot_conserved: bool. If True, plots the conserved quantities:
+    energy, angular momentum, linear momentum.
+    The default is False.
+
+    This function will take ~0.42 seconds per 10**6 steps.
+    The time may vary depending on your hardware.
+    It will take longer than usual on the first call.
+    """
 
     num_years = descriptors.float_desc()
     num_steps = descriptors.positive_int()
@@ -179,17 +228,17 @@ class Simulation:
 
         self.vel_angle = vel_angle
 
-        self.star_pos: Array2D = np.empty((0, 3), dtype=np.double)
+        self.star_pos = np.empty((0, 3), dtype=np.double)
 
-        self.star_vel: Array2D = np.empty_like(self.star_pos)
+        self.star_vel = np.empty_like(self.star_pos)
 
-        self.planet_pos: Array2D = np.empty_like(self.star_pos)
+        self.planet_pos = np.empty_like(self.star_pos)
 
-        self.planet_vel: Array2D = np.empty_like(self.star_pos)
+        self.planet_vel = np.empty_like(self.star_pos)
 
-        self.sat_pos: Array2D = np.empty_like(self.star_pos)
+        self.sat_pos = np.empty_like(self.star_pos)
 
-        self.sat_vel: Array2D = np.empty_like(self.star_pos)
+        self.sat_vel = np.empty_like(self.star_pos)
 
         self.plot_conserved = plot_conserved
 
@@ -455,7 +504,7 @@ class Simulation:
         orbit_plot.setYRange(-1.2 * self.planet_distance, 1.2 * self.planet_distance)
         orbit_plot.setAspectLocked(True)
 
-        arr_step = self.plot_array_step()
+        arr_step = self.array_step()
 
         # Sun has an orbit on the scale of micro-AU under normal Earth-Sun conditions
         # Zoom in to see it
@@ -578,7 +627,7 @@ class Simulation:
 
         corotating_plot.addItem(anim_rotated_plot)
 
-        arr_step = self.plot_array_step()
+        arr_step = self.array_step()
 
         corotating_plot.plot(
             sat_pos_rotated[::arr_step, 0] / AU,
@@ -665,7 +714,7 @@ class Simulation:
 
         return corotating_plot, update_corotating
 
-    def plot_array_step(self, num_points_to_plot: int = 10**5) -> int:
+    def array_step(self, num_points_to_plot: int = 10**5) -> int:
 
         # no need to plot all points
 
@@ -678,7 +727,7 @@ class Simulation:
 
         return points_plotted_step
 
-    def idx_gen(self) -> Generator[int, None, None]:
+    def idx_gen(self):
         """This function is used to update the index of the plots"""
 
         i = 0
@@ -779,7 +828,8 @@ class Simulation:
 
         linear_momentum_plot.addLegend()
 
-        arr_step = self.plot_array_step()
+        # step through the array so that we only plot at most 10**5 points.
+        arr_step = self.array_step()
 
         times_in_years = self.times[::arr_step] / years
 
