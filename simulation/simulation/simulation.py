@@ -34,6 +34,11 @@ def array_of_norms(arr_2d: Array2D) -> Array1D:
     return norm(arr_2d, axis=1)
 
 
+def unit_vector(angle: float) -> Array1D:
+
+    return np.array([np.cos(angle), np.sin(angle), 0])
+
+
 def simulate(
     num_years: float = 100.0,
     num_steps: int | float = 10**6,
@@ -225,6 +230,8 @@ class Simulation:
 
         self.lagrange_label = lagrange_label
 
+        self.lagrange_point_trans = np.empty(3, dtype=np.double)
+
         self.perturbation_angle = perturbation_angle
 
         self.vel_angle = vel_angle
@@ -294,11 +301,11 @@ class Simulation:
 
             case "L4":
 
-                return planet_distance * np.array((np.cos(pi / 3), np.sin(pi / 3), 0))
+                return planet_distance * unit_vector(pi / 3)
 
             case "L5":
 
-                return planet_distance * np.array((np.cos(pi / 3), -np.sin(pi / 3), 0))
+                return planet_distance * unit_vector(-pi / 3)
 
             case _:
                 raise ValueError(
@@ -342,34 +349,20 @@ class Simulation:
 
         self.calc_orbit()
 
-        CM_pos = self.calc_center_of_mass_pos_or_vel(
-            self.star_pos, self.planet_pos, self.sat_pos
-        )
-
-        # Transform to coordinate system where the Center of Mass is the origin
-        star_pos_trans = self.star_pos - CM_pos
-
-        planet_pos_trans = self.planet_pos - CM_pos
-
-        sat_pos_trans = self.sat_pos - CM_pos
-
         orbit_plot, update_plot = self.plot_orbit()
 
         self.timer.timeout.connect(update_plot)  # type: ignore # pylint: disable=no-member
 
-        star_pos_rotated = self.transform_to_corotating(star_pos_trans)
+        star_pos_rotated = self.transform_to_corotating(self.star_pos)
 
-        planet_pos_rotated = self.transform_to_corotating(planet_pos_trans)
+        planet_pos_rotated = self.transform_to_corotating(self.planet_pos)
 
-        sat_pos_rotated = self.transform_to_corotating(sat_pos_trans)
-
-        lagrange_point_trans = self.lagrange_point - CM_pos
+        sat_pos_rotated = self.transform_to_corotating(self.sat_pos)
 
         corotating_plot, update_corotating = self.plot_corotating_orbit(
             star_pos_rotated,
             planet_pos_rotated,
             sat_pos_rotated,
-            lagrange_point_trans,
         )
 
         self.timer.timeout.connect(update_corotating)  # type: ignore # pylint: disable=no-member
@@ -399,15 +392,34 @@ class Simulation:
 
     def calc_orbit(self):
 
-        self.initialization()
+        self.initialize_system()
 
         self.integrate()
 
-    def initialization(self):
+    def initialize_system(self):
 
         """Initializes the arrays of positions and velocities
         so that their initial values correspond to the input parameters
         """
+
+        if len(self.star_pos) != self.num_steps + 1:
+
+            self.allocate_arrays()
+
+        self.initialize_positions()
+
+        # we setup conditions so that the star and planet have circular orbits
+        # about the center of mass
+        # velocities have to be defined relative to the CM
+        init_CM_pos = self.calc_center_of_mass_pos_or_vel(
+            self.star_pos[0], self.planet_pos[0], self.sat_pos[0]
+        )
+
+        self.initialize_velocities(init_CM_pos)
+
+        self.transform_to_CM_ref_frame(init_CM_pos)
+
+    def allocate_arrays(self):
 
         self.star_pos = np.empty((self.num_steps + 1, 3), dtype=np.double)
 
@@ -421,11 +433,13 @@ class Simulation:
 
         self.sat_vel = np.empty_like(self.star_pos)
 
+    def initialize_positions(self):
+
         self.star_pos[0] = np.array((0, 0, 0))
 
         self.planet_pos[0] = np.array((self.planet_distance * AU, 0, 0))
 
-        # Perturbation #
+        # Perturbation of satellite's position #
 
         perturbation_size = self.perturbation_size * AU
 
@@ -437,25 +451,11 @@ class Simulation:
 
         self.sat_pos[0] = self.lagrange_point + perturbation
 
-        # we setup conditions so that the star and planet have circular orbits
-        # velocities have to be defined relative to the CM
-        init_CM_pos = self.calc_center_of_mass_pos_or_vel(
-            self.star_pos[0], self.planet_pos[0], self.sat_pos[0]
-        )
+    def initialize_velocities(self, init_CM_pos: Array1D):
 
         # orbits are counter clockwise so
         # angular velocity is in the positive z direction
         angular_vel = np.array((0, 0, self.angular_speed), dtype=np.double)
-
-        speed = self.speed * norm(
-            np.cross(angular_vel, self.planet_pos[0] - init_CM_pos)
-        )
-
-        vel_angle: float = np.radians(self.actual_vel_angle)
-
-        self.sat_vel[0] = speed * np.array((np.cos(vel_angle), np.sin(vel_angle), 0))
-
-        # End Perturbation #
 
         # for a circular orbit velocity = cross_product(angular velocity, position)
         # where vec(position) is the position relative to the point being orbited
@@ -463,6 +463,20 @@ class Simulation:
         self.star_vel[0] = np.cross(angular_vel, self.star_pos[0] - init_CM_pos)
 
         self.planet_vel[0] = np.cross(angular_vel, self.planet_pos[0] - init_CM_pos)
+
+        speed = self.speed * norm(self.planet_vel[0])
+
+        vel_angle = np.radians(self.actual_vel_angle)
+
+        self.sat_vel[0] = speed * unit_vector(vel_angle)
+
+    def transform_to_CM_ref_frame(self, init_CM_pos: Array1D):
+
+        self.star_pos[0] -= init_CM_pos
+        self.planet_pos[0] -= init_CM_pos
+        self.sat_pos[0] -= init_CM_pos
+
+        self.lagrange_point_trans = self.lagrange_point - init_CM_pos
 
     def integrate(self):
 
@@ -603,7 +617,6 @@ class Simulation:
         star_pos_rotated: Array2D,
         planet_pos_rotated: Array2D,
         sat_pos_rotated: Array2D,
-        lagrange_point_trans: Array1D,
     ) -> tuple[pg.PlotWidget, Callable[[], None]]:
 
         # Animated plot of satellites orbit in co-rotating frame.
@@ -618,7 +631,7 @@ class Simulation:
 
         min_y = -0.5 * self.planet_distance
 
-        max_y = lagrange_point_trans[0, 1] / AU + 0.5 * self.planet_distance
+        max_y = self.lagrange_point_trans[1] / AU + 0.5 * self.planet_distance
 
         corotating_plot.setXRange(min_x, max_x)
         corotating_plot.setYRange(min_y, max_y)
@@ -669,8 +682,8 @@ class Simulation:
         )
 
         corotating_plot.plot(
-            [lagrange_point_trans[0, 0] / AU],
-            [lagrange_point_trans[0, 1] / AU],
+            [self.lagrange_point_trans[0] / AU],
+            [self.lagrange_point_trans[1] / AU],
             name="Lagrange Point",
             pen="k",
             symbol="o",
