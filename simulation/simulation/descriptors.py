@@ -8,33 +8,33 @@ is_positive = value_check_factory(lambda x: x > 0, "positive")
 is_non_negative = value_check_factory(lambda x: x >= 0, "non-negative")
 
 
-def positive_int() -> ValidatedDescriptor[int]:
+def positive_int():
 
-    return ValidatedDescriptor(int, [is_positive])
-
-
-def non_negative_float() -> ValidatedDescriptor[float]:
-
-    return ValidatedDescriptor(float, [is_non_negative])
+    return ValidatedDescriptor[int](int, [is_positive])
 
 
-def positive_float() -> ValidatedDescriptor[float]:
+def non_negative_float():
 
-    return ValidatedDescriptor(float, [is_positive])
+    return ValidatedDescriptor[float](float, [is_non_negative])
 
 
-def bool_desc() -> ValidatedDescriptor[bool]:
+def positive_float():
+
+    return ValidatedDescriptor[float](float, [is_positive])
+
+
+def bool_desc():
 
     return ValidatedDescriptor(bool)
 
 
-def float_desc() -> ValidatedDescriptor[float]:
+def float_desc():
 
-    return ValidatedDescriptor(float)
+    return ValidatedDescriptor[float](float)
 
 
-def optional_float_desc() -> ValidatedDescriptor[float | None]:
-    return ValidatedDescriptor(float | None)
+def optional_float_desc():
+    return ValidatedDescriptor[float | None](float | None)
 
 
 lagrange_labels = ("L1", "L2", "L3", "L4", "L5")
@@ -45,6 +45,6 @@ is_lagrange_label = value_check_factory(
 )
 
 
-def lagrange_label_desc() -> ValidatedDescriptor[str]:
+def lagrange_label_desc():
 
-    return ValidatedDescriptor(str, [is_lagrange_label])
+    return ValidatedDescriptor[str](str, [is_lagrange_label])
