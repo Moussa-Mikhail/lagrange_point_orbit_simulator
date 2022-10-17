@@ -144,20 +144,20 @@ def integrate(
 
 @njit(parallel=True)
 def transform_to_corotating(
-    times: Array2D, angular_speed: float, pos_trans: Array2D
+    pos_trans: Array2D, times: Array1D, angular_speed: float
 ) -> Array2D:
-    # it is necessary to transform our coordinate system to one which
-    # rotates with the system
-    # we can do this by linearly transforming each position vector by
+    """Transforms pos_trans to a frame of reference that rotates at a rate of angular_speed.
+    pos_trans is an array of positions measured relative to the center of rotation.
+    """
+
+    # we do this by linearly transforming each position vector by
     # the inverse of the coordinate transform
     # the coordinate transform is unit(x) -> R(w*t)*unit(x), unit(y) -> R(w*t)*unit(y)
     # where R(w*t) is the rotation matrix with angle w*t about the z axis
     # the inverse is R(-w*t)
-    # at each time t we multiply the position vectors by the matrix R(-w*t)
+    # at each time t we apply the matrix R(-w*t) to the position vector
 
-    # pos_trans is the position relative to the center of mass
-
-    pos_rotated = np.empty_like(pos_trans)
+    pos_corotating = np.empty_like(pos_trans)
 
     for i in prange(pos_trans.shape[0]):
 
@@ -173,10 +173,10 @@ def transform_to_corotating(
 
         pos_trans_y: float = pos_trans[i, 1]
 
-        pos_rotated[i, 0] = c * pos_trans_x - s * pos_trans_y
+        pos_corotating[i, 0] = c * pos_trans_x - s * pos_trans_y
 
-        pos_rotated[i, 1] = s * pos_trans_x + c * pos_trans_y
+        pos_corotating[i, 1] = s * pos_trans_x + c * pos_trans_y
 
-    pos_rotated[:, 2] = pos_trans[:, 2]
+    pos_corotating[:, 2] = pos_trans[:, 2]
 
-    return pos_rotated
+    return pos_corotating
