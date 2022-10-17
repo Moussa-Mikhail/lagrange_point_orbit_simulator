@@ -1,3 +1,4 @@
+# pylint: disable=missing-function-docstring
 """This module contains the OrbitPlotter class which is responsible for plotting
 the orbits of the system simulated by an instance of the Simulator class.
 """
@@ -19,9 +20,9 @@ class Plotter:
 
         self.timer = QTimer()
 
-    def plot_orbit(self):
+    def plot_orbits(self):
 
-        inertial_plot, update_inertial = self.plot_inertial_orbit()
+        inertial_plot, update_inertial = self.plot_inertial_orbits()
 
         self.timer.timeout.connect(update_inertial)
 
@@ -31,7 +32,7 @@ class Plotter:
 
         sat_pos_corotating = self.sim.transform_to_corotating(self.sim.sat_pos)
 
-        corotating_plot, update_corotating = self.plot_corotating_orbit(
+        corotating_plot, update_corotating = self.plot_corotating_orbits(
             star_pos_corotating,
             planet_pos_corotating,
             sat_pos_corotating,
@@ -44,7 +45,9 @@ class Plotter:
 
         self.timer.start(period)
 
-    def plot_inertial_orbit(self):
+        return inertial_plot, corotating_plot, self.timer
+
+    def plot_inertial_orbits(self):
 
         orbit_plot = pg.plot(title="Orbits of Masses")
         orbit_plot.setLabel("bottom", "x", units="AU")
@@ -148,7 +151,7 @@ class Plotter:
 
         return orbit_plot, update_plot
 
-    def plot_corotating_orbit(
+    def plot_corotating_orbits(
         self,
         star_pos_corotating: Array2D,
         planet_pos_corotating: Array2D,
