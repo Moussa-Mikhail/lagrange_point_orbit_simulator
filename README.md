@@ -38,7 +38,7 @@ a ratio of 10**4 steps per year is recommended.
 perturbation_size: float. Size of perturbation away from the Lagrange point in AU.
 The default is 0.0.
 
-perturbation_angle: float Angle of perturbation relative to positive x axis in degrees.
+perturbation_angle: float. Angle of perturbation relative to positive x axis in degrees.
 The default is None.
 If None, then perturbations are away or toward the origin.
 
