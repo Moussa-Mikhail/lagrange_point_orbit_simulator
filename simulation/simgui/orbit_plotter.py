@@ -285,7 +285,7 @@ class Plotter:
         times_in_years = self.sim.times[::arr_step] / years
 
         self.plot_linear_momentum(
-            total_momentum, init_planet_momentum, times_in_years, arr_step
+            total_momentum, init_planet_momentum, times_in_years, arr_step  # type: ignore
         )
 
         self.plot_angular_momentum(total_angular_momentum, times_in_years, arr_step)
@@ -368,7 +368,7 @@ class Plotter:
 
     @staticmethod
     def initialize_conserved_plot(quantity_name: str):
-        """Initializes the plot axes and title for the conserved quantities"""
+        """Initializes the plot axes and title for the conserved quantities plots"""
 
         plot = pg.plot(title=f"Relative Change in {quantity_name} vs Time")
 
