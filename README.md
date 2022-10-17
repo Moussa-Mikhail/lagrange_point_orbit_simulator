@@ -68,4 +68,4 @@ The time may vary depending on your hardware.
 It will take longer than usual on the first simulation.
  ```
 
-This is the docstring of simulator.main which can be seen at any time by using "help(simulation.main)" or "help(main)" in Python.
+This is the docstring of simulator.main which can be seen at any time by using "help(simulator.main)" or "help(main)" in Python.
