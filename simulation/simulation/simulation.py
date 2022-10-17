@@ -90,10 +90,6 @@ class Simulation:
 
     planet_distance: float. Distance between the planet and the star in AU. The default is 1.0.
 
-    plot_conserved: bool. If True, plots the conserved quantities:
-    energy, angular momentum, linear momentum.
-    The default is False.
-
     This function will take ~0.42 seconds per 10**6 steps.
     The time may vary depending on your hardware.
     It will take longer than usual on the first call.
@@ -109,7 +105,6 @@ class Simulation:
     planet_mass = descriptors.non_negative_float()
     planet_distance = descriptors.positive_float()
     lagrange_label = descriptors.lagrange_label_desc()
-    plot_conserved = descriptors.bool_desc()
 
     def __init__(
         self,
@@ -123,7 +118,6 @@ class Simulation:
         planet_mass: float = earth_mass,
         planet_distance: float = 1.0,
         lagrange_label: str = "L4",
-        plot_conserved: bool = False,
     ):
 
         self.num_years = num_years
@@ -142,25 +136,23 @@ class Simulation:
 
         self.lagrange_label = lagrange_label
 
-        self.lagrange_point_trans = np.empty(3, dtype=np.double)
+        self.lagrange_point_trans: Array1D = np.empty(3, dtype=np.double)
 
         self.perturbation_angle = perturbation_angle
 
         self.vel_angle = vel_angle
 
-        self.star_pos = np.empty((0, 3), dtype=np.double)
+        self.star_pos: Array2D = np.empty((0, 3), dtype=np.double)
 
-        self.star_vel = np.empty_like(self.star_pos)
+        self.star_vel: Array2D = np.empty_like(self.star_pos)
 
-        self.planet_pos = np.empty_like(self.star_pos)
+        self.planet_pos: Array2D = np.empty_like(self.star_pos)
 
-        self.planet_vel = np.empty_like(self.star_pos)
+        self.planet_vel: Array2D = np.empty_like(self.star_pos)
 
-        self.sat_pos = np.empty_like(self.star_pos)
+        self.sat_pos: Array2D = np.empty_like(self.star_pos)
 
-        self.sat_vel = np.empty_like(self.star_pos)
-
-        self.plot_conserved = plot_conserved
+        self.sat_vel: Array2D = np.empty_like(self.star_pos)
 
         self.timer = QTimer()
 
