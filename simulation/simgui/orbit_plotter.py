@@ -26,16 +26,16 @@ class Plotter:
 
         self.timer.timeout.connect(update_inertial)
 
-        star_pos_rotated = self.sim.transform_to_corotating(self.sim.star_pos)
+        star_pos_corotating = self.sim.transform_to_corotating(self.sim.star_pos)
 
-        planet_pos_rotated = self.sim.transform_to_corotating(self.sim.planet_pos)
+        planet_pos_corotating = self.sim.transform_to_corotating(self.sim.planet_pos)
 
-        sat_pos_rotated = self.sim.transform_to_corotating(self.sim.sat_pos)
+        sat_pos_corotating = self.sim.transform_to_corotating(self.sim.sat_pos)
 
         corotating_plot, update_corotating = self.plot_corotating_orbit(
-            star_pos_rotated,
-            planet_pos_rotated,
-            sat_pos_rotated,
+            star_pos_corotating,
+            planet_pos_corotating,
+            sat_pos_corotating,
         )
 
         self.timer.timeout.connect(update_corotating)  # type: ignore # pylint: disable=no-member
@@ -152,9 +152,9 @@ class Plotter:
 
     def plot_corotating_orbit(
         self,
-        star_pos_rotated: Array2D,
-        planet_pos_rotated: Array2D,
-        sat_pos_rotated: Array2D,
+        star_pos_corotating: Array2D,
+        planet_pos_corotating: Array2D,
+        sat_pos_corotating: Array2D,
     ) -> tuple[pg.PlotWidget, Callable[[], None]]:
         """Plots the orbits of the system simulated by the simulation in the corotating frame"""
 
@@ -164,9 +164,9 @@ class Plotter:
         corotating_plot.setLabel("left", "y", units="AU")
         corotating_plot.addLegend()
 
-        min_x = star_pos_rotated[0, 0] / AU - 0.2 * self.sim.planet_distance
+        min_x = star_pos_corotating[0, 0] / AU - 0.2 * self.sim.planet_distance
 
-        max_x = planet_pos_rotated[0, 0] / AU + 0.2 * self.sim.planet_distance
+        max_x = planet_pos_corotating[0, 0] / AU + 0.2 * self.sim.planet_distance
 
         min_y = -0.5 * self.sim.planet_distance
 
@@ -176,23 +176,23 @@ class Plotter:
         corotating_plot.setYRange(min_y, max_y)
         corotating_plot.setAspectLocked(True)
 
-        anim_rotated_plot = pg.ScatterPlotItem()
+        anim_corotating_plot = pg.ScatterPlotItem()
 
-        corotating_plot.addItem(anim_rotated_plot)
+        corotating_plot.addItem(anim_corotating_plot)
 
         arr_step = self.sim.array_step()
 
         corotating_plot.plot(
-            sat_pos_rotated[::arr_step, 0] / AU,
-            sat_pos_rotated[::arr_step, 1] / AU,
+            sat_pos_corotating[::arr_step, 0] / AU,
+            sat_pos_corotating[::arr_step, 1] / AU,
             pen="g",
         )
 
         # The purpose of this is to add the bodies to the plot legend
         # and plot their initial positions
         corotating_plot.plot(
-            [star_pos_rotated[0, 0] / AU],
-            [star_pos_rotated[0, 1] / AU],
+            [star_pos_corotating[0, 0] / AU],
+            [star_pos_corotating[0, 1] / AU],
             name="Star",
             pen="k",
             symbol="o",
@@ -201,8 +201,8 @@ class Plotter:
         )
 
         corotating_plot.plot(
-            [planet_pos_rotated[0, 0] / AU],
-            [planet_pos_rotated[0, 1] / AU],
+            [planet_pos_corotating[0, 0] / AU],
+            [planet_pos_corotating[0, 1] / AU],
             name="Planet",
             pen="k",
             symbol="o",
@@ -211,8 +211,8 @@ class Plotter:
         )
 
         corotating_plot.plot(
-            [sat_pos_rotated[0, 0] / AU],
-            [sat_pos_rotated[0, 1] / AU],
+            [sat_pos_corotating[0, 0] / AU],
+            [sat_pos_corotating[0, 1] / AU],
             name="Satellite",
             pen="k",
             symbol="o",
@@ -236,29 +236,29 @@ class Plotter:
 
             j = next(idx_gen)
 
-            anim_rotated_plot.clear()
+            anim_corotating_plot.clear()
 
-            anim_rotated_plot.addPoints(
-                [star_pos_rotated[j, 0] / AU],
-                [star_pos_rotated[j, 1] / AU],
+            anim_corotating_plot.addPoints(
+                [star_pos_corotating[j, 0] / AU],
+                [star_pos_corotating[j, 1] / AU],
                 pen="y",
                 brush="y",
                 size=10,
                 name="Star",
             )
 
-            anim_rotated_plot.addPoints(
-                [planet_pos_rotated[j, 0] / AU],
-                [planet_pos_rotated[j, 1] / AU],
+            anim_corotating_plot.addPoints(
+                [planet_pos_corotating[j, 0] / AU],
+                [planet_pos_corotating[j, 1] / AU],
                 pen="b",
                 brush="b",
                 size=10,
                 name="Planet",
             )
 
-            anim_rotated_plot.addPoints(
-                [sat_pos_rotated[j, 0] / AU],
-                [sat_pos_rotated[j, 1] / AU],
+            anim_corotating_plot.addPoints(
+                [sat_pos_corotating[j, 0] / AU],
+                [sat_pos_corotating[j, 1] / AU],
                 pen="g",
                 brush="g",
                 size=10,
