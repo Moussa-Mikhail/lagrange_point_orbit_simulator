@@ -5,7 +5,7 @@ It assumes that both the star and planet are undergoing uniform circular motion.
 """
 
 
-from math import ceil, sqrt
+from math import sqrt
 
 # numpy allows us to compute common math functions and work with arrays.
 import numpy as np
@@ -370,42 +370,6 @@ class Simulator:
         return transform_to_corotating(
             pos_trans, self.time_points(), self.angular_speed
         )
-
-    def array_step(self, num_points_to_plot: int = 10**5) -> int:
-
-        # no need to plot all points
-
-        # step size when plotting
-        # i.e. if points_plotted_step = 10 then plot every 10th point
-        points_plotted_step = int((self.num_steps + 1) / num_points_to_plot)
-
-        if points_plotted_step == 0:
-            points_plotted_step = 1
-
-        return points_plotted_step
-
-    def idx_gen(self):
-        """This function is used to update the index of the plots"""
-
-        i = 0
-
-        time_step_default = 10 * years / 10**5
-
-        # maximum rate of plot update is too slow
-        # so instead step through arrays
-        # inversely proportional to time_step so that
-        # animated motion is the same regardless of
-        # num_steps or num_years
-        rate = ceil(50 * time_step_default / abs(self.time_step))
-
-        while True:
-
-            i = i + rate
-
-            if i >= self.num_steps:
-                i = 0
-
-            yield i
 
     def conservation_calculations(self) -> tuple[Array2D, Array2D, Array1D]:
 
