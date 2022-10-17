@@ -1,19 +1,20 @@
 # pylint: disable=missing-function-docstring
-"""This module contains the OrbitPlotter class which is responsible for plotting
+"""This module contains the Plotter class which is responsible for plotting
 the orbits of the system simulated by an instance of the Simulator class.
 """
+from math import ceil
 from typing import Callable
 
 import pyqtgraph as pg  # type: ignore
 from numpy.linalg import norm
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
 from simulation import Simulator
-from simulation.constants import AU
+from simulation.constants import AU, years
 from simulation.simulator.sim_types import Array1D, Array2D
 
 
 class Plotter:
-    """Plots the data produced by a Simulator"""
+    """Plots the arrays produced by a Simulator"""
 
     def __init__(self, sim: Simulator):
         self.sim = sim
@@ -47,6 +48,42 @@ class Plotter:
 
         return inertial_plot, corotating_plot, self.timer
 
+    def idx_gen(self):
+        """This function is used to update the index of the plots"""
+
+        i = 0
+
+        time_step_default = 10 * years / 10**5
+
+        # maximum rate of plot update is too slow
+        # so instead step through arrays
+        # inversely proportional to time_step so that
+        # animated motion is the same regardless of
+        # num_steps or num_years
+        rate = ceil(50 * time_step_default / abs(self.sim.time_step))
+
+        while True:
+
+            i = i + rate
+
+            if i >= self.sim.num_steps:
+                i = 0
+
+            yield i
+
+    def array_step(self, num_points_to_plot: int = 10**5) -> int:
+
+        # no need to plot all points
+
+        # step size when plotting
+        # i.e. if points_plotted_step = 10 then plot every 10th point
+        points_plotted_step = int((self.sim.num_steps + 1) / num_points_to_plot)
+
+        if points_plotted_step == 0:
+            points_plotted_step = 1
+
+        return points_plotted_step
+
     def plot_inertial_orbits(self):
 
         orbit_plot = pg.plot(title="Orbits of Masses")
@@ -62,7 +99,7 @@ class Plotter:
         )
         orbit_plot.setAspectLocked(True)
 
-        arr_step = self.sim.array_step()
+        arr_step = self.array_step()
 
         # Sun has an orbit on the scale of micro-AU under normal Earth-Sun conditions
         # Zoom in to see it
@@ -114,7 +151,7 @@ class Plotter:
 
         orbit_plot.addItem(anim_plot)
 
-        idx_gen = self.sim.idx_gen()
+        idx_gen = self.idx_gen()
 
         def update_plot():
 
@@ -181,7 +218,7 @@ class Plotter:
 
         corotating_plot.addItem(anim_corotating_plot)
 
-        arr_step = self.sim.array_step()
+        arr_step = self.array_step()
 
         corotating_plot.plot(
             sat_pos_corotating[::arr_step, 0] / AU,
@@ -231,7 +268,7 @@ class Plotter:
             symbolBrush="w",
         )
 
-        idx_gen = self.sim.idx_gen()
+        idx_gen = self.idx_gen()
 
         def update_corotating():
 
@@ -280,8 +317,8 @@ class Plotter:
 
         init_planet_momentum = norm(self.sim.planet_mass * self.sim.planet_vel[0])
 
-        # step through the array so that we only plot at most 10**5 points.
-        arr_step = self.sim.array_step()
+        # slice the array so that we only plot at most 10**5 points.
+        arr_step = self.array_step()
 
         times_in_years = self.sim.time_points_in_years()[::arr_step]
 

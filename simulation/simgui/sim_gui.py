@@ -6,8 +6,7 @@ import pyqtgraph as pg  # type: ignore
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
-from simulation import Simulator
-
+from simulation import Plotter, Simulator
 from simulation.constants import safe_eval as safeEval
 
 simParams = {
@@ -187,6 +186,8 @@ class SimCtrl:
 
         self._model = model
 
+        self._plotter = Plotter(self._model)
+
         self._view = view
 
         self._connectSignals()
@@ -223,7 +224,9 @@ class SimCtrl:
 
         try:
 
-            orbitPlot, corotatingPlot, timer = self._model(**translatedInputs)
+            for attr, value in translatedInputs.items():
+
+                setattr(self._model, attr, value)
 
         except (TypeError, ValueError) as e:
 
@@ -236,6 +239,10 @@ class SimCtrl:
             errorMessage(msg)
 
             return
+
+        self._model.simulate()
+
+        orbitPlot, corotatingPlot, timer = self._plotter.plot_orbits()
 
         timer.stop()
 
