@@ -45,7 +45,7 @@ def calc_period_from_semi_major_axis(
     return sqrt(period_squared)
 
 
-class Simulation:
+class Simulator:
     """Simulates orbits near Lagrange points using the position Verlet algorithm.
 
     Takes the following parameters:

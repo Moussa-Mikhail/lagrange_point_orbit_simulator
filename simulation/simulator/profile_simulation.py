@@ -2,9 +2,9 @@ import pstats
 
 import cProfile
 
-from simulation import Simulation
+from simulation import Simulator
 
-sim = Simulation()
+sim = Simulator()
 
 cProfile.runctx("sim.simulate()", globals(), locals(), "Profile.prof")
 
