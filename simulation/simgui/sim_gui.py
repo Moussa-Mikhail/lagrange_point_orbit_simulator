@@ -1,12 +1,12 @@
 # pylint: disable=no-name-in-module, invalid-name, missing-docstring, attribute-defined-outside-init
 import sys
-from typing import Callable, TypeVar
+from typing import TypeVar
 
 import pyqtgraph as pg  # type: ignore
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
-from simulation import simulate as simulate
+from simulation import Simulator
 
 from simulation.constants import safe_eval as safeEval
 
@@ -181,7 +181,7 @@ class SimUi(QtWidgets.QMainWindow):
 class SimCtrl:
     def __init__(
         self,
-        model: Callable[..., tuple[pg.PlotWidget, pg.PlotWidget, QTimer]],
+        model: Simulator,
         view: SimUi,
     ):
 
@@ -320,7 +320,7 @@ def main():
     # pylint: disable=unused-variable
     # this assignment shouldn't be necessary, but it is
     # TODO: fix this bug
-    ctrl = SimCtrl(model=simulate, view=view)  # noqa: F841
+    ctrl = SimCtrl(model=Simulator(), view=view)  # noqa: F841
 
     sys.exit(simApp.exec())
 

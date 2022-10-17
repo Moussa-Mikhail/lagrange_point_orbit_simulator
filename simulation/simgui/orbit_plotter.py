@@ -1,26 +1,25 @@
 """This module contains the OrbitPlotter class which is responsible for plotting
-the orbits of the system simulated by an instance of the Simulation class.
+the orbits of the system simulated by an instance of the Simulator class.
 """
 from typing import Callable
 
 import pyqtgraph as pg  # type: ignore
 from numpy.linalg import norm
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
-from simulation import Simulation
-from simulation.constants import AU, years
-from simulation.simulation.sim_types import Array1D, Array2D
+from simulation import Simulator
+from simulation.constants import AU
+from simulation.simulator.sim_types import Array1D, Array2D
 
 
 class Plotter:
-    """Plots the data produced by a Simulation"""
+    """Plots the data produced by a Simulator"""
 
-    def __init__(self, sim: Simulation):
+    def __init__(self, sim: Simulator):
         self.sim = sim
 
         self.timer = QTimer()
 
     def plot_orbit(self):
-        """Plots the orbit of the satellite in both inertial and corotating frames"""
 
         inertial_plot, update_inertial = self.plot_inertial_orbit()
 
@@ -46,7 +45,6 @@ class Plotter:
         self.timer.start(period)
 
     def plot_inertial_orbit(self):
-        """Plots the orbits of the system simulated by the simulation"""
 
         orbit_plot = pg.plot(title="Orbits of Masses")
         orbit_plot.setLabel("bottom", "x", units="AU")
@@ -156,7 +154,7 @@ class Plotter:
         planet_pos_corotating: Array2D,
         sat_pos_corotating: Array2D,
     ) -> tuple[pg.PlotWidget, Callable[[], None]]:
-        """Plots the orbits of the system simulated by the simulation in the corotating frame"""
+        """Plots the orbits of the system simulated in the corotating frame"""
 
         # Animated plot of satellites orbit in co-rotating frame.
         corotating_plot = pg.plot(title="Orbits in Co-Rotating Coordinate System")
@@ -282,7 +280,7 @@ class Plotter:
         # step through the array so that we only plot at most 10**5 points.
         arr_step = self.sim.array_step()
 
-        times_in_years = self.sim.times[::arr_step] / years
+        times_in_years = self.sim.time_points_in_years()[::arr_step]
 
         self.plot_linear_momentum(
             total_momentum, init_planet_momentum, times_in_years, arr_step  # type: ignore
