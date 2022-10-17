@@ -11,7 +11,6 @@ from math import ceil, sqrt
 import numpy as np
 
 # plotting module.
-import pyqtgraph as pg  # type: ignore
 from numpy import pi
 
 # shortens function call
