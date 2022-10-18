@@ -18,12 +18,10 @@ If you use Pip open your command line in the repository directory and enter "pip
 
 ## Usage of simulator.py
 
-The simulator.py module is meant to be used by calling its main function.
-
 ```
-main simulates a satellite's orbit and returns position and velocity arrays of the star, planet, and satellite.
-
-Takes the following parameters:
+This class holds parameters defining a satellites orbit and simulates it.
+Once an instance of the class has been created it can be used by calling the simulate method.
+The constructor takes the following parameters:
 
 #### Simulation Parameters
 
@@ -68,4 +66,4 @@ The time may vary depending on your hardware.
 It will take longer than usual on the first simulation.
  ```
 
-This is the docstring of simulator.main which can be seen at any time by using "help(simulator.main)" or "help(main)" in Python.
+This is the docstring of the Simulator class which can be seen at any time by using "help(Simulator)" in Python.
