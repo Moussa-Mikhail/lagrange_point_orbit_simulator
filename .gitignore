@@ -143,4 +143,5 @@ thesis notes.txt
 perf_test.py
 *.csv
 simulation/profile_simulation.py
-simulation/Profile.prof
+*Profile.prof
+start_gui.bat
