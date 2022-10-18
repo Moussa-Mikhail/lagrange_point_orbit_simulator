@@ -6,6 +6,8 @@ from simulation import Simulator
 
 sim = Simulator()
 
+sim.simulate()
+
 cProfile.runctx("sim.simulate()", globals(), locals(), "Profile.prof")
 
 s = pstats.Stats("Profile.prof")
