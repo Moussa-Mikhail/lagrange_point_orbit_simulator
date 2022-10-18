@@ -140,7 +140,6 @@ dmypy.json
 *.html
 .VSCodeCounter
 thesis notes.txt
-perf_test.py
 *.csv
 simulation/profile_simulation.py
 *Profile.prof
