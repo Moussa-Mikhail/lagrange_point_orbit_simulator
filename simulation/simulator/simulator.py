@@ -1,16 +1,14 @@
 # pylint: disable=invalid-name, missing-function-docstring
-"""This module contains the simulation class which simulates
-orbits near Lagrange points using the position Verlet algorithm.
+"""This module contains the Simulator class
+which holds parameters defining a satellites orbit near a Lagrange point and simulates
+that orbit.
 It assumes that both the star and planet are undergoing uniform circular motion.
 """
 
 
 from math import sqrt
 
-# numpy allows us to compute common math functions and work with arrays.
 import numpy as np
-
-# plotting module.
 from numpy import pi
 
 # shortens function call
@@ -46,29 +44,29 @@ def calc_period_from_semi_major_axis(
 
 
 class Simulator:
-    """Simulates orbits near Lagrange points using the position Verlet algorithm.
-
-    Takes the following parameters:
+    """This class holds parameters defining a satellites orbit and simulates it.
+    Once an instance of the class has been created it can be used by calling the simulate method.
+    The constructor takes the following parameters:
 
     #### Simulation Parameters
 
-    num_years: float. Number of years to simulate. The default is 100.0.
+    num_years: float. Time to simulate in years. The default is 100.0.
 
-    num_steps: int. Number of steps to simulate. The default is 10**6.
+    num_steps: non-negative int. Number of steps to simulate. The default is 10**6.
 
     a ratio of 10**4 steps per year is recommended.
 
-    #### Initial Conditions
+    #### Satellite Parameters
 
     perturbation_size: float. Size of perturbation away from the Lagrange point in AU.
     The default is 0.0.
 
-    perturbation_angle: float Angle of perturbation relative to positive x axis in degrees.
+    perturbation_angle: float. Angle of perturbation relative to positive x axis in degrees.
     The default is None.
     If None, then perturbations are away or toward the origin.
 
     speed: float. Initial speed of satellite as a factor of the planet's speed.
-    i.e. speed = 1.0 -> satellite has the same speed as the planet.
+    e.g. speed = 1.0 -> satellite has the same speed as the planet.
     the default is 1.0.
 
     vel_angle: float. Angle of satellite's initial velocity relative to positive x axis in degrees.
@@ -76,25 +74,27 @@ class Simulator:
     If None, then vel_angle is perpendicular to the satellite's
     default position relative to the star.
 
-    lagrange_point: string. Non-perturbed position of satellite. Must be a string.
+    lagrange_point: string. Non-perturbed position of satellite.
     The default is 'L4' but 'L1', 'L2', 'L3', and 'L5' can also be used.
 
     #### System Parameters
 
-    star_mass: float. Mass of the star in kilograms. The default is the mass of the Sun.
+    star_mass: positive float. Mass of the star in kilograms. The default is the mass of the Sun.
 
-    planet_mass: float. Mass of the planet in kilograms. The default is the mass of the Earth.
-    The constants sun_mass and earth_mass may be imported from the file constants.py.
+    planet_mass: positive float. Mass of the planet in kilograms.
+    The default is the mass of the Earth.
+    The constants sun_mass and earth_mass may be imported from the constants module.
 
-    planet_distance: float. Distance between the planet and the star in AU. The default is 1.0.
+    planet_distance: positive float.
+    Distance between the planet and the star in AU. The default is 1.0.
 
     This function will take ~0.42 seconds per 10**6 steps.
     The time may vary depending on your hardware.
-    It will take longer than usual on the first simulation.
+    It will take longer than usual on the first call to simulate.
     """
 
     num_years = descriptors.float_desc()
-    num_steps = descriptors.positive_int()
+    num_steps = descriptors.non_negative_int()
     perturbation_size = descriptors.float_desc()
     perturbation_angle = descriptors.optional_float_desc()
     speed = descriptors.float_desc()
