@@ -8,9 +8,9 @@ is_positive = value_check_factory(lambda x: x > 0, "positive")
 is_non_negative = value_check_factory(lambda x: x >= 0, "non-negative")
 
 
-def positive_int():
+def non_negative_int():
 
-    return ValidatedDescriptor[int](int, [is_positive])
+    return ValidatedDescriptor[int](int, [is_non_negative])
 
 
 def non_negative_float():
