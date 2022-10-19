@@ -10,7 +10,7 @@ from .sim_types import Array2D, Array1D
 
 
 @njit()
-def norm(vector: Array2D) -> float:
+def norm(vector: Array1D) -> float:
 
     return sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2])
 
