@@ -11,6 +11,8 @@ AU = 1.495978707 * 10**11
 # serves as a conversion factor from years to seconds
 years = 365.25 * 24 * 60 * 60
 
+hours = 60 * 60
+
 # mass of Sun in kilograms
 sun_mass: float = 1.98847 * 10**30
 
