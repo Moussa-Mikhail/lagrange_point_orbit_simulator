@@ -24,7 +24,10 @@ constants_names = {
 
 
 def safe_eval(expr: str) -> int | float:
-    """safe eval function used on expressions that contain the above constants."""
+    """safe eval function used on expressions that contain the above constants.
+    Raises a ValueError if the expression contains anything other than
+    the above constants, digits, operators, parens, or scientific notation.
+    """
 
     exprNoConstants = expr
 
@@ -38,8 +41,16 @@ def safe_eval(expr: str) -> int | float:
 
         raise ValueError(f"{expr} is an invalid expression")
 
-    res = eval(expr)  # pylint: disable=eval-used
+    try:
 
-    assert isinstance(res, (int, float))
+        res = eval(expr)  # pylint: disable=eval-used
+
+    except NameError as e:
+
+        raise ValueError(f"{expr} is an invalid expression") from e
+
+    if not isinstance(res, (int, float)):
+
+        raise ValueError(f"{expr} is an invalid expression")
 
     return res
