@@ -12,7 +12,7 @@ import numpy as np
 
 # shortens function call
 from numpy.linalg import norm
-from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
+from simulation.constants import AU, G, earth_mass, sun_mass, years
 
 from . import descriptors
 from .numba_funcs import integrate, transform_to_corotating
@@ -90,6 +90,10 @@ class Simulator:
     The time may vary depending on your hardware.
     It will take longer than usual on the first call to simulate.
     """
+
+    # mass of satellite in kilograms
+    # must be negligible compared to other masses
+    sat_mass = 1.0
 
     num_years = descriptors.float_desc()
     num_steps = descriptors.non_negative_int()
@@ -358,9 +362,9 @@ class Simulator:
         return (
             self.star_mass * star_pos_or_vel
             + self.planet_mass * planet_pos_or_vel
-            + sat_mass * sat_pos_or_vel
+            + self.sat_mass * sat_pos_or_vel
         ) / (
-            self.star_mass + self.planet_mass + sat_mass
+            self.star_mass + self.planet_mass + self.sat_mass
         )  # type: ignore
 
     def transform_to_corotating(self, pos_trans: Array2D) -> Array2D:
@@ -384,7 +388,7 @@ class Simulator:
         return (
             self.star_mass * self.star_vel
             + self.planet_mass * self.planet_vel
-            + sat_mass * self.sat_vel
+            + self.sat_mass * self.sat_vel
         )
 
     def calc_total_angular_momentum(self) -> Array2D:
@@ -397,7 +401,7 @@ class Simulator:
             self.planet_pos, self.planet_mass * self.planet_vel
         )
 
-        angular_momentum_sat = np.cross(self.sat_pos, sat_mass * self.sat_vel)
+        angular_momentum_sat = np.cross(self.sat_pos, self.sat_mass * self.sat_vel)
 
         return angular_momentum_star + angular_momentum_planet + angular_momentum_sat
 
@@ -411,8 +415,8 @@ class Simulator:
 
         potential_energy = (
             -G * self.star_mass * self.planet_mass / d_planet_to_star
-            + -G * sat_mass * self.planet_mass / d_planet_to_sat
-            + -G * sat_mass * self.star_mass / d_star_to_sat
+            + -G * self.sat_mass * self.planet_mass / d_planet_to_sat
+            + -G * self.sat_mass * self.star_mass / d_star_to_sat
         )
 
         mag_star_vel = array_of_norms(self.star_vel)
@@ -424,7 +428,7 @@ class Simulator:
         kinetic_energy = (
             0.5 * self.star_mass * mag_star_vel**2
             + 0.5 * self.planet_mass * mag_planet_vel**2
-            + 0.5 * sat_mass * mag_sat_vel**2
+            + 0.5 * self.sat_mass * mag_sat_vel**2
         )
 
         return potential_energy + kinetic_energy

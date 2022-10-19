@@ -17,19 +17,14 @@ sun_mass: float = 1.98847 * 10**30
 # mass of Earth in kilograms
 earth_mass = 5.9722 * 10**24
 
-# mass of satellite in kilograms
-# must be negligible compared to other masses
-sat_mass = 1.0
-
 constants_names = {
     "sun_mass",
     "earth_mass",
-    "sat_mass",
 }
 
 
 def safe_eval(expr: str) -> int | float:
-    """safe eval function used on expressions that contain the above constants"""
+    """safe eval function used on expressions that contain the above constants."""
 
     exprNoConstants = expr
 
@@ -39,7 +34,7 @@ def safe_eval(expr: str) -> int | float:
 
     chars = set(exprNoConstants)
 
-    if not chars.issubset("0123456789.+-*/()ej"):
+    if not chars.issubset("0123456789.+-*/()[]{}e"):
 
         raise ValueError(f"{expr} is an invalid expression")
 
