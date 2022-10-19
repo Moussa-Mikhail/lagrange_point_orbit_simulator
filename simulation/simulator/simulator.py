@@ -9,16 +9,14 @@ It assumes that both the star and planet are undergoing uniform circular motion.
 from math import sqrt
 
 import numpy as np
-from numpy import pi
 
 # shortens function call
 from numpy.linalg import norm
-
 from simulation.constants import AU, G, earth_mass, sat_mass, sun_mass, years
 
 from . import descriptors
 from .numba_funcs import integrate, transform_to_corotating
-from .sim_types import Array2D, Array1D
+from .sim_types import Array1D, Array2D
 
 
 def array_of_norms(arr_2d: Array2D) -> Array1D:
@@ -37,7 +35,7 @@ def calc_period_from_semi_major_axis(
 ) -> float:
 
     period_squared = (
-        4 * pi**2 * semi_major_axis**3 / (G * (star_mass + planet_mass))
+        4 * np.pi**2 * semi_major_axis**3 / (G * (star_mass + planet_mass))
     )
 
     return sqrt(period_squared)
@@ -206,11 +204,11 @@ class Simulator:
 
             case "L4":
 
-                return planet_distance_meters * unit_vector(pi / 3)
+                return planet_distance_meters * unit_vector(np.pi / 3)
 
             case "L5":
 
-                return planet_distance_meters * unit_vector(-pi / 3)
+                return planet_distance_meters * unit_vector(-np.pi / 3)
 
             case _:
                 raise ValueError(
@@ -247,7 +245,7 @@ class Simulator:
     @property
     def angular_speed(self) -> float:
 
-        return 2 * pi / self.orbital_period
+        return 2 * np.pi / self.orbital_period
 
     def simulate(self):
 
