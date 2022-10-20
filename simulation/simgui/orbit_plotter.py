@@ -9,7 +9,7 @@ import pyqtgraph as pg  # type: ignore
 from numpy.linalg import norm
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
 from simulation import Simulator
-from simulation.constants import AU, years
+from simulation.constants import AU, hours
 from simulation.simulator.sim_types import Array1D, Array2D
 
 
@@ -53,14 +53,14 @@ class Plotter:
 
         i = 0
 
-        time_step_default = 10 * years / 10**5
+        time_step_default = 1 * hours
 
         # maximum rate of plot update is too slow
         # so instead step through arrays
         # inversely proportional to time_step so that
         # animated motion is the same regardless of
         # num_steps or num_years
-        rate = ceil(50 * time_step_default / abs(self.sim.time_step))
+        rate = ceil(50 * time_step_default / abs(self.sim.time_step_in_seconds))
 
         while True:
 
@@ -317,7 +317,7 @@ class Plotter:
 
         init_planet_momentum = norm(self.sim.planet_mass * self.sim.planet_vel[0])
 
-        # slice the array so that we only plot at most 10**5 points.
+        # slice the arrays so that we only plot at most 10**5 points.
         arr_step = self.array_step()
 
         times_in_years = self.sim.time_points_in_years()[::arr_step]

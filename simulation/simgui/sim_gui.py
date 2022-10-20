@@ -10,15 +10,15 @@ from simulation import Plotter, Simulator
 from simulation.constants import safe_eval as safeEval
 
 simParams = {
-    "number of years": "10",
-    "number of steps": "10**5",
+    "number of years": "10.0",
+    "time step (hours)": "1.0",
 }
 
 satParams = {
-    "perturbation size": "0",
-    "perturbation angle": "60",
-    "initial speed": "1",
-    "initial velocity angle": "150",
+    "perturbation size": "0.0",
+    "perturbation angle": "60.0",
+    "initial speed": "1.0",
+    "initial velocity angle": "150.0",
     "Lagrange label": "L4",
 }
 
@@ -30,9 +30,8 @@ sysParams = {
 
 # used to translate param labels used in gui to arg names used in simMain
 argNames = {
-    "number of steps": "num_steps",
     "number of years": "num_years",
-    "time step": "time_step",
+    "time step (hours)": "time_step",
     "perturbation size": "perturbation_size",
     "perturbation angle": "perturbation_angle",
     "initial speed": "speed",
@@ -48,6 +47,9 @@ class SimUi(QtWidgets.QMainWindow):
     def __init__(self):
 
         super().__init__()
+
+        # time in milliseconds between plot updates
+        self._period = 33
 
         self.setWindowTitle("Simulation of Orbits near Lagrange Points")
 
@@ -129,9 +131,6 @@ class SimUi(QtWidgets.QMainWindow):
 
         self._generalLayout.addWidget(corotatingPlot)
 
-        # time in milliseconds between plot updates
-        self._period = 33
-
         self._timer: QTimer | None = None
 
     def setPlots(
@@ -155,10 +154,6 @@ class SimUi(QtWidgets.QMainWindow):
         currOrbitPlot.hide()
 
         currCorotatingPlot.hide()
-
-        del currOrbitPlot
-
-        del currCorotatingPlot
 
     def toggleAnimation(self):
 
