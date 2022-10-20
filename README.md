@@ -7,7 +7,7 @@ Python code used to simulate satellite orbits near Lagrange points. It is meant 
 Download the repository.
 If you use Pip open your command line in the repository directory and enter "pip install -r requirements.txt". This will install all the packages this code depends on. If you use Poetry then a .lock file is provided.
 
-## Usage of simulator.py
+## Usage
 
 ```
 This class holds parameters defining a satellites orbit and simulates it.
