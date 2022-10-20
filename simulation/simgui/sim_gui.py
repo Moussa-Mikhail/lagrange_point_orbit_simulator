@@ -9,37 +9,26 @@ from PyQt6.QtGui import QFont
 from simulation import Plotter, Simulator
 from simulation.constants import safe_eval as safeEval
 
-simParams = {
-    "number of years": "10.0",
-    "time step (hours)": "1.0",
+paramsT = dict[str, tuple[str, str]]
+
+# parameter name: (default, attribute name)
+simParams: paramsT = {
+    "number of years": ("10.0", "num_years"),
+    "time step (hours)": ("1.0", "time_step"),
 }
 
-satParams = {
-    "perturbation size": "0.0",
-    "perturbation angle": "60.0",
-    "initial speed": "1.0",
-    "initial velocity angle": "150.0",
-    "Lagrange label": "L4",
+satParams: paramsT = {
+    "perturbation size": ("0.0", "perturbation_size"),
+    "perturbation angle": ("60.0", "perturbation_angle"),
+    "initial speed": ("1.0", "speed"),
+    "initial velocity angle": ("150.0", "vel_angle"),
+    "Lagrange label": ("L4", "lagrange_label"),
 }
 
-sysParams = {
-    "star mass": "sun_mass",
-    "planet mass": "earth_mass",
-    "planet distance": "1.0",
-}
-
-# used to translate param labels used in gui to arg names used in simMain
-argNames = {
-    "number of years": "num_years",
-    "time step (hours)": "time_step",
-    "perturbation size": "perturbation_size",
-    "perturbation angle": "perturbation_angle",
-    "initial speed": "speed",
-    "initial velocity angle": "vel_angle",
-    "star mass": "star_mass",
-    "planet mass": "planet_mass",
-    "planet distance": "planet_distance",
-    "Lagrange label": "lagrange_label",
+sysParams: paramsT = {
+    "star mass": ("sun_mass", "star_mass"),
+    "planet mass": ("earth_mass", "planet_mass"),
+    "planet distance": ("1.0", "planet_distance"),
 }
 
 
@@ -97,7 +86,7 @@ class SimUi(QtWidgets.QMainWindow):
 
         self._inputsLayout.addRow(buttonsLayout)
 
-    def _addParams(self, argLabelText: str, Params: dict[str, str]):
+    def _addParams(self, argLabelText: str, Params: paramsT):
 
         argLabel = QtWidgets.QLabel(argLabelText)
 
@@ -105,7 +94,7 @@ class SimUi(QtWidgets.QMainWindow):
 
         self._inputsLayout.addRow(argLabel)
 
-        for fieldText, defaultValue in Params.items():
+        for fieldText, (defaultValue, _) in Params.items():
 
             fieldLine = QtWidgets.QLineEdit(defaultValue)
 
@@ -172,6 +161,14 @@ class SimUi(QtWidgets.QMainWindow):
             self._timer.start(self._period)
 
 
+allParams = simParams | satParams | sysParams
+
+# used to translate param labels used in gui to attribute names
+paramLabelsToAttribute = {
+    paramLabel: attribue for paramLabel, (_, attribue) in allParams.items()
+}
+
+
 class SimCtrl:
     def __init__(
         self,
@@ -227,7 +224,7 @@ class SimCtrl:
 
             msg = str(e)
 
-            for k, v in argNames.items():
+            for k, v in paramLabelsToAttribute.items():
 
                 msg = msg.replace(v, k)
 
@@ -306,7 +303,7 @@ T = TypeVar("T")
 
 def _translateInputs(inputs: dict[str, T]) -> dict[str, T]:
 
-    return {argNames[label]: v for label, v in inputs.items()}
+    return {paramLabelsToAttribute[label]: v for label, v in inputs.items()}
 
 
 def main():
