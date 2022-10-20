@@ -6,13 +6,13 @@ It assumes that both the star and planet are undergoing uniform circular motion.
 """
 
 
-from math import sqrt
+from math import ceil, sqrt
 
 import numpy as np
 
 # shortens function call
 from numpy.linalg import norm
-from simulation.constants import AU, G, earth_mass, sun_mass, years
+from simulation.constants import AU, G, earth_mass, sun_mass, years, hours
 
 from . import descriptors
 from .numba_funcs import integrate, transform_to_corotating
@@ -48,11 +48,10 @@ class Simulator:
 
     #### Simulation Parameters
 
-    num_years: float. Time to simulate in years. The default is 100.0.
+    num_years: positive float. Time to simulate in years. The default is 100.0.
 
-    num_steps: non-negative int. Number of steps to simulate. The default is 10**6.
-
-    a ratio of 10**4 steps per year is recommended.
+    time_step: float. Time inbetween simulation steps in hours. the default is 1.0.
+    A negative value will cause the simulation to run backwards in time.
 
     #### Satellite Parameters
 
@@ -81,22 +80,21 @@ class Simulator:
 
     planet_mass: positive float. Mass of the planet in kilograms.
     The default is the mass of the Earth.
-    The constants sun_mass and earth_mass may be imported from the constants module.
+
+    These constants and others maybe import from the constants module.
 
     planet_distance: positive float.
     Distance between the planet and the star in AU. The default is 1.0.
 
-    This function will take ~0.42 seconds per 10**6 steps.
-    The time may vary depending on your hardware.
-    It will take longer than usual on the first call to simulate.
+    The time to simulate will take longer than usual on the first call to the simulate method.
     """
 
     # mass of satellite in kilograms
     # must be negligible compared to other masses
     sat_mass = 1.0
 
-    num_years = descriptors.float_desc()
-    num_steps = descriptors.non_negative_int()
+    num_years = descriptors.positive_float()
+    time_step = descriptors.float_desc()
     perturbation_size = descriptors.float_desc()
     perturbation_angle = descriptors.optional_float_desc()
     speed = descriptors.float_desc()
@@ -109,7 +107,7 @@ class Simulator:
     def __init__(
         self,
         num_years: float = 100.0,
-        num_steps: int = 10**6,
+        time_step: float = 1.0,
         perturbation_size: float = 0.0,
         perturbation_angle: float | None = None,
         speed: float = 1.0,
@@ -122,7 +120,7 @@ class Simulator:
 
         self.num_years = num_years
 
-        self.num_steps = num_steps
+        self.time_step = time_step
 
         self.perturbation_size = perturbation_size
 
@@ -155,22 +153,32 @@ class Simulator:
         self.sat_vel: Array2D = np.empty_like(self.star_pos)
 
     @property
-    def sim_stop(self) -> float:
+    def sim_time(self) -> float:
+        """Time to simulate in seconds"""
 
         return self.num_years * years
 
     @property
-    def time_step(self) -> float:
+    def time_step_in_seconds(self) -> float:
 
-        return self.sim_stop / self.num_steps
+        return self.time_step * hours
+
+    @property
+    def num_steps(self) -> int:
+
+        return (
+            0
+            if self.time_step_in_seconds == 0
+            else ceil(abs(self.sim_time / self.time_step_in_seconds))
+        )
 
     def time_points(self) -> Array1D:
 
-        return np.linspace(0, self.sim_stop, self.num_steps)
+        return np.linspace(0, self.sim_time, self.num_steps + 1)
 
     def time_points_in_years(self) -> Array1D:
 
-        return np.linspace(0, self.num_years, self.num_steps + 1)
+        return self.time_points() / years
 
     @property
     def lagrange_point(self) -> Array1D:
@@ -340,7 +348,7 @@ class Simulator:
     def _integrate(self):
 
         integrate(
-            self.time_step,
+            self.time_step_in_seconds,
             self.num_steps,
             self.star_mass,
             self.planet_mass,
@@ -369,9 +377,9 @@ class Simulator:
 
     def transform_to_corotating(self, pos_trans: Array2D) -> Array2D:
 
-        return transform_to_corotating(
-            pos_trans, self.time_points(), self.angular_speed
-        )
+        angular_speed = self.angular_speed * np.sign(self.time_step_in_seconds)
+
+        return transform_to_corotating(pos_trans, self.time_points(), angular_speed)
 
     def conservation_calculations(self) -> tuple[Array2D, Array2D, Array1D]:
 
