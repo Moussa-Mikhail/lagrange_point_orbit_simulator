@@ -208,7 +208,9 @@ class SimCtrl:
 
             simulationInputs = self._getSimulationInputs()
 
-        except (ValueError, SyntaxError, ZeroDivisionError, TypeError):
+        except ValueError as e:
+
+            errorMessage(str(e))
 
             return
 
@@ -240,9 +242,9 @@ class SimCtrl:
 
         self._view.setPlots(orbitPlot, corotatingPlot, timer)
 
-    def _getSimulationInputs(self) -> dict[str, str | int | float]:
+    def _getSimulationInputs(self) -> dict[str, str | float]:
 
-        inputs: dict[str, str | int | float] = {}
+        inputs: dict[str, str | float] = {}
 
         for fieldText, field in self._view.inputFields.items():
 
@@ -258,29 +260,15 @@ class SimCtrl:
 
                 value = safeEval(fieldValue)
 
-            except (ValueError, SyntaxError, ZeroDivisionError) as e:
+            except ValueError as e:
 
-                errorMessage(f"Invalid expression in field '{fieldText}'")
+                # errorMessage(f"Invalid expression in field '{fieldText}'.\n{e}")
 
-                raise e
+                raise ValueError(
+                    f"Invalid expression in field '{fieldText}'.\n{e}"
+                ) from e
 
-            if fieldText == "number of steps":
-
-                inputs[fieldText] = int(value)
-
-                continue
-
-            try:
-
-                inputs[fieldText] = float(value)
-
-            except TypeError as e:
-
-                errorMessage(
-                    f"{fieldText} must be a real number, not {type(value).__name__}"
-                )
-
-                raise e
+            inputs[fieldText] = float(value)
 
         return inputs
 
