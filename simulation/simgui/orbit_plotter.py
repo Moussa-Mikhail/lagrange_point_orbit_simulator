@@ -315,6 +315,7 @@ class Plotter:
             total_energy,
         ) = self.sim.conservation_calculations()
 
+        # Conversion to float is just to satisfy mypy
         init_planet_momentum = float(
             norm(self.sim.planet_mass * self.sim.planet_vel[0])
         )
