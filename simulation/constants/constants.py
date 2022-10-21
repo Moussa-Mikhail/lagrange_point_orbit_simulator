@@ -9,19 +9,19 @@ AU = 1.495978707 * 10**11
 
 # 1 Julian year in seconds
 # serves as a conversion factor from years to seconds
-years = 365.25 * 24 * 60 * 60
+YEARS = 365.25 * 24 * 60 * 60
 
-hours = 60 * 60
+HOURS = 60 * 60
 
 # mass of Sun in kilograms
-sun_mass: float = 1.98847 * 10**30
+SUN_MASS: float = 1.98847 * 10**30
 
 # mass of Earth in kilograms
-earth_mass = 5.9722 * 10**24
+EARTH_MASS = 5.9722 * 10**24
 
-constants_names = {
-    "sun_mass",
-    "earth_mass",
+CONSTANT_NAMES = {
+    "SUN_MASS",
+    "EARTH_MASS",
 }
 
 
@@ -31,9 +31,11 @@ def safe_eval(expr: str) -> int | float:
     the above constants, digits, operators, parens, or scientific notation.
     """
 
+    expr = expr.upper()
+
     exprNoConstants = expr
 
-    for constant in constants_names:
+    for constant in CONSTANT_NAMES:
 
         exprNoConstants = exprNoConstants.replace(constant, "")
 

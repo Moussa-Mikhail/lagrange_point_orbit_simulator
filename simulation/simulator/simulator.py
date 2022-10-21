@@ -12,7 +12,7 @@ import numpy as np
 
 # shortens function call
 from numpy.linalg import norm
-from simulation.constants import AU, G, earth_mass, sun_mass, years, hours
+from simulation.constants import AU, G, EARTH_MASS, SUN_MASS, YEARS, HOURS
 
 from . import descriptors
 from .numba_funcs import integrate, transform_to_corotating
@@ -112,8 +112,8 @@ class Simulator:
         perturbation_angle: float | None = None,
         speed: float = 1.0,
         vel_angle: float | None = None,
-        star_mass: float = sun_mass,
-        planet_mass: float = earth_mass,
+        star_mass: float = SUN_MASS,
+        planet_mass: float = EARTH_MASS,
         planet_distance: float = 1.0,
         lagrange_label: str = "L4",
     ):
@@ -156,12 +156,12 @@ class Simulator:
     def sim_time(self) -> float:
         """Time to simulate in seconds"""
 
-        return self.num_years * years
+        return self.num_years * YEARS
 
     @property
     def time_step_in_seconds(self) -> float:
 
-        return self.time_step * hours
+        return self.time_step * HOURS
 
     @property
     def num_steps(self) -> int:
@@ -178,7 +178,7 @@ class Simulator:
 
     def time_points_in_years(self) -> Array1D:
 
-        return self.time_points() / years
+        return self.time_points() / YEARS
 
     @property
     def lagrange_point(self) -> Array1D:
