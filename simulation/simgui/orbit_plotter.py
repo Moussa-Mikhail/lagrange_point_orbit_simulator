@@ -315,27 +315,32 @@ class Plotter:
             total_energy,
         ) = self.sim.conservation_calculations()
 
-        init_planet_momentum = norm(self.sim.planet_mass * self.sim.planet_vel[0])
+        init_planet_momentum = float(
+            norm(self.sim.planet_mass * self.sim.planet_vel[0])
+        )
 
         # slice the arrays so that we only plot at most 10**5 points.
         arr_step = self.array_step()
 
         times_in_years = self.sim.time_points_in_years()[::arr_step]
 
-        self.plot_linear_momentum(
-            total_momentum, init_planet_momentum, times_in_years, arr_step  # type: ignore
-        )
+        total_momentum = total_momentum[::arr_step]
 
-        self.plot_angular_momentum(total_angular_momentum, times_in_years, arr_step)
+        self.plot_linear_momentum(total_momentum, init_planet_momentum, times_in_years)
 
-        self.plot_energy(total_energy, times_in_years, arr_step)
+        total_angular_momentum = total_angular_momentum[::arr_step]
+
+        self.plot_angular_momentum(total_angular_momentum, times_in_years)
+
+        total_energy = total_energy[::arr_step]
+
+        self.plot_energy(total_energy, times_in_years)
 
     def plot_linear_momentum(
         self,
         total_momentum: Array2D,
         init_planet_momentum: float,
         times_in_years: Array1D,
-        arr_step: int,
     ):
         """Plots the relative change in the linear momentum"""
 
@@ -346,27 +351,27 @@ class Plotter:
         # the star's and planet's individual linear momenta
         linear_momentum_plot.plot(
             times_in_years,
-            total_momentum[::arr_step, 0] / init_planet_momentum,
+            total_momentum[0] / init_planet_momentum,
             pen="r",
             name="x",
         )
 
         linear_momentum_plot.plot(
             times_in_years,
-            total_momentum[::arr_step, 1] / init_planet_momentum,
+            total_momentum[1] / init_planet_momentum,
             pen="g",
             name="y",
         )
 
         linear_momentum_plot.plot(
             times_in_years,
-            total_momentum[::arr_step, 2] / init_planet_momentum,
+            total_momentum[2] / init_planet_momentum,
             pen="b",
             name="z",
         )
 
     def plot_angular_momentum(
-        self, total_angular_momentum: Array2D, times_in_years: Array1D, arr_step
+        self, total_angular_momentum: Array2D, times_in_years: Array1D
     ):
         """Plots the relative change in the angular momentum.
         Doesn't plot the x and y components of the angular momentum, because they are always 0"""
@@ -376,33 +381,31 @@ class Plotter:
         # x and y components of angular momentum are 0
         # angular_momentum_plot.plot(
         #   times_in_years,
-        #   total_angular_momentum[::arr_step, 0]/total_angular_momentum[0, 0]-1,
+        #   total_angular_momentum[0]/total_angular_momentum[0, 0]-1,
         #   pen='r',
         #   name='x'
         # )
 
         # angular_momentum_plot.plot(
         #   times_in_years,
-        #   total_angular_momentum[::arr_step, 1]/total_angular_momentum[0, 1]-1,
+        #   total_angular_momentum[1]/total_angular_momentum[0, 1]-1,
         #   pen='g',
         #   name='y'
         # )
 
         angular_momentum_plot.plot(
             times_in_years,
-            total_angular_momentum[::arr_step, 2] / total_angular_momentum[0, 2] - 1,
+            total_angular_momentum[2] / total_angular_momentum[0, 2] - 1,
             pen="b",
             name="z",
         )
 
-    def plot_energy(
-        self, total_energy: Array1D, times_in_years: Array1D, arr_step: int
-    ):
+    def plot_energy(self, total_energy: Array1D, times_in_years: Array1D):
         """Plots the relative change in the energy"""
 
         energy_plot = self.initialize_conserved_plot("Energy")
 
-        energy_plot.plot(times_in_years, total_energy[::arr_step] / total_energy[0] - 1)
+        energy_plot.plot(times_in_years, total_energy / total_energy[0] - 1)
 
     @staticmethod
     def initialize_conserved_plot(quantity_name: str):
