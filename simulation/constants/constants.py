@@ -24,6 +24,8 @@ CONSTANT_NAMES = {
     "EARTH_MASS",
 }
 
+allowed_chars = set("0123456789.+-*/()[]{}")
+
 
 def safe_eval(expr: str) -> int | float:
     """safe eval function used on expressions that contain the above constants.
@@ -31,30 +33,53 @@ def safe_eval(expr: str) -> int | float:
     the above constants, digits, operators, parens, or scientific notation.
     """
 
-    expr = expr.upper()
+    expr_translated = translate_input(expr)
 
-    exprNoConstants = expr
+    expr_no_constants = remove_constants(expr_translated)
 
-    for constant in CONSTANT_NAMES:
+    chars_in_expr = set(expr_no_constants)
 
-        exprNoConstants = exprNoConstants.replace(constant, "")
+    if not chars_in_expr.issubset(allowed_chars):
 
-    chars = set(exprNoConstants)
+        not_allowed = chars_in_expr.difference(allowed_chars)
 
-    if not chars.issubset("0123456789.+-*/()[]{}e"):
-
-        raise ValueError(f"{expr} is an invalid expression")
+        raise ValueError(f"{not_allowed} are not allowed.")
 
     try:
 
-        res = eval(expr)  # pylint: disable=eval-used
+        res = eval(expr_translated)  # pylint: disable=eval-used
 
-    except NameError as e:
+    except (NameError, SyntaxError, ZeroDivisionError) as e:
 
-        raise ValueError(f"{expr} is an invalid expression") from e
+        raise ValueError(str(e)) from e
 
     if not isinstance(res, (int, float)):
 
-        raise ValueError(f"{expr} is an invalid expression")
+        raise ValueError("Result is not a number.")
 
     return res
+
+
+def translate_input(expr: str) -> str:
+    """Translates constant names in user input from lowercase to uppercase."""
+
+    expr_translated = expr
+
+    for constant in CONSTANT_NAMES:
+
+        expr_translated = expr_translated.replace(constant.lower(), constant)
+
+    return expr_translated
+
+
+def remove_constants(expr: str) -> str:
+
+    """Removes constants from an expression."""
+
+    expr_no_constants = expr
+
+    for constant in CONSTANT_NAMES:
+
+        expr_no_constants = expr_no_constants.replace(constant, "")
+
+    return expr_no_constants
