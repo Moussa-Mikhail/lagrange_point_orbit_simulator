@@ -9,7 +9,7 @@ import pyqtgraph as pg  # type: ignore
 from numpy.linalg import norm
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
 from simulation import Simulator
-from simulation.constants import AU, hours
+from simulation.constants import AU, HOURS
 from simulation.simulator.sim_types import Array1D, Array2D
 
 
@@ -53,7 +53,7 @@ class Plotter:
 
         i = 0
 
-        time_step_default = 1 * hours
+        time_step_default = 1 * HOURS
 
         # maximum rate of plot update is too slow
         # so instead step through arrays
