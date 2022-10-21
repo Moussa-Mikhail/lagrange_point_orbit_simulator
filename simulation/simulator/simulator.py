@@ -371,9 +371,7 @@ class Simulator:
             self.star_mass * star_pos_or_vel
             + self.planet_mass * planet_pos_or_vel
             + self.sat_mass * sat_pos_or_vel
-        ) / (
-            self.star_mass + self.planet_mass + self.sat_mass
-        )  # type: ignore
+        ) / (self.star_mass + self.planet_mass + self.sat_mass)
 
     def transform_to_corotating(self, pos_trans: Array2D) -> Array2D:
 
