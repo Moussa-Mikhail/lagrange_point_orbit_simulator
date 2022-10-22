@@ -54,7 +54,7 @@ class SimUi(QtWidgets.QMainWindow):
 
         self._addInputFields()
 
-        self._generalLayout.addWidget(self._plotter.orbit_plot)
+        self._generalLayout.addWidget(self._plotter.inertial_plot)
 
         self._generalLayout.addWidget(self._plotter.corotating_plot)
 
