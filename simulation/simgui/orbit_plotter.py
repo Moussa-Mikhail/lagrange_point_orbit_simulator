@@ -279,13 +279,13 @@ class Plotter:
 
         def update_corotating():
 
-            j = next(idx_gen)
+            i = next(idx_gen)
 
             anim_corotating_plot.clear()
 
             anim_corotating_plot.addPoints(
-                [star_pos_corotating[j, 0] / AU],
-                [star_pos_corotating[j, 1] / AU],
+                [star_pos_corotating[i, 0] / AU],
+                [star_pos_corotating[i, 1] / AU],
                 pen="y",
                 brush="y",
                 size=10,
@@ -293,8 +293,8 @@ class Plotter:
             )
 
             anim_corotating_plot.addPoints(
-                [planet_pos_corotating[j, 0] / AU],
-                [planet_pos_corotating[j, 1] / AU],
+                [planet_pos_corotating[i, 0] / AU],
+                [planet_pos_corotating[i, 1] / AU],
                 pen="b",
                 brush="b",
                 size=10,
@@ -302,8 +302,8 @@ class Plotter:
             )
 
             anim_corotating_plot.addPoints(
-                [sat_pos_corotating[j, 0] / AU],
-                [sat_pos_corotating[j, 1] / AU],
+                [sat_pos_corotating[i, 0] / AU],
+                [sat_pos_corotating[i, 1] / AU],
                 pen="g",
                 brush="g",
                 size=10,
