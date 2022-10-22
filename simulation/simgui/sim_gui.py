@@ -7,7 +7,7 @@ from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
 from simulation import Plotter, Simulator
-from simulation.constants import safe_eval as safeEval
+from .safe_eval import safe_eval as safeEval
 
 paramsT = dict[str, tuple[str, str]]
 
