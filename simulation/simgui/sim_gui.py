@@ -6,7 +6,7 @@ import pyqtgraph as pg  # type: ignore
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
-from simulation import Plotter, Simulator
+from .orbit_plotter import Plotter, Simulator
 from .safe_eval import safe_eval as safeEval
 
 paramsT = dict[str, tuple[str, str]]
