@@ -1,4 +1,4 @@
-# pylint: disable=no-name-in-module, invalid-name, missing-docstring, attribute-defined-outside-init
+# pylint: disable=no-name-in-module, invalid-name, missing-docstring
 import sys
 from typing import TypeVar
 
@@ -36,6 +36,12 @@ class SimUi(QtWidgets.QMainWindow):
     def __init__(self):
 
         super().__init__()
+
+        self._orbitPlot: pg.PlotWidget | None = None
+
+        self._corotatingPlot: pg.PlotWidget | None = None
+
+        self._timer: QTimer | None = None
 
         # time in milliseconds between plot updates
         self._period = 33
@@ -119,8 +125,6 @@ class SimUi(QtWidgets.QMainWindow):
         self._generalLayout.addWidget(orbitPlot)
 
         self._generalLayout.addWidget(corotatingPlot)
-
-        self._timer: QTimer | None = None
 
     def setPlots(
         self, orbitPlot: pg.PlotWidget, corotatingPlot: pg.PlotWidget, timer: QTimer

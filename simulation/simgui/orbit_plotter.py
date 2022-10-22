@@ -28,6 +28,8 @@ class Plotter:
 
     def plot_orbits(self):
 
+        self.timer = QTimer()
+
         inertial_plot, update_inertial = self.plot_inertial_orbits()
 
         self.timer.timeout.connect(update_inertial)
