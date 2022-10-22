@@ -132,13 +132,23 @@ class SimUi(QtWidgets.QMainWindow):
 
         currCorotatingPlot = self._corotatingPlot
 
-        self._generalLayout.replaceWidget(currOrbitPlot, orbitPlot)
-
-        self._generalLayout.replaceWidget(currCorotatingPlot, corotatingPlot)
-
         self._orbitPlot = orbitPlot
 
         self._corotatingPlot = corotatingPlot
+
+        oldOrbitPlot = self._generalLayout.replaceWidget(currOrbitPlot, orbitPlot)
+
+        oldCorotatingPlot = self._generalLayout.replaceWidget(
+            currCorotatingPlot, corotatingPlot
+        )
+
+        self._orbitPlot.show()
+
+        self._corotatingPlot.show()
+
+        oldOrbitPlot.widget().hide()
+
+        oldCorotatingPlot.widget().hide()
 
     def toggleAnimation(self):
 
