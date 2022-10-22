@@ -1,5 +1,5 @@
 # pylint: disable=unused-import
-from simulation.constants import SUN_MASS, EARTH_MASS, CONSTANTS  # noqa: F401
+from simulation.constants import CONSTANTS  # noqa: F401
 
 allowed_chars = set("0123456789.+-*/()[]{}")
 
@@ -26,7 +26,7 @@ def safe_eval(expr: str) -> int | float | None:
 
     try:
 
-        res = eval(translated_expr)  # pylint: disable=eval-used
+        res = eval(translated_expr, CONSTANTS)  # pylint: disable=eval-used
 
     except (NameError, SyntaxError, ZeroDivisionError) as err:
 
