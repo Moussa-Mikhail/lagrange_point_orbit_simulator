@@ -81,7 +81,7 @@ class Simulator:
     planet_mass: positive float. Mass of the planet in kilograms.
     The default is the mass of the Earth.
 
-    These constants and others maybe import from the constants module.
+    The constants "sun_mass", "earth_mass", and others maybe import from the constants module.
 
     planet_distance: positive float.
     Distance between the planet and the star in AU. The default is 1.0.

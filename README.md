@@ -16,11 +16,10 @@ The constructor takes the following parameters:
 
 #### Simulation Parameters
 
-num_years: float. Number of years to simulate. The default is 100.0.
+num_years: positive float. Time to simulate in years. The default is 100.0.
 
-num_steps: non-negative int. Number of steps to simulate. The default is 10**6.
-
-a ratio of 10**4 steps per year is recommended.
+time_step: float. Time inbetween simulation steps in hours. the default is 1.0.
+A negative value will cause the simulation to run backwards in time.
 
 #### Satellite Parameters
 
@@ -47,14 +46,15 @@ The default is 'L4' but 'L1', 'L2', 'L3', and 'L5' can also be used.
 
 star_mass: positive float. Mass of the star in kilograms. The default is the mass of the Sun.
 
-planet_mass: positive float. Mass of the planet in kilograms. The default is the mass of the Earth.
-The constants sun_mass and earth_mass may be imported from the file constants.py.
+planet_mass: positive float. Mass of the planet in kilograms.
+The default is the mass of the Earth.
 
-planet_distance: positive float. Distance between the planet and the star in AU. The default is 1.0.
+The constants "sun_mass", "earth_mass", and others maybe import from the constants module.
 
-This function will take ~0.42 seconds per 10**6 steps.
-The time may vary depending on your hardware.
-It will take longer than usual on the first call to simulate.
+planet_distance: positive float.
+Distance between the planet and the star in AU. The default is 1.0.
+
+The time to simulate will take longer than usual on the first call to the simulate method.
  ```
 
 This is the docstring of the Simulator class which can be seen at any time by using "help(Simulator)" in Python.
