@@ -1,6 +1,6 @@
 # About
 
-Python code used to simulate satellite orbits near Lagrange points. It is meant for the L4/L5 points but any of the 5 points can be used. The initial position and velocity of the satellite can be specified by the user. Additionally, the masses of the star and planet, and the distance between them can also be specified.
+Python code used to simulate satellite orbits near Lagrange points. It is meant for the L4/L5 points but any of the 5 points can be used. The initial position and velocity of the satellite can be specified by the user. Additionally, the masses of the star, planet, and the distance between them can also be specified.
 
 ## Installation of source code
 
