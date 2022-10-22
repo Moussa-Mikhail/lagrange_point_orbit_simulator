@@ -143,4 +143,3 @@ thesis notes.txt
 *.csv
 simulation/profile_simulation.py
 *Profile.prof
-start_gui.bat
