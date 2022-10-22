@@ -4,11 +4,15 @@ from simulation.constants import SUN_MASS, EARTH_MASS, CONSTANTS  # noqa: F401
 allowed_chars = set("0123456789.+-*/()[]{}")
 
 
-def safe_eval(expr: str) -> int | float:
+def safe_eval(expr: str) -> int | float | None:
     """safe eval function used on expressions that contain the above constants.
     Raises a ValueError if the expression contains anything other than
     the above constants, digits, operators, parens, or scientific notation.
     """
+
+    if not expr:
+
+        return None
 
     translated_expr = translate(expr)
 

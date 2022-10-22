@@ -19,9 +19,9 @@ simParams: paramsT = {
 
 satParams: paramsT = {
     "perturbation size": ("0.0", "perturbation_size"),
-    "perturbation angle": ("60.0", "perturbation_angle"),
+    "perturbation angle": ("", "perturbation_angle"),
     "initial speed": ("1.0", "speed"),
-    "initial velocity angle": ("150.0", "vel_angle"),
+    "initial velocity angle": ("", "vel_angle"),
     "Lagrange label": ("L4", "lagrange_label"),
 }
 
@@ -242,9 +242,9 @@ class SimCtrl:
 
         self._view.setPlots(orbitPlot, corotatingPlot, timer)
 
-    def _getSimulationInputs(self) -> dict[str, str | float]:
+    def _getSimulationInputs(self) -> dict[str, str | float | None]:
 
-        inputs: dict[str, str | float] = {}
+        inputs: dict[str, str | float | None] = {}
 
         for fieldText, field in self._view.inputFields.items():
 
@@ -267,6 +267,12 @@ class SimCtrl:
                 raise ValueError(
                     f"Invalid expression in field '{fieldText}'.\n{e}"
                 ) from e
+
+            if value is None:
+
+                inputs[fieldText] = value
+
+                continue
 
             inputs[fieldText] = float(value)
 
