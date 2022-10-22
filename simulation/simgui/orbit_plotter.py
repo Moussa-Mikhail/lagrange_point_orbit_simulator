@@ -25,9 +25,13 @@ class Plotter:
             title="Orbits in Inertial Coordinate System"
         )
 
+        self.inertial_plot.setAspectLocked(True)
+
         self.corotating_plot = Plotter.make_plot(
             title="Orbits in Co-Rotating Coordinate System"
         )
+
+        self.corotating_plot.setAspectLocked(True)
 
         self.timer = QTimer()
 
@@ -111,7 +115,9 @@ class Plotter:
         planet_pos: Array2D,
         sat_pos: Array2D,
     ):
-        """Plotting logic common to both inertial and corotating plots"""
+        """Plotting logic common to both inertial and corotating plots.
+        Returns a function which is called by the timer to animate the plot.
+        """
 
         plot.clear()
 
@@ -206,21 +212,9 @@ class Plotter:
 
     def plot_inertial_orbits(self) -> AnimatePlotFuncT:
 
-        animate_inertial = self.plot_orbit(
+        return self.plot_orbit(
             self.inertial_plot, self.sim.star_pos, self.sim.planet_pos, self.sim.sat_pos
         )
-
-        self.inertial_plot.setXRange(
-            -1.2 * self.sim.planet_distance, 1.2 * self.sim.planet_distance
-        )
-
-        self.inertial_plot.setYRange(
-            -1.2 * self.sim.planet_distance, 1.2 * self.sim.planet_distance
-        )
-
-        self.inertial_plot.setAspectLocked(True)
-
-        return animate_inertial
 
     def plot_corotating_orbits(self) -> AnimatePlotFuncT:
         """Plots the orbits of the system simulated in the corotating frame"""
@@ -231,16 +225,12 @@ class Plotter:
 
         sat_pos_corotating = self.sim.transform_to_corotating(self.sim.sat_pos)
 
-        animate_corotating = self.plot_orbit(
+        return self.plot_orbit(
             self.corotating_plot,
             star_pos_corotating,
             planet_pos_corotating,
             sat_pos_corotating,
         )
-
-        self.corotating_plot.setAspectLocked(True)
-
-        return animate_corotating
 
     def plot_conserved_quantities(self):
         """Plots the relative change in the conserved quantities:
