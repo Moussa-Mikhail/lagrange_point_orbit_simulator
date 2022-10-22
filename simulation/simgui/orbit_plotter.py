@@ -21,7 +21,7 @@ class Plotter:
     def __init__(self, sim: Simulator):
         self.sim = sim
 
-        self.orbit_plot = Plotter.make_plot(
+        self.inertial_plot = Plotter.make_plot(
             title="Orbits in Inertial Coordinate System"
         )
 
@@ -56,15 +56,15 @@ class Plotter:
 
     def plot_orbits(self):
 
-        update_inertial = self.plot_inertial_orbits()
+        animate_inertial = self.plot_inertial_orbits()
 
-        update_corotating = self.plot_corotating_orbits()
+        animate_corotating = self.plot_corotating_orbits()
 
         self.timer = QTimer()
 
-        self.timer.timeout.connect(update_inertial)
+        self.timer.timeout.connect(animate_inertial)
 
-        self.timer.timeout.connect(update_corotating)
+        self.timer.timeout.connect(animate_corotating)
 
     def idx_gen(self):
         """This function is used to update the index of the plots"""
@@ -85,6 +85,7 @@ class Plotter:
             i = i + rate
 
             if i >= self.sim.num_steps:
+
                 i = 0
 
             yield i
@@ -98,87 +99,85 @@ class Plotter:
         points_plotted_step = int((self.sim.num_steps + 1) / num_points_to_plot)
 
         if points_plotted_step == 0:
+
             points_plotted_step = 1
 
         return points_plotted_step
 
-    def plot_inertial_orbits(self) -> AnimatePlotFuncT:
+    def plot_orbit(
+        self,
+        plot: pg.PlotWidget,
+        star_pos: Array2D,
+        planet_pos: Array2D,
+        sat_pos: Array2D,
+    ):
+        """Plotting logic common to both inertial and corotating plots"""
 
-        self.orbit_plot.clear()
+        plot.clear()
 
-        self.orbit_plot.addLegend()
-
-        self.orbit_plot.setXRange(
-            -1.2 * self.sim.planet_distance, 1.2 * self.sim.planet_distance
-        )
-        self.orbit_plot.setYRange(
-            -1.2 * self.sim.planet_distance, 1.2 * self.sim.planet_distance
-        )
-        self.orbit_plot.setAspectLocked(True)
+        plot.addLegend()
 
         arr_step = self.array_step()
 
-        # Sun has an orbit on the scale of micro-AU under normal Earth-Sun conditions
-        # Zoom in to see it
-        self.orbit_plot.plot(
-            self.sim.star_pos[::arr_step, :2] / AU,
+        plot.plot(
+            star_pos[::arr_step, :2] / AU,
             pen="y",
             name="Star",
         )
 
-        self.orbit_plot.plot(
-            self.sim.planet_pos[::arr_step, :2] / AU,
+        plot.plot(
+            planet_pos[::arr_step, :2] / AU,
             pen="b",
             name="Planet",
         )
 
-        self.orbit_plot.plot(
-            self.sim.sat_pos[::arr_step, :2] / AU,
+        plot.plot(
+            sat_pos[::arr_step, :2] / AU,
             pen="g",
             name="Satellite",
         )
 
         anim_plot = pg.ScatterPlotItem()
 
+        plot.addItem(anim_plot)
+
         # The purpose of this is to add the bodies to the plot legend
         # and plot their initial positions
         anim_plot.addPoints(
-            [self.sim.star_pos[0, 0] / AU],
-            [self.sim.star_pos[0, 1] / AU],
+            [star_pos[0, 0] / AU],
+            [star_pos[0, 1] / AU],
             pen="y",
             brush="y",
             size=10,
         )
 
         anim_plot.addPoints(
-            [self.sim.planet_pos[0, 0] / AU],
-            [self.sim.planet_pos[0, 1] / AU],
+            [planet_pos[0, 0] / AU],
+            [planet_pos[0, 1] / AU],
             pen="b",
             brush="b",
             size=10,
         )
 
         anim_plot.addPoints(
-            [self.sim.sat_pos[0, 0] / AU],
-            [self.sim.sat_pos[0, 1] / AU],
+            [sat_pos[0, 0] / AU],
+            [sat_pos[0, 1] / AU],
             pen="g",
             brush="g",
             size=10,
         )
 
-        self.orbit_plot.addItem(anim_plot)
-
         idx_gen = self.idx_gen()
 
-        def update_plot():
+        def animate_plot():
 
             i = next(idx_gen)
 
             anim_plot.clear()
 
             anim_plot.addPoints(
-                [self.sim.star_pos[i, 0] / AU],
-                [self.sim.star_pos[i, 1] / AU],
+                [star_pos[i, 0] / AU],
+                [star_pos[i, 1] / AU],
                 pen="y",
                 brush="y",
                 size=10,
@@ -186,8 +185,8 @@ class Plotter:
             )
 
             anim_plot.addPoints(
-                [self.sim.planet_pos[i, 0] / AU],
-                [self.sim.planet_pos[i, 1] / AU],
+                [planet_pos[i, 0] / AU],
+                [planet_pos[i, 1] / AU],
                 pen="b",
                 brush="b",
                 size=10,
@@ -195,20 +194,34 @@ class Plotter:
             )
 
             anim_plot.addPoints(
-                [self.sim.sat_pos[i, 0] / AU],
-                [self.sim.sat_pos[i, 1] / AU],
+                [sat_pos[i, 0] / AU],
+                [sat_pos[i, 1] / AU],
                 pen="g",
                 brush="g",
                 size=10,
                 name="Satellite",
             )
 
-        return update_plot
+        return animate_plot
+
+    def plot_inertial_orbits(self) -> AnimatePlotFuncT:
+
+        animate_inertial = self.plot_orbit(
+            self.inertial_plot, self.sim.star_pos, self.sim.planet_pos, self.sim.sat_pos
+        )
+
+        self.inertial_plot.setXRange(
+            -1.2 * self.sim.planet_distance, 1.2 * self.sim.planet_distance
+        )
+        self.inertial_plot.setYRange(
+            -1.2 * self.sim.planet_distance, 1.2 * self.sim.planet_distance
+        )
+        self.inertial_plot.setAspectLocked(True)
+
+        return animate_inertial
 
     def plot_corotating_orbits(self) -> AnimatePlotFuncT:
         """Plots the orbits of the system simulated in the corotating frame"""
-
-        self.corotating_plot.clear()
 
         star_pos_corotating = self.sim.transform_to_corotating(self.sim.star_pos)
 
@@ -216,110 +229,32 @@ class Plotter:
 
         sat_pos_corotating = self.sim.transform_to_corotating(self.sim.sat_pos)
 
-        self.corotating_plot.addLegend()
+        animate_corotating = self.plot_orbit(
+            self.corotating_plot,
+            star_pos_corotating,
+            planet_pos_corotating,
+            sat_pos_corotating,
+        )
 
         min_x = star_pos_corotating[0, 0] / AU - 0.2 * self.sim.planet_distance
 
         max_x = planet_pos_corotating[0, 0] / AU + 0.2 * self.sim.planet_distance
 
-        min_y = -0.5 * self.sim.planet_distance
+        min_y = star_pos_corotating[0, 1] / AU
 
-        max_y = self.sim.lagrange_point_trans[1] / AU + 0.5 * self.sim.planet_distance
+        max_y = sat_pos_corotating[0, 1] / AU
+
+        min_y, max_y = sorted((min_y, max_y))
+
+        min_y -= 0.2 * self.sim.planet_distance
+
+        max_y += 0.2 * self.sim.planet_distance
 
         self.corotating_plot.setXRange(min_x, max_x)
         self.corotating_plot.setYRange(min_y, max_y)
         self.corotating_plot.setAspectLocked(True)
 
-        anim_corotating_plot = pg.ScatterPlotItem()
-
-        self.corotating_plot.addItem(anim_corotating_plot)
-
-        arr_step = self.array_step()
-
-        self.corotating_plot.plot(
-            sat_pos_corotating[::arr_step, 0] / AU,
-            sat_pos_corotating[::arr_step, 1] / AU,
-            pen="g",
-        )
-
-        # The purpose of this is to add the bodies to the plot legend
-        # and plot their initial positions
-        self.corotating_plot.plot(
-            [star_pos_corotating[0, 0] / AU],
-            [star_pos_corotating[0, 1] / AU],
-            name="Star",
-            pen="k",
-            symbol="o",
-            symbolPen="y",
-            symbolBrush="y",
-        )
-
-        self.corotating_plot.plot(
-            [planet_pos_corotating[0, 0] / AU],
-            [planet_pos_corotating[0, 1] / AU],
-            name="Planet",
-            pen="k",
-            symbol="o",
-            symbolPen="b",
-            symbolBrush="b",
-        )
-
-        self.corotating_plot.plot(
-            [sat_pos_corotating[0, 0] / AU],
-            [sat_pos_corotating[0, 1] / AU],
-            name="Satellite",
-            pen="k",
-            symbol="o",
-            symbolPen="g",
-            symbolBrush="g",
-        )
-
-        self.corotating_plot.plot(
-            [self.sim.lagrange_point_trans[0] / AU],
-            [self.sim.lagrange_point_trans[1] / AU],
-            name="Lagrange Point",
-            pen="k",
-            symbol="o",
-            symbolPen="w",
-            symbolBrush="w",
-        )
-
-        idx_gen = self.idx_gen()
-
-        def update_corotating():
-
-            i = next(idx_gen)
-
-            anim_corotating_plot.clear()
-
-            anim_corotating_plot.addPoints(
-                [star_pos_corotating[i, 0] / AU],
-                [star_pos_corotating[i, 1] / AU],
-                pen="y",
-                brush="y",
-                size=10,
-                name="Star",
-            )
-
-            anim_corotating_plot.addPoints(
-                [planet_pos_corotating[i, 0] / AU],
-                [planet_pos_corotating[i, 1] / AU],
-                pen="b",
-                brush="b",
-                size=10,
-                name="Planet",
-            )
-
-            anim_corotating_plot.addPoints(
-                [sat_pos_corotating[i, 0] / AU],
-                [sat_pos_corotating[i, 1] / AU],
-                pen="g",
-                brush="g",
-                size=10,
-                name="Satellite",
-            )
-
-        return update_corotating
+        return animate_corotating
 
     def plot_conserved_quantities(self):
         """Plots the relative change in the conserved quantities:
