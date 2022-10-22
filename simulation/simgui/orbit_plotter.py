@@ -21,6 +21,11 @@ class Plotter:
 
         self.timer = QTimer()
 
+    @staticmethod
+    def make_plot(title: str = "") -> pg.PlotWidget:
+
+        return pg.PlotWidget(title=title)
+
     def plot_orbits(self):
 
         inertial_plot, update_inertial = self.plot_inertial_orbits()
@@ -86,7 +91,7 @@ class Plotter:
 
     def plot_inertial_orbits(self):
 
-        orbit_plot = pg.plot(title="Orbits of Masses")
+        orbit_plot = Plotter.make_plot(title="Orbits of Masses")
         orbit_plot.setLabel("bottom", "x", units="AU")
         orbit_plot.setLabel("left", "y", units="AU")
         orbit_plot.addLegend()
@@ -197,7 +202,9 @@ class Plotter:
         """Plots the orbits of the system simulated in the corotating frame"""
 
         # Animated plot of satellites orbit in co-rotating frame.
-        corotating_plot = pg.plot(title="Orbits in Co-Rotating Coordinate System")
+        corotating_plot = Plotter.make_plot(
+            title="Orbits in Co-Rotating Coordinate System"
+        )
         corotating_plot.setLabel("bottom", "x", units="AU")
         corotating_plot.setLabel("left", "y", units="AU")
         corotating_plot.addLegend()
@@ -412,7 +419,7 @@ class Plotter:
     def initialize_conserved_plot(quantity_name: str):
         """Initializes the plot axes and title for the conserved quantities plots"""
 
-        plot = pg.plot(title=f"Relative Change in {quantity_name} vs Time")
+        plot = Plotter.make_plot(title=f"Relative Change in {quantity_name} vs Time")
 
         plot.setLabel("bottom", "Time", units="years")
 

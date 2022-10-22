@@ -140,10 +140,6 @@ class SimUi(QtWidgets.QMainWindow):
 
         self._corotatingPlot = corotatingPlot
 
-        currOrbitPlot.hide()
-
-        currCorotatingPlot.hide()
-
     def toggleAnimation(self):
 
         if self._timer is None:
