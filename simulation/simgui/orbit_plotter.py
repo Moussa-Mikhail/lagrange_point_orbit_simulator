@@ -12,6 +12,8 @@ from simulation import Simulator
 from simulation.constants import AU, HOURS
 from simulation.simulator.sim_types import Array1D, Array2D
 
+AnimatePlotFuncT = Callable[[], None]
+
 
 class Plotter:
     """Plots the arrays produced by a Simulator"""
@@ -19,41 +21,50 @@ class Plotter:
     def __init__(self, sim: Simulator):
         self.sim = sim
 
+        self.orbit_plot = Plotter.make_plot(
+            title="Orbits in Inertial Coordinate System"
+        )
+
+        self.corotating_plot = Plotter.make_plot(
+            title="Orbits in Co-Rotating Coordinate System"
+        )
+
         self.timer = QTimer()
+
+        self.period_of_animation = 33
+
+    def toggle_animation(self):
+
+        if self.timer.isActive():
+
+            self.timer.stop()
+
+        else:
+
+            self.timer.start(self.period_of_animation)
 
     @staticmethod
     def make_plot(title: str = "") -> pg.PlotWidget:
 
-        return pg.PlotWidget(title=title)
+        plot = pg.PlotWidget(title=title)
+
+        plot.setLabel("bottom", "x", units="AU")
+
+        plot.setLabel("left", "y", units="AU")
+
+        return plot
 
     def plot_orbits(self):
 
-        self.timer = QTimer()
+        update_inertial = self.plot_inertial_orbits()
 
-        inertial_plot, update_inertial = self.plot_inertial_orbits()
+        update_corotating = self.plot_corotating_orbits()
+
+        self.timer = QTimer()
 
         self.timer.timeout.connect(update_inertial)
 
-        star_pos_corotating = self.sim.transform_to_corotating(self.sim.star_pos)
-
-        planet_pos_corotating = self.sim.transform_to_corotating(self.sim.planet_pos)
-
-        sat_pos_corotating = self.sim.transform_to_corotating(self.sim.sat_pos)
-
-        corotating_plot, update_corotating = self.plot_corotating_orbits(
-            star_pos_corotating,
-            planet_pos_corotating,
-            sat_pos_corotating,
-        )
-
-        self.timer.timeout.connect(update_corotating)  # type: ignore # pylint: disable=no-member
-
-        # time in milliseconds between plot updates
-        period = 33
-
-        self.timer.start(period)
-
-        return inertial_plot, corotating_plot, self.timer
+        self.timer.timeout.connect(update_corotating)
 
     def idx_gen(self):
         """This function is used to update the index of the plots"""
@@ -91,38 +102,37 @@ class Plotter:
 
         return points_plotted_step
 
-    def plot_inertial_orbits(self):
+    def plot_inertial_orbits(self) -> AnimatePlotFuncT:
 
-        orbit_plot = Plotter.make_plot(title="Orbits of Masses")
-        orbit_plot.setLabel("bottom", "x", units="AU")
-        orbit_plot.setLabel("left", "y", units="AU")
-        orbit_plot.addLegend()
+        self.orbit_plot.clear()
 
-        orbit_plot.setXRange(
+        self.orbit_plot.addLegend()
+
+        self.orbit_plot.setXRange(
             -1.2 * self.sim.planet_distance, 1.2 * self.sim.planet_distance
         )
-        orbit_plot.setYRange(
+        self.orbit_plot.setYRange(
             -1.2 * self.sim.planet_distance, 1.2 * self.sim.planet_distance
         )
-        orbit_plot.setAspectLocked(True)
+        self.orbit_plot.setAspectLocked(True)
 
         arr_step = self.array_step()
 
         # Sun has an orbit on the scale of micro-AU under normal Earth-Sun conditions
         # Zoom in to see it
-        orbit_plot.plot(
+        self.orbit_plot.plot(
             self.sim.star_pos[::arr_step, :2] / AU,
             pen="y",
             name="Star",
         )
 
-        orbit_plot.plot(
+        self.orbit_plot.plot(
             self.sim.planet_pos[::arr_step, :2] / AU,
             pen="b",
             name="Planet",
         )
 
-        orbit_plot.plot(
+        self.orbit_plot.plot(
             self.sim.sat_pos[::arr_step, :2] / AU,
             pen="g",
             name="Satellite",
@@ -156,7 +166,7 @@ class Plotter:
             size=10,
         )
 
-        orbit_plot.addItem(anim_plot)
+        self.orbit_plot.addItem(anim_plot)
 
         idx_gen = self.idx_gen()
 
@@ -193,23 +203,20 @@ class Plotter:
                 name="Satellite",
             )
 
-        return orbit_plot, update_plot
+        return update_plot
 
-    def plot_corotating_orbits(
-        self,
-        star_pos_corotating: Array2D,
-        planet_pos_corotating: Array2D,
-        sat_pos_corotating: Array2D,
-    ) -> tuple[pg.PlotWidget, Callable[[], None]]:
+    def plot_corotating_orbits(self) -> AnimatePlotFuncT:
         """Plots the orbits of the system simulated in the corotating frame"""
 
-        # Animated plot of satellites orbit in co-rotating frame.
-        corotating_plot = Plotter.make_plot(
-            title="Orbits in Co-Rotating Coordinate System"
-        )
-        corotating_plot.setLabel("bottom", "x", units="AU")
-        corotating_plot.setLabel("left", "y", units="AU")
-        corotating_plot.addLegend()
+        self.corotating_plot.clear()
+
+        star_pos_corotating = self.sim.transform_to_corotating(self.sim.star_pos)
+
+        planet_pos_corotating = self.sim.transform_to_corotating(self.sim.planet_pos)
+
+        sat_pos_corotating = self.sim.transform_to_corotating(self.sim.sat_pos)
+
+        self.corotating_plot.addLegend()
 
         min_x = star_pos_corotating[0, 0] / AU - 0.2 * self.sim.planet_distance
 
@@ -219,17 +226,17 @@ class Plotter:
 
         max_y = self.sim.lagrange_point_trans[1] / AU + 0.5 * self.sim.planet_distance
 
-        corotating_plot.setXRange(min_x, max_x)
-        corotating_plot.setYRange(min_y, max_y)
-        corotating_plot.setAspectLocked(True)
+        self.corotating_plot.setXRange(min_x, max_x)
+        self.corotating_plot.setYRange(min_y, max_y)
+        self.corotating_plot.setAspectLocked(True)
 
         anim_corotating_plot = pg.ScatterPlotItem()
 
-        corotating_plot.addItem(anim_corotating_plot)
+        self.corotating_plot.addItem(anim_corotating_plot)
 
         arr_step = self.array_step()
 
-        corotating_plot.plot(
+        self.corotating_plot.plot(
             sat_pos_corotating[::arr_step, 0] / AU,
             sat_pos_corotating[::arr_step, 1] / AU,
             pen="g",
@@ -237,7 +244,7 @@ class Plotter:
 
         # The purpose of this is to add the bodies to the plot legend
         # and plot their initial positions
-        corotating_plot.plot(
+        self.corotating_plot.plot(
             [star_pos_corotating[0, 0] / AU],
             [star_pos_corotating[0, 1] / AU],
             name="Star",
@@ -247,7 +254,7 @@ class Plotter:
             symbolBrush="y",
         )
 
-        corotating_plot.plot(
+        self.corotating_plot.plot(
             [planet_pos_corotating[0, 0] / AU],
             [planet_pos_corotating[0, 1] / AU],
             name="Planet",
@@ -257,7 +264,7 @@ class Plotter:
             symbolBrush="b",
         )
 
-        corotating_plot.plot(
+        self.corotating_plot.plot(
             [sat_pos_corotating[0, 0] / AU],
             [sat_pos_corotating[0, 1] / AU],
             name="Satellite",
@@ -267,7 +274,7 @@ class Plotter:
             symbolBrush="g",
         )
 
-        corotating_plot.plot(
+        self.corotating_plot.plot(
             [self.sim.lagrange_point_trans[0] / AU],
             [self.sim.lagrange_point_trans[1] / AU],
             name="Lagrange Point",
@@ -312,7 +319,7 @@ class Plotter:
                 name="Satellite",
             )
 
-        return corotating_plot, update_corotating
+        return update_corotating
 
     def plot_conserved_quantities(self):
         """Plots the relative change in the conserved quantities:

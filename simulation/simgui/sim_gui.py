@@ -2,9 +2,8 @@
 import sys
 from typing import TypeVar
 
-import pyqtgraph as pg  # type: ignore
 from PyQt6 import QtWidgets
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from simulation.simgui.orbit_plotter import Plotter, Simulator
 from simulation.simgui.safe_eval import safe_eval as safeEval
@@ -33,18 +32,13 @@ sysParams: paramsT = {
 
 
 class SimUi(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, plotter: Plotter):
 
         super().__init__()
 
-        self._orbitPlot: pg.PlotWidget | None = None
+        self._plotter = plotter
 
-        self._corotatingPlot: pg.PlotWidget | None = None
-
-        self._timer: QTimer | None = None
-
-        # time in milliseconds between plot updates
-        self._period = 33
+        self._plotted = False
 
         self.setWindowTitle("Simulation of Orbits near Lagrange Points")
 
@@ -60,7 +54,9 @@ class SimUi(QtWidgets.QMainWindow):
 
         self._addInputFields()
 
-        self._initializePlots()
+        self._generalLayout.addWidget(self._plotter.orbit_plot)
+
+        self._generalLayout.addWidget(self._plotter.corotating_plot)
 
     def _addInputFields(self):
 
@@ -108,67 +104,21 @@ class SimUi(QtWidgets.QMainWindow):
 
             self._inputsLayout.addRow(fieldText, fieldLine)
 
-    def _initializePlots(self):
+    def updatePlots(self):
 
-        orbitPlot = pg.plot(title="Orbits of Masses")
-        orbitPlot.setLabel("bottom", "x", units="AU")
-        orbitPlot.setLabel("left", "y", units="AU")
+        self._plotted = True
 
-        corotatingPlot = pg.plot(title="Orbits in Co-Rotating Coordinate System")
-        corotatingPlot.setLabel("bottom", "x", units="AU")
-        corotatingPlot.setLabel("left", "y", units="AU")
-
-        self._orbitPlot = orbitPlot
-
-        self._corotatingPlot = corotatingPlot
-
-        self._generalLayout.addWidget(orbitPlot)
-
-        self._generalLayout.addWidget(corotatingPlot)
-
-    def setPlots(
-        self, orbitPlot: pg.PlotWidget, corotatingPlot: pg.PlotWidget, timer: QTimer
-    ):
-
-        self._timer = timer
-
-        currOrbitPlot = self._orbitPlot
-
-        currCorotatingPlot = self._corotatingPlot
-
-        self._orbitPlot = orbitPlot
-
-        self._corotatingPlot = corotatingPlot
-
-        oldOrbitPlot = self._generalLayout.replaceWidget(currOrbitPlot, orbitPlot)
-
-        oldCorotatingPlot = self._generalLayout.replaceWidget(
-            currCorotatingPlot, corotatingPlot
-        )
-
-        self._orbitPlot.show()
-
-        self._corotatingPlot.show()
-
-        oldOrbitPlot.widget().hide()
-
-        oldCorotatingPlot.widget().hide()
+        self._plotter.plot_orbits()
 
     def toggleAnimation(self):
 
-        if self._timer is None:
+        if not self._plotted:
 
-            errorMessage("No plot to animate")
+            errorMessage("No plots to animate.")
 
             return
 
-        if self._timer.isActive():
-
-            self._timer.stop()
-
-        else:
-
-            self._timer.start(self._period)
+        self._plotter.toggle_animation()
 
 
 allParams = simParams | satParams | sysParams
@@ -187,8 +137,6 @@ class SimCtrl:
     ):
 
         self._model = model
-
-        self._plotter = Plotter(self._model)
 
         self._view = view
 
@@ -236,9 +184,9 @@ class SimCtrl:
 
             msg = str(e)
 
-            for k, v in paramLabelsToAttribute.items():
+            for paramLabel, attr in paramLabelsToAttribute.items():
 
-                msg = msg.replace(v, k)
+                msg = msg.replace(attr, paramLabel)
 
             errorMessage(msg)
 
@@ -246,11 +194,7 @@ class SimCtrl:
 
         self._model.simulate()
 
-        orbitPlot, corotatingPlot, timer = self._plotter.plot_orbits()
-
-        timer.stop()
-
-        self._view.setPlots(orbitPlot, corotatingPlot, timer)
+        self._view.updatePlots()
 
     def _getSimulationInputs(self) -> dict[str, str | float | None]:
 
@@ -316,14 +260,18 @@ def main():
 
     simApp.setFont(QFont("Arial", 10))
 
-    view = SimUi()
+    sim = Simulator()
+
+    plotter = Plotter(sim)
+
+    view = SimUi(plotter)
 
     view.show()
 
     # pylint: disable=unused-variable
     # this assignment shouldn't be necessary, but it is
     # TODO: fix this bug
-    ctrl = SimCtrl(model=Simulator(), view=view)  # noqa: F841
+    ctrl = SimCtrl(model=sim, view=view)  # noqa: F841
 
     sys.exit(simApp.exec())
 
