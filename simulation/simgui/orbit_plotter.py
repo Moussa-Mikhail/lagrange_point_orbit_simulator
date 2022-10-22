@@ -213,9 +213,11 @@ class Plotter:
         self.inertial_plot.setXRange(
             -1.2 * self.sim.planet_distance, 1.2 * self.sim.planet_distance
         )
+
         self.inertial_plot.setYRange(
             -1.2 * self.sim.planet_distance, 1.2 * self.sim.planet_distance
         )
+
         self.inertial_plot.setAspectLocked(True)
 
         return animate_inertial
@@ -236,22 +238,6 @@ class Plotter:
             sat_pos_corotating,
         )
 
-        min_x = star_pos_corotating[0, 0] / AU - 0.2 * self.sim.planet_distance
-
-        max_x = planet_pos_corotating[0, 0] / AU + 0.2 * self.sim.planet_distance
-
-        min_y = star_pos_corotating[0, 1] / AU
-
-        max_y = sat_pos_corotating[0, 1] / AU
-
-        min_y, max_y = sorted((min_y, max_y))
-
-        min_y -= 0.2 * self.sim.planet_distance
-
-        max_y += 0.2 * self.sim.planet_distance
-
-        self.corotating_plot.setXRange(min_x, max_x)
-        self.corotating_plot.setYRange(min_y, max_y)
         self.corotating_plot.setAspectLocked(True)
 
         return animate_corotating
