@@ -10,7 +10,7 @@ from simulation.simgui.safe_eval import safe_eval as safeEval
 
 paramsT = dict[str, tuple[str, str]]
 
-# parameter name: (default, attribute name)
+# parameter name: (default value, attribute name)
 simParams: paramsT = {
     "number of years": ("10.0", "num_years"),
     "time step (hours)": ("1.0", "time_step"),
@@ -57,6 +57,8 @@ class SimUi(QtWidgets.QMainWindow):
         self._generalLayout.addWidget(self._plotter.inertial_plot)
 
         self._generalLayout.addWidget(self._plotter.corotating_plot)
+
+        self.resize(self._generalLayout.sizeHint())
 
     def _addInputFields(self):
 
