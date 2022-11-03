@@ -1,7 +1,7 @@
 # pylint: disable=unused-import
 from simulation.constants import CONSTANTS  # noqa: F401
 
-allowed_chars = set("0123456789.+-*/()[]{}")
+allowed_chars = set("0123456789.+-*/()")
 
 
 def safe_eval(expr: str) -> int | float | None:
