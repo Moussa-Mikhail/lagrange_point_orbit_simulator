@@ -14,8 +14,6 @@ def safe_eval(expr: str) -> int | float | None:
 
         return None
 
-    translated_expr = translate(expr)
-
     cleaned_expr = remove_constants(expr)
 
     chars_in_expr = set(cleaned_expr)
@@ -25,6 +23,8 @@ def safe_eval(expr: str) -> int | float | None:
         raise ValueError("invalid name or operator in expression.")
 
     try:
+
+        translated_expr = translate(expr)
 
         res = eval(translated_expr, CONSTANTS)  # pylint: disable=eval-used
 
