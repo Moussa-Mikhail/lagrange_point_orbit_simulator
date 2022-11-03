@@ -236,12 +236,20 @@ class Simulator:
     @property
     def actual_perturbation_angle(self) -> float:
 
-        return self.perturbation_angle or self.default_perturbation_angle()
+        if self.perturbation_angle is None:
+
+            return self.default_perturbation_angle()
+
+        return self.perturbation_angle
 
     @property
     def actual_vel_angle(self) -> float:
 
-        return self.vel_angle or self.default_perturbation_angle() + 90
+        if self.vel_angle is None:
+
+            return self.default_perturbation_angle() + 90.0
+
+        return self.vel_angle
 
     @property
     def orbital_period(self) -> float:
