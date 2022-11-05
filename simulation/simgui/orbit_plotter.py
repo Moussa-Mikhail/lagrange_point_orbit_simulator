@@ -8,17 +8,19 @@ from typing import Callable
 import pyqtgraph as pg  # type: ignore
 from numpy.linalg import norm
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
+
 from simulation import Simulator
-from simulation.constants import AU, HOURS
+from simulation.simulator.constants import AU, HOURS
 from simulation.simulator.sim_types import Array1D, Array2D
 
-AnimatePlotFuncT = Callable[[], None]
+AnimatePlotFunc = Callable[[], None]
 
 
 class Plotter:
     """Plots the arrays produced by a Simulator"""
 
     def __init__(self, sim: Simulator):
+
         self.sim = sim
 
         self.inertial_plot = Plotter.make_plot(
@@ -210,13 +212,13 @@ class Plotter:
 
         return animate_plot
 
-    def plot_inertial_orbits(self) -> AnimatePlotFuncT:
+    def plot_inertial_orbits(self) -> AnimatePlotFunc:
 
         return self.plot_orbit(
             self.inertial_plot, self.sim.star_pos, self.sim.planet_pos, self.sim.sat_pos
         )
 
-    def plot_corotating_orbits(self) -> AnimatePlotFuncT:
+    def plot_corotating_orbits(self) -> AnimatePlotFunc:
         """Plots the orbits of the system simulated in the corotating frame"""
 
         star_pos_corotating = self.sim.transform_to_corotating(self.sim.star_pos)
