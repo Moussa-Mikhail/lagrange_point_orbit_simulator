@@ -5,8 +5,10 @@ from typing import TypeVar
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
-from simulation.simgui.orbit_plotter import Plotter, Simulator
+
+from simulation.simgui.orbit_plotter import Plotter
 from simulation.simgui.safe_eval import safe_eval as safeEval
+from simulation.simulator import Simulator
 
 paramsT = dict[str, tuple[str, str]]
 
@@ -40,7 +42,7 @@ class SimUi(QtWidgets.QMainWindow):
 
         self._plotted = False
 
-        self.setWindowTitle("Simulation of Orbits near Lagrange Points")
+        self.setWindowTitle("Orbits near Lagrange Point")
 
         self._generalLayout = QtWidgets.QHBoxLayout()
 
