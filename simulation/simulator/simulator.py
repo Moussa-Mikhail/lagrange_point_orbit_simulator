@@ -12,9 +12,9 @@ import numpy as np
 
 # shortens function call
 from numpy.linalg import norm
-from simulation.constants import AU, G, EARTH_MASS, SUN_MASS, YEARS, HOURS
 
 from . import descriptors
+from .constants import AU, EARTH_MASS, HOURS, SUN_MASS, YEARS, G
 from .numba_funcs import integrate, transform_to_corotating
 from .sim_types import Array1D, Array2D
 

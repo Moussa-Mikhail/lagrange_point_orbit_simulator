@@ -1,6 +1,5 @@
-import pstats
-
 import cProfile
+import pstats
 
 from simulation import Simulator
 

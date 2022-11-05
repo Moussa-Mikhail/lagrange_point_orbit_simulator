@@ -1,12 +1,12 @@
 # pylint: disable=missing-docstring, not-an-iterable, invalid-name
 
 from math import sqrt
-import numpy as np
 
+import numpy as np
 from numba import njit, prange  # type: ignore
 
-from simulation.constants import G
-from .sim_types import Array2D, Array1D
+from .constants import G
+from .sim_types import Array1D, Array2D
 
 
 @njit()
