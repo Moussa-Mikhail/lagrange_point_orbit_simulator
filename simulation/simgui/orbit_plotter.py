@@ -116,14 +116,16 @@ class Plotter:
         star_pos: Array2D,
         planet_pos: Array2D,
         sat_pos: Array2D,
-    ):
+    ) -> AnimatePlotFunc:
         """Plotting logic common to both inertial and corotating plots.
         Returns a function which is called by the timer to animate the plot.
         """
 
         plot.clear()
 
-        plot.addLegend()
+        legend = plot.addLegend()
+
+        legend.clear()
 
         arr_step = self.array_step()
 
@@ -227,12 +229,38 @@ class Plotter:
 
         sat_pos_corotating = self.sim.transform_to_corotating(self.sim.sat_pos)
 
-        return self.plot_orbit(
+        animate_corotating_plot = self.plot_orbit(
             self.corotating_plot,
             star_pos_corotating,
             planet_pos_corotating,
             sat_pos_corotating,
         )
+
+        self.add_lagrange_point_to_corotating_plot()
+
+        return animate_corotating_plot
+
+    def add_lagrange_point_to_corotating_plot(self):
+
+        lagrange_point_plot = pg.ScatterPlotItem()
+
+        self.corotating_plot.addItem(lagrange_point_plot)
+
+        lagrange_point = self.sim.lagrange_point
+
+        lagrange_point_plot.addPoints(
+            pos=[lagrange_point[:2] / AU],
+            pen="w",
+            brush="w",
+            size=10,
+            name="Lagrange Point",
+        )
+
+        plot_data_item = pg.PlotDataItem(pen="w")
+
+        legend: pg.LegendItem = self.corotating_plot.addLegend()
+
+        legend.addItem(plot_data_item, self.sim.lagrange_label)
 
     def plot_conserved_quantities(self):
         """Plots the relative change in the conserved quantities:
