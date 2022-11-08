@@ -272,9 +272,6 @@ def main():
 
     view.show()
 
-    # pylint: disable=unused-variable
-    # this assignment shouldn't be necessary, but it is
-    # TODO: fix this bug
     ctrl = SimCtrl(model=sim, view=view)  # noqa: F841
 
     sys.exit(simApp.exec())
