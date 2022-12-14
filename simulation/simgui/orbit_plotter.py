@@ -19,6 +19,12 @@ AnimatePlotFunc = Callable[[], None]
 class Plotter:
     """Plots the arrays produced by a Simulator"""
 
+    component_to_plot_args: dict[str, tuple[int, str]] = {
+        "x": (0, "r"),
+        "y": (1, "g"),
+        "z": (2, "b"),
+    }
+
     def __init__(self, sim: Simulator):
 
         self.sim = sim
@@ -72,8 +78,8 @@ class Plotter:
 
         self.timer.timeout.connect(animate_corotating)
 
-    def idx_gen(self):
-        """This function is used to update the index of the plots"""
+    def plot_index_generator(self):
+        """This generator yields the index of the next point to plot."""
 
         i = 0
 
@@ -104,11 +110,7 @@ class Plotter:
         # i.e. if points_plotted_step = 10 then plot every 10th point
         points_plotted_step = int((self.sim.num_steps + 1) / num_points_to_plot)
 
-        if points_plotted_step == 0:
-
-            points_plotted_step = 1
-
-        return points_plotted_step
+        return 1 if points_plotted_step == 0 else points_plotted_step
 
     def plot_orbit(
         self,
@@ -151,33 +153,36 @@ class Plotter:
 
         plot.addItem(anim_plot)
 
+        star_args: dict[str, str | int] = {
+            "pen": "y",
+            "brush": "y",
+            "size": 10,
+            "name": "Star",
+        }
+
+        planet_args: dict[str, str | int] = {
+            "pen": "b",
+            "brush": "b",
+            "size": 10,
+            "name": "Planet",
+        }
+
+        sat_args: dict[str, str | int] = {
+            "pen": "g",
+            "brush": "g",
+            "size": 10,
+            "name": "Satellite",
+        }
+
         # The purpose of this is to add the bodies to the plot legend
         # and plot their initial positions
-        anim_plot.addPoints(
-            [star_pos[0, 0] / AU],
-            [star_pos[0, 1] / AU],
-            pen="y",
-            brush="y",
-            size=10,
-        )
+        Plotter.plot_point(anim_plot, star_pos[0], **star_args)
 
-        anim_plot.addPoints(
-            [planet_pos[0, 0] / AU],
-            [planet_pos[0, 1] / AU],
-            pen="b",
-            brush="b",
-            size=10,
-        )
+        Plotter.plot_point(anim_plot, planet_pos[0], **planet_args)
 
-        anim_plot.addPoints(
-            [sat_pos[0, 0] / AU],
-            [sat_pos[0, 1] / AU],
-            pen="g",
-            brush="g",
-            size=10,
-        )
+        Plotter.plot_point(anim_plot, sat_pos[0], **sat_args)
 
-        idx_gen = self.idx_gen()
+        idx_gen = self.plot_index_generator()
 
         def animate_plot():
 
@@ -185,34 +190,24 @@ class Plotter:
 
             anim_plot.clear()
 
-            anim_plot.addPoints(
-                [star_pos[i, 0] / AU],
-                [star_pos[i, 1] / AU],
-                pen="y",
-                brush="y",
-                size=10,
-                name="Star",
-            )
+            Plotter.plot_point(anim_plot, star_pos[i], **star_args)
 
-            anim_plot.addPoints(
-                [planet_pos[i, 0] / AU],
-                [planet_pos[i, 1] / AU],
-                pen="b",
-                brush="b",
-                size=10,
-                name="Planet",
-            )
+            Plotter.plot_point(anim_plot, planet_pos[i], **planet_args)
 
-            anim_plot.addPoints(
-                [sat_pos[i, 0] / AU],
-                [sat_pos[i, 1] / AU],
-                pen="g",
-                brush="g",
-                size=10,
-                name="Satellite",
-            )
+            Plotter.plot_point(anim_plot, sat_pos[i], **sat_args)
 
         return animate_plot
+
+    @staticmethod
+    def plot_point(scatter_plot: pg.ScatterPlotItem, pos: Array1D, **kwargs):
+        """Plots pos on scatter_plot.
+        pos can be any subscriptable list with length >= 2. Only the first 2 elements are plotted.
+        """
+
+        scatter_plot.addPoints(
+            pos=[pos[:2] / AU],
+            **kwargs,
+        )
 
     def plot_inertial_orbits(self) -> AnimatePlotFunc:
 
@@ -304,59 +299,64 @@ class Plotter:
 
         linear_momentum_plot = self.initialize_conserved_plot("Linear Momentum")
 
-        # total linear momentum is not conserved (likely due to floating point errors)
+        # total linear momentum is initially approx. 0.
+        # due to this any variation will make it seem as if it is not conserved.
         # however the variation is insignificant compared to
-        # the star's and planet's individual linear momenta
-        linear_momentum_plot.plot(
-            times_in_years,
-            total_momentum[0] / init_planet_momentum,
-            pen="r",
-            name="x",
-        )
+        # the star and planet's individual linear momenta.
+        # That suggests that the variation is due to floating point error
+        # or the error of the numerical integration method.
 
-        linear_momentum_plot.plot(
-            times_in_years,
-            total_momentum[1] / init_planet_momentum,
-            pen="g",
-            name="y",
-        )
+        normalized_linear_momentum = total_momentum / init_planet_momentum
 
-        linear_momentum_plot.plot(
-            times_in_years,
-            total_momentum[2] / init_planet_momentum,
-            pen="b",
-            name="z",
-        )
+        for component in ("x", "y", "z"):
+
+            Plotter.plot_component(
+                linear_momentum_plot,
+                times_in_years,
+                normalized_linear_momentum,
+                component,
+            )
 
     def plot_angular_momentum(
         self, total_angular_momentum: Array2D, times_in_years: Array1D
     ):
-        """Plots the relative change in the angular momentum.
-        Doesn't plot the x and y components of the angular momentum, because they are always 0"""
+        """Plots the relative change in the angular momentum."""
 
         angular_momentum_plot = self.initialize_conserved_plot("Angular Momentum")
 
-        # x and y components of angular momentum are 0
-        # angular_momentum_plot.plot(
-        #   times_in_years,
-        #   total_angular_momentum[0]/total_angular_momentum[0, 0]-1,
-        #   pen='r',
-        #   name='x'
-        # )
+        for component, (idx, _) in Plotter.component_to_plot_args.items():
 
-        # angular_momentum_plot.plot(
-        #   times_in_years,
-        #   total_angular_momentum[1]/total_angular_momentum[0, 1]-1,
-        #   pen='g',
-        #   name='y'
-        # )
+            normalized_angular_momentum = (
+                total_angular_momentum[:, idx] / total_angular_momentum[0, idx] - 1
+            )
 
-        angular_momentum_plot.plot(
-            times_in_years,
-            total_angular_momentum[2] / total_angular_momentum[0, 2] - 1,
-            pen="b",
-            name="z",
-        )
+            Plotter.plot_component(
+                angular_momentum_plot,
+                times_in_years,
+                normalized_angular_momentum,
+                component,
+            )
+
+    @staticmethod
+    def plot_component(
+        plot: pg.PlotWidget, times: Array1D, arr: Array2D, component: str
+    ):
+        """Plots a component of a 2D array against the times array.
+        component must be one of the following: 'x', 'y', 'z'"""
+
+        try:
+
+            idx, pen = Plotter.component_to_plot_args[component]
+
+        except KeyError as err:
+
+            raise ValueError(
+                f"component must be one of the following: x, y, z. Got {component}"
+            ) from err
+
+        arr = arr[:, idx]
+
+        plot.plot(times, arr, name=component, pen=pen)
 
     def plot_energy(self, total_energy: Array1D, times_in_years: Array1D):
         """Plots the relative change in the energy"""
