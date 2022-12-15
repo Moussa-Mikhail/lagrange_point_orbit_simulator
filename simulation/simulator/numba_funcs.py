@@ -11,7 +11,6 @@ from .sim_types import Array1D, Array2D
 
 @njit()
 def norm(vector: Array1D) -> float:
-
     return sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2])
 
 
@@ -29,25 +28,18 @@ def calc_acceleration(
     r_sat_to_star: Array1D,
     r_sat_to_planet: Array1D,
 ):
-
     for j in range(3):
-
         # vector from planet to star
         r_planet_to_star[j] = star_pos[j] - planet_pos[j]
-
         r_sat_to_star[j] = star_pos[j] - sat_pos[j]
-
         r_sat_to_planet[j] = planet_pos[j] - sat_pos[j]
 
     # distance between star to planet
     d_planet_to_star = norm(r_planet_to_star)
-
     d_sat_to_star = norm(r_sat_to_star)
-
     d_sat_to_planet = norm(r_sat_to_planet)
 
     for j in range(3):
-
         star_accel[j] = -G * planet_mass * r_planet_to_star[j] / d_planet_to_star**3
 
         # note the lack of negative sign in the following lines
@@ -72,29 +64,20 @@ def integrate(
     sat_pos: Array2D,
     sat_vel: Array2D,
 ):
-
     star_accel = np.empty(3, dtype=np.double)
-
     planet_accel = np.empty_like(star_accel)
-
     sat_accel = np.empty_like(star_accel)
 
     star_intermediate_pos = np.empty_like(star_accel)
-
     planet_intermediate_pos = np.empty_like(star_accel)
-
     sat_intermediate_pos = np.empty_like(star_accel)
 
     r_planet_to_star = np.empty_like(star_accel)
-
     r_sat_to_star = np.empty_like(star_accel)
-
     r_sat_to_planet = np.empty_like(star_accel)
 
     for k in range(1, num_steps + 1):
-
         for j in range(3):
-
             # intermediate position calculation
             star_intermediate_pos[j] = (
                 star_pos[k - 1, j] + 0.5 * star_vel[k - 1, j] * time_step
@@ -124,12 +107,9 @@ def integrate(
         )
 
         for j in range(3):
-
             # velocity update
             star_vel[k, j] = star_vel[k - 1, j] + star_accel[j] * time_step
-
             planet_vel[k, j] = planet_vel[k - 1, j] + planet_accel[j] * time_step
-
             sat_vel[k, j] = sat_vel[k - 1, j] + sat_accel[j] * time_step
 
             # position update
@@ -160,17 +140,14 @@ def transform_to_corotating(
     pos_corotating = np.empty_like(pos_trans)
 
     for i in prange(pos_trans.shape[0]):
-
         time: float = times[i]
 
         angle = -angular_speed * time
 
         c: float = np.cos(angle)
-
         s: float = np.sin(angle)
 
         pos_trans_x: float = pos_trans[i, 0]
-
         pos_trans_y: float = pos_trans[i, 1]
 
         pos_corotating[i, 0] = c * pos_trans_x - s * pos_trans_y

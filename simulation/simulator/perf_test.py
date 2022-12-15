@@ -13,4 +13,4 @@ for _ in range(NUM_SAMPLES):
 
 end = time.perf_counter()
 
-print(f"Without reallocation: {(end - start)/NUM_SAMPLES} seconds per simulation")
+print(f"Without reallocation: {(end - start) / NUM_SAMPLES} seconds per simulation")

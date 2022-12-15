@@ -5,7 +5,6 @@ that orbit.
 It assumes that both the star and planet are undergoing uniform circular motion.
 """
 
-
 from math import ceil, sqrt
 
 import numpy as np
@@ -26,14 +25,12 @@ def array_of_norms(arr_2d: Array2D) -> Array1D:
 
 
 def unit_vector(angle: float) -> Array1D:
-
     return np.array([np.cos(angle), np.sin(angle), 0])
 
 
 def calc_period_from_semi_major_axis(
     semi_major_axis: float, star_mass: float, planet_mass: float
 ) -> float:
-
     period_squared = (
         4 * np.pi**2 * semi_major_axis**3 / (G * (star_mass + planet_mass))
     )
@@ -237,7 +234,6 @@ class Simulator:
     def actual_perturbation_angle(self) -> float:
 
         if self.perturbation_angle is None:
-
             return self.default_perturbation_angle()
 
         return self.perturbation_angle
@@ -246,7 +242,6 @@ class Simulator:
     def actual_vel_angle(self) -> float:
 
         if self.vel_angle is None:
-
             return self.default_perturbation_angle() + 90.0
 
         return self.vel_angle
@@ -278,7 +273,6 @@ class Simulator:
         # so that their initial values correspond to the input parameters
 
         if len(self.star_pos) != self.num_steps + 1:
-
             self._allocate_arrays()
 
         self._initialize_positions()
