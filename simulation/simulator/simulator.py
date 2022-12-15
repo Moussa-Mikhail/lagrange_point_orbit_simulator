@@ -330,7 +330,7 @@ class Simulator:
 
         speed = self.speed * norm(self.planet_vel[0])
 
-        vel_angle = np.radians(self.actual_vel_angle)
+        vel_angle = float(np.radians(self.actual_vel_angle))
 
         self.sat_vel[0] = speed * unit_vector(vel_angle)
 
