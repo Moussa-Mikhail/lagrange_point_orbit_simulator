@@ -126,7 +126,7 @@ allParams = simParams | satParams | sysParams
 
 # used to translate param labels used in gui to attribute names
 paramLabelsToAttribute = {
-    paramLabel: attribue for paramLabel, (_, attribue) in allParams.items()
+    paramLabel: attribute for paramLabel, (_, attribute) in allParams.items()
 }
 
 
