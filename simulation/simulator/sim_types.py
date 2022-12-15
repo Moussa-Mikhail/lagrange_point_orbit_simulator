@@ -1,4 +1,4 @@
-""""This module contains type aliases for NDArray[np.double] which are used
+"""This module contains type aliases for NDArray[np.double] which are used
 to distinguish between 1 and 2 dimensional arrays."""
 from numpy import double
 from numpy.typing import NDArray
