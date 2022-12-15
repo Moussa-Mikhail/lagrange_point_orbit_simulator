@@ -55,7 +55,7 @@ class Simulator:
     perturbation_size: float. Size of perturbation away from the Lagrange point in AU.
     The default is 0.0.
 
-    perturbation_angle: float. Angle of perturbation relative to positive x axis in degrees.
+    perturbation_angle: float. Angle of perturbation relative to positive x-axis in degrees.
     The default is None.
     If None, then perturbations are away or toward the origin.
 
@@ -63,7 +63,7 @@ class Simulator:
     e.g. speed = 1.0 -> satellite has the same speed as the planet.
     the default is 1.0.
 
-    vel_angle: float. Angle of satellite's initial velocity relative to positive x axis in degrees.
+    vel_angle: float. Angle of satellite's initial velocity relative to positive x-axis in degrees.
     The default is None.
     If None, then vel_angle is perpendicular to the satellite's
     default position relative to the star.
@@ -272,7 +272,7 @@ class Simulator:
 
         self._initialize_positions()
 
-        # we setup conditions so that the star and planet have circular orbits
+        # we set up conditions so that the star and planet have circular orbits
         # about the center of mass
         # velocities have to be defined relative to the CM
         init_CM_pos = self.calc_center_of_mass_pos_or_vel(
@@ -317,7 +317,7 @@ class Simulator:
 
     def _initialize_velocities(self, init_cm_pos: Array1D):
 
-        # orbits are counter clockwise so
+        # orbits are counterclockwise so
         # angular velocity is in the positive z direction
         angular_vel = np.array((0, 0, self.angular_speed), dtype=np.double)
 
