@@ -198,12 +198,12 @@ class Simulator:
                 )
 
             case "L3":
-                L3_dist = (
+                l3_dist = (
                     planet_distance_meters * 7 / 12 * self.planet_mass / self.star_mass
                 )
 
                 return -planet_distance_meters * np.array((1, 0, 0)) - np.array(
-                    (L3_dist, 0, 0)
+                    (l3_dist, 0, 0)
                 )
 
             case "L4":
@@ -275,13 +275,13 @@ class Simulator:
         # we set up conditions so that the star and planet have circular orbits
         # about the center of mass
         # velocities have to be defined relative to the CM
-        init_CM_pos = self.calc_center_of_mass_pos_or_vel(
+        init_cm_pos = self.calc_center_of_mass_pos_or_vel(
             self.star_pos[0], self.planet_pos[0], self.sat_pos[0]
         )
 
-        self._initialize_velocities(init_CM_pos)
+        self._initialize_velocities(init_cm_pos)
 
-        self._transform_to_cm_ref_frame(init_CM_pos)
+        self._transform_to_cm_ref_frame(init_cm_pos)
 
     def _allocate_arrays(self):
 
