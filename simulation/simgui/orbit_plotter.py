@@ -6,8 +6,8 @@ from math import ceil
 from typing import Callable
 
 import pyqtgraph as pg  # type: ignore
-from numpy.linalg import norm
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
+from numpy.linalg import norm
 
 from simulation import Simulator
 from simulation.simulator.constants import AU, HOURS
@@ -46,7 +46,6 @@ class Plotter:
         self.period_of_animation = 33
 
     def toggle_animation(self):
-
         if self.timer.isActive():
 
             self.timer.stop()
@@ -61,7 +60,6 @@ class Plotter:
         plot = pg.PlotWidget(title=title)
 
         plot.setLabel("bottom", "x", units="AU")
-
         plot.setLabel("left", "y", units="AU")
 
         return plot
@@ -70,14 +68,11 @@ class Plotter:
     def plot_orbits(self):
 
         animate_inertial = self.plot_inertial_orbits()
-
         animate_corotating = self.plot_corotating_orbits()
 
         self.timer = QTimer()
-
         self.timer.timeout.connect(animate_inertial)  # type: ignore
-
-        self.timer.timeout.connect(animate_corotating) # type: ignore
+        self.timer.timeout.connect(animate_corotating)  # type: ignore
 
     def plot_index_generator(self):
         """This generator yields the index of the next point to plot."""
@@ -98,12 +93,11 @@ class Plotter:
             i = i + rate
 
             if i >= self.sim.num_steps:
-
                 i = 0
 
             yield i
 
-    def array_step(self, num_points_to_plot: int = 10**5) -> int:
+    def array_step(self, num_points_to_plot: int = 10 ** 5) -> int:
 
         # no need to plot all points
 
@@ -114,11 +108,11 @@ class Plotter:
         return 1 if points_plotted_step == 0 else points_plotted_step
 
     def plot_orbit(
-        self,
-        plot: pg.PlotWidget,
-        star_pos: Array2D,
-        planet_pos: Array2D,
-        sat_pos: Array2D,
+            self,
+            plot: pg.PlotWidget,
+            star_pos: Array2D,
+            planet_pos: Array2D,
+            sat_pos: Array2D,
     ) -> AnimatePlotFunc:
         """Plotting logic common to both inertial and corotating plots.
         Returns a function which is called by the timer to animate the plot.
@@ -186,15 +180,12 @@ class Plotter:
         idx_gen = self.plot_index_generator()
 
         def animate_plot():
-
             i = next(idx_gen)
 
             anim_plot.clear()
 
             Plotter.plot_point(anim_plot, star_pos[i], **star_args)
-
             Plotter.plot_point(anim_plot, planet_pos[i], **planet_args)
-
             Plotter.plot_point(anim_plot, sat_pos[i], **sat_args)
 
         return animate_plot
@@ -220,9 +211,7 @@ class Plotter:
         """Plots the orbits of the system simulated in the corotating frame"""
 
         star_pos_corotating = self.sim.transform_to_corotating(self.sim.star_pos)
-
         planet_pos_corotating = self.sim.transform_to_corotating(self.sim.planet_pos)
-
         sat_pos_corotating = self.sim.transform_to_corotating(self.sim.sat_pos)
 
         animate_corotating_plot = self.plot_orbit(
@@ -279,22 +268,19 @@ class Plotter:
         times_in_years = self.sim.time_points_in_years()[::arr_step]
 
         total_momentum = total_momentum[::arr_step]
-
         self.plot_linear_momentum(total_momentum, init_planet_momentum, times_in_years)
 
         total_angular_momentum = total_angular_momentum[::arr_step]
-
         self.plot_angular_momentum(total_angular_momentum, times_in_years)
 
         total_energy = total_energy[::arr_step]
-
         self.plot_energy(total_energy, times_in_years)
 
     def plot_linear_momentum(
-        self,
-        total_momentum: Array2D,
-        init_planet_momentum: float,
-        times_in_years: Array1D,
+            self,
+            total_momentum: Array2D,
+            init_planet_momentum: float,
+            times_in_years: Array1D,
     ):
         """Plots the relative change in the linear momentum"""
 
@@ -310,7 +296,6 @@ class Plotter:
         normalized_linear_momentum = total_momentum / init_planet_momentum
 
         for component in ("x", "y", "z"):
-
             Plotter.plot_component(
                 linear_momentum_plot,
                 times_in_years,
@@ -319,16 +304,15 @@ class Plotter:
             )
 
     def plot_angular_momentum(
-        self, total_angular_momentum: Array2D, times_in_years: Array1D
+            self, total_angular_momentum: Array2D, times_in_years: Array1D
     ):
         """Plots the relative change in the angular momentum."""
 
         angular_momentum_plot = self.initialize_conserved_plot("Angular Momentum")
 
         for component, (idx, _) in Plotter.component_to_plot_args.items():
-
             normalized_angular_momentum = (
-                total_angular_momentum[:, idx] / total_angular_momentum[0, idx] - 1
+                    total_angular_momentum[:, idx] / total_angular_momentum[0, idx] - 1
             )
 
             Plotter.plot_component(
@@ -340,17 +324,15 @@ class Plotter:
 
     @staticmethod
     def plot_component(
-        plot: pg.PlotWidget, times: Array1D, arr: Array2D, component: str
+            plot: pg.PlotWidget, times: Array1D, arr: Array2D, component: str
     ):
         """Plots a component of a 2D array against the times array.
         component must be one of the following: 'x', 'y', 'z'"""
 
         try:
-
             idx, pen = Plotter.component_to_plot_args[component]
 
         except KeyError as err:
-
             raise ValueError(
                 f"component must be one of the following: x, y, z. Got {component}"
             ) from err
@@ -363,7 +345,6 @@ class Plotter:
         """Plots the relative change in the energy"""
 
         energy_plot = self.initialize_conserved_plot("Energy")
-
         energy_plot.plot(times_in_years, total_energy / total_energy[0] - 1)
 
     @staticmethod
@@ -373,9 +354,7 @@ class Plotter:
         plot = Plotter.make_plot(title=f"Relative Change in {quantity_name} vs Time")
 
         plot.setLabel("bottom", "Time", units="years")
-
         plot.setLabel("left", f"Relative Change in {quantity_name}")
-
         plot.addLegend()
 
         return plot
