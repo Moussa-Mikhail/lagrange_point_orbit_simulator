@@ -66,6 +66,7 @@ class Plotter:
 
         return plot
 
+    # noinspection PyUnresolvedReferences
     def plot_orbits(self):
 
         animate_inertial = self.plot_inertial_orbits()
@@ -74,9 +75,9 @@ class Plotter:
 
         self.timer = QTimer()
 
-        self.timer.timeout.connect(animate_inertial)
+        self.timer.timeout.connect(animate_inertial)  # type: ignore
 
-        self.timer.timeout.connect(animate_corotating)
+        self.timer.timeout.connect(animate_corotating) # type: ignore
 
     def plot_index_generator(self):
         """This generator yields the index of the next point to plot."""
@@ -201,7 +202,7 @@ class Plotter:
     @staticmethod
     def plot_point(scatter_plot: pg.ScatterPlotItem, pos: Array1D, **kwargs):
         """Plots pos on scatter_plot.
-        pos can be any subscriptable list with length >= 2. Only the first 2 elements are plotted.
+        pos can be any subscript-able list with length >= 2. Only the first 2 elements are plotted.
         """
 
         scatter_plot.addPoints(
