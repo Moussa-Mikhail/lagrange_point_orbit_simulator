@@ -138,15 +138,10 @@ class Simulator:
         self.vel_angle = vel_angle
 
         self.star_pos: Array2D = np.empty((0, 3), dtype=np.double)
-
         self.star_vel: Array2D = np.empty_like(self.star_pos)
-
         self.planet_pos: Array2D = np.empty_like(self.star_pos)
-
         self.planet_vel: Array2D = np.empty_like(self.star_pos)
-
         self.sat_pos: Array2D = np.empty_like(self.star_pos)
-
         self.sat_vel: Array2D = np.empty_like(self.star_pos)
 
     @property
