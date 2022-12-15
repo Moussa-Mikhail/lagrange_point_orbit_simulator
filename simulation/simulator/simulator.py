@@ -281,7 +281,7 @@ class Simulator:
 
         self._initialize_velocities(init_CM_pos)
 
-        self._transform_to_CM_ref_frame(init_CM_pos)
+        self._transform_to_cm_ref_frame(init_CM_pos)
 
     def _allocate_arrays(self):
 
@@ -315,7 +315,7 @@ class Simulator:
 
         self.sat_pos[0] = self.lagrange_point + perturbation
 
-    def _initialize_velocities(self, init_CM_pos: Array1D):
+    def _initialize_velocities(self, init_cm_pos: Array1D):
 
         # orbits are counter clockwise so
         # angular velocity is in the positive z direction
@@ -324,9 +324,9 @@ class Simulator:
         # for a circular orbit velocity = cross_product(angular velocity, position)
         # where vec(position) is the position relative to the point being orbited
         # in this case the Center of Mass
-        self.star_vel[0] = np.cross(angular_vel, self.star_pos[0] - init_CM_pos)
+        self.star_vel[0] = np.cross(angular_vel, self.star_pos[0] - init_cm_pos)
 
-        self.planet_vel[0] = np.cross(angular_vel, self.planet_pos[0] - init_CM_pos)
+        self.planet_vel[0] = np.cross(angular_vel, self.planet_pos[0] - init_cm_pos)
 
         speed = self.speed * norm(self.planet_vel[0])
 
@@ -334,13 +334,13 @@ class Simulator:
 
         self.sat_vel[0] = speed * unit_vector(vel_angle)
 
-    def _transform_to_CM_ref_frame(self, init_CM_pos: Array1D):
+    def _transform_to_cm_ref_frame(self, init_cm_pos: Array1D):
 
-        self.star_pos[0] -= init_CM_pos
-        self.planet_pos[0] -= init_CM_pos
-        self.sat_pos[0] -= init_CM_pos
+        self.star_pos[0] -= init_cm_pos
+        self.planet_pos[0] -= init_cm_pos
+        self.sat_pos[0] -= init_cm_pos
 
-        self.lagrange_point_trans = self.lagrange_point - init_CM_pos
+        self.lagrange_point_trans = self.lagrange_point - init_cm_pos
 
     def _integrate(self):
 
