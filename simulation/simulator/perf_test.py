@@ -1,3 +1,4 @@
+"""This script measures how long a simulation takes to run."""
 import time
 
 from simulation import Simulator
