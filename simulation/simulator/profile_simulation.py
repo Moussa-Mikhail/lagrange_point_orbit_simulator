@@ -1,3 +1,4 @@
+"""This script creates a profile of the simulate method."""
 import cProfile
 import pstats
 
