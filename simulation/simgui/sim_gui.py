@@ -85,7 +85,6 @@ class SimUi(QtWidgets.QMainWindow):
         buttonsLayout = QtWidgets.QHBoxLayout()
 
         for btnText in buttons:
-
             self.buttons[btnText] = QtWidgets.QPushButton(btnText)
 
             buttonsLayout.addWidget(self.buttons[btnText])
@@ -101,7 +100,6 @@ class SimUi(QtWidgets.QMainWindow):
         self._inputsLayout.addRow(argLabel)
 
         for fieldText, (defaultValue, _) in Params.items():
-
             fieldLine = QtWidgets.QLineEdit(defaultValue)
 
             self.inputFields[fieldText] = fieldLine
@@ -117,7 +115,6 @@ class SimUi(QtWidgets.QMainWindow):
     def toggleAnimation(self):
 
         if not self._plotted:
-
             errorMessage("No plots to animate.")
 
             return
@@ -153,7 +150,6 @@ class SimCtrl:
         btnActions = {"Simulate": self._simulate, "Start/Stop": self._toggleAnimation}
 
         for btnText, btn in self._view.buttons.items():
-
             action = btnActions[btnText]
 
             btn.clicked.connect(action)  # type: ignore
@@ -161,7 +157,6 @@ class SimCtrl:
     def _addReturnPressed(self):
 
         for field in self._view.inputFields.values():
-
             field.returnPressed.connect(self._simulate)  # type: ignore
 
     def _simulate(self):
@@ -181,7 +176,6 @@ class SimCtrl:
         try:
 
             for attr, value in translatedInputs.items():
-
                 setattr(self._model, attr, value)
 
         except (TypeError, ValueError) as e:
@@ -189,7 +183,6 @@ class SimCtrl:
             msg = str(e)
 
             for paramLabel, attr in paramLabelsToAttribute.items():
-
                 msg = msg.replace(attr, paramLabel)
 
             errorMessage(msg)
@@ -209,7 +202,6 @@ class SimCtrl:
             fieldValue = field.text()
 
             if fieldText == "Lagrange label":
-
                 inputs[fieldText] = fieldValue
 
                 continue
@@ -227,7 +219,6 @@ class SimCtrl:
                 ) from e
 
             if value is None:
-
                 inputs[fieldText] = value
 
                 continue
@@ -242,7 +233,6 @@ class SimCtrl:
 
 
 def errorMessage(message: str):
-
     errorMsg = QtWidgets.QErrorMessage()
 
     errorMsg.showMessage(message)
@@ -254,12 +244,10 @@ T = TypeVar("T")
 
 
 def _translateInputs(inputs: dict[str, T]) -> dict[str, T]:
-
     return {paramLabelsToAttribute[label]: v for label, v in inputs.items()}
 
 
 def main():
-
     simApp = QtWidgets.QApplication(sys.argv)
 
     simApp.setFont(QFont("Arial", 10))
@@ -278,5 +266,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()

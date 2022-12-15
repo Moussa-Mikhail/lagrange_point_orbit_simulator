@@ -97,10 +97,8 @@ class Plotter:
 
             yield i
 
-    def array_step(self, num_points_to_plot: int = 10 ** 5) -> int:
-
+    def array_step(self, num_points_to_plot: int = 10**5) -> int:
         # no need to plot all points
-
         # step size when plotting
         # i.e. if points_plotted_step = 10 then plot every 10th point
         points_plotted_step = int((self.sim.num_steps + 1) / num_points_to_plot)
@@ -108,11 +106,11 @@ class Plotter:
         return 1 if points_plotted_step == 0 else points_plotted_step
 
     def plot_orbit(
-            self,
-            plot: pg.PlotWidget,
-            star_pos: Array2D,
-            planet_pos: Array2D,
-            sat_pos: Array2D,
+        self,
+        plot: pg.PlotWidget,
+        star_pos: Array2D,
+        planet_pos: Array2D,
+        sat_pos: Array2D,
     ) -> AnimatePlotFunc:
         """Plotting logic common to both inertial and corotating plots.
         Returns a function which is called by the timer to animate the plot.
@@ -277,10 +275,10 @@ class Plotter:
         self.plot_energy(total_energy, times_in_years)
 
     def plot_linear_momentum(
-            self,
-            total_momentum: Array2D,
-            init_planet_momentum: float,
-            times_in_years: Array1D,
+        self,
+        total_momentum: Array2D,
+        init_planet_momentum: float,
+        times_in_years: Array1D,
     ):
         """Plots the relative change in the linear momentum"""
 
@@ -304,7 +302,7 @@ class Plotter:
             )
 
     def plot_angular_momentum(
-            self, total_angular_momentum: Array2D, times_in_years: Array1D
+        self, total_angular_momentum: Array2D, times_in_years: Array1D
     ):
         """Plots the relative change in the angular momentum."""
 
@@ -312,7 +310,7 @@ class Plotter:
 
         for component, (idx, _) in Plotter.component_to_plot_args.items():
             normalized_angular_momentum = (
-                    total_angular_momentum[:, idx] / total_angular_momentum[0, idx] - 1
+                total_angular_momentum[:, idx] / total_angular_momentum[0, idx] - 1
             )
 
             Plotter.plot_component(
@@ -324,7 +322,7 @@ class Plotter:
 
     @staticmethod
     def plot_component(
-            plot: pg.PlotWidget, times: Array1D, arr: Array2D, component: str
+        plot: pg.PlotWidget, times: Array1D, arr: Array2D, component: str
     ):
         """Plots a component of a 2D array against the times array.
         component must be one of the following: 'x', 'y', 'z'"""
