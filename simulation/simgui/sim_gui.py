@@ -130,7 +130,7 @@ paramLabelsToAttribute = {
 }
 
 
-class SimCtrl:
+class SimCtrl:  # pylint: disable=too-few-public-methods
     def __init__(
         self,
         model: Simulator,
@@ -260,7 +260,7 @@ def main():
 
     view.show()
 
-    ctrl = SimCtrl(model=sim, view=view)  # noqa: F841
+    ctrl = SimCtrl(model=sim, view=view)  # noqa: F841 # pylint: disable=unused-variable
 
     sys.exit(simApp.exec())
 
