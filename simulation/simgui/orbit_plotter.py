@@ -229,7 +229,7 @@ class Plotter:
 
         self.corotating_plot.addItem(lagrange_point_plot)
 
-        lagrange_point = self.sim.lagrange_point
+        lagrange_point = self.sim.lagrange_point_trans
 
         lagrange_point_plot.addPoints(
             pos=[lagrange_point[:2] / AU],
