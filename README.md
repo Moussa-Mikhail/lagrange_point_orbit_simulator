@@ -39,7 +39,7 @@ The default is None.
 If None, then vel_angle is perpendicular to the satellite's
 default position relative to the star.
 
-lagrange_point: string. Non-perturbed position of satellite.
+lagrange_label: string. Non-perturbed position of satellite.
 The default is 'L4' but 'L1', 'L2', 'L3', and 'L5' can also be used.
 
 #### System Parameters
