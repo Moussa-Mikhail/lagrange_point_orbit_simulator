@@ -88,7 +88,7 @@ class Simulator:
 
     # mass of satellite in kilograms
     # must be negligible compared to other masses
-    sat_mass = 1.0
+    SAT_MASS = 1.0
 
     num_years = descriptors.positive_float()
     time_step = descriptors.float_desc()
@@ -370,8 +370,8 @@ class Simulator:
         return (
             self.star_mass * star_pos_or_vel
             + self.planet_mass * planet_pos_or_vel
-            + self.sat_mass * sat_pos_or_vel
-        ) / (self.star_mass + self.planet_mass + self.sat_mass)
+            + self.SAT_MASS * sat_pos_or_vel
+        ) / (self.star_mass + self.planet_mass + self.SAT_MASS)
 
     def transform_to_corotating(self, pos_trans: Array2D) -> Array2D:
 
@@ -394,7 +394,7 @@ class Simulator:
         return (
             self.star_mass * self.star_vel
             + self.planet_mass * self.planet_vel
-            + self.sat_mass * self.sat_vel
+            + self.SAT_MASS * self.sat_vel
         )
 
     def calc_total_angular_momentum(self) -> Array2D:
@@ -407,7 +407,7 @@ class Simulator:
             self.planet_pos, self.planet_mass * self.planet_vel
         )
 
-        angular_momentum_sat = np.cross(self.sat_pos, self.sat_mass * self.sat_vel)
+        angular_momentum_sat = np.cross(self.sat_pos, self.SAT_MASS * self.sat_vel)
 
         return angular_momentum_star + angular_momentum_planet + angular_momentum_sat
 
@@ -421,8 +421,8 @@ class Simulator:
 
         potential_energy = (
             -G * self.star_mass * self.planet_mass / d_planet_to_star
-            + -G * self.sat_mass * self.planet_mass / d_planet_to_sat
-            + -G * self.sat_mass * self.star_mass / d_star_to_sat
+            + -G * self.SAT_MASS * self.planet_mass / d_planet_to_sat
+            + -G * self.SAT_MASS * self.star_mass / d_star_to_sat
         )
 
         mag_star_vel = array_of_norms(self.star_vel)
@@ -434,7 +434,7 @@ class Simulator:
         kinetic_energy = (
             0.5 * self.star_mass * mag_star_vel**2
             + 0.5 * self.planet_mass * mag_planet_vel**2
-            + 0.5 * self.sat_mass * mag_sat_vel**2
+            + 0.5 * self.SAT_MASS * mag_sat_vel**2
         )
 
         return potential_energy + kinetic_energy
