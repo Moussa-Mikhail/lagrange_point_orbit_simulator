@@ -275,7 +275,7 @@ class Simulator:
         # we set up conditions so that the star and planet have circular orbits
         # about the center of mass
         # velocities have to be defined relative to the CM
-        init_cm_pos = self.calc_center_of_mass_pos_or_vel(
+        init_cm_pos = self.calc_center_of_mass(
             self.star_pos[0], self.planet_pos[0], self.sat_pos[0]
         )
 
@@ -357,12 +357,15 @@ class Simulator:
             self.sat_vel,
         )
 
-    def calc_center_of_mass_pos_or_vel(
+    def calc_center_of_mass(
         self,
         star_pos_or_vel: Array1D | Array2D,
         planet_pos_or_vel: Array1D | Array2D,
         sat_pos_or_vel: Array1D | Array2D,
     ) -> Array1D | Array2D:
+        """Can be used to calculate either the position or velocity of the center of mass.
+        The input arrays can be either 1D or 2D. If 2D, the first dimension is the time
+        """
 
         return (
             self.star_mass * star_pos_or_vel
