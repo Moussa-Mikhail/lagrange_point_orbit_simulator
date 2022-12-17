@@ -12,15 +12,14 @@ import numpy as np
 # shortens function call
 from numpy.linalg import norm
 
-from . import descriptors
-from .constants import AU, EARTH_MASS, HOURS, SUN_MASS, YEARS, G
-from .numba_funcs import integrate, transform_to_corotating
-from .sim_types import Array1D, Array2D
+from simulation.simulator import descriptors
+from simulation.simulator.constants import AU, EARTH_MASS, HOURS, SUN_MASS, YEARS, G
+from simulation.simulator.numba_funcs import integrate, transform_to_corotating
+from simulation.simulator.sim_types import Array1D, Array2D
 
 
 def array_of_norms(arr_2d: Array2D) -> Array1D:
     """Returns an array of the norm of each element of the input array"""
-
     return norm(arr_2d, axis=1)
 
 
@@ -68,7 +67,7 @@ class Simulator:
     If None, then vel_angle is perpendicular to the satellite's
     default position relative to the star.
 
-    lagrange_point: string. Non-perturbed position of satellite.
+    lagrange_label: string. Non-perturbed position of satellite.
     The default is 'L4' but 'L1', 'L2', 'L3', and 'L5' can also be used.
 
     #### System Parameters
@@ -109,33 +108,26 @@ class Simulator:
         perturbation_angle: float | None = None,
         speed: float = 1.0,
         vel_angle: float | None = None,
+        lagrange_label: str = "L4",
         star_mass: float = SUN_MASS,
         planet_mass: float = EARTH_MASS,
         planet_distance: float = 1.0,
-        lagrange_label: str = "L4",
     ):
 
         self.num_years = num_years
-
         self.time_step = time_step
 
         self.perturbation_size = perturbation_size
-
+        self.perturbation_angle = perturbation_angle
         self.speed = speed
-
-        self.star_mass = star_mass
-
-        self.planet_mass = planet_mass
-
-        self.planet_distance = planet_distance
-
+        self.vel_angle = vel_angle
         self.lagrange_label = lagrange_label
 
+        self.star_mass = star_mass
+        self.planet_mass = planet_mass
+        self.planet_distance = planet_distance
+
         self.lagrange_point_trans: Array1D = np.empty(3, dtype=np.double)
-
-        self.perturbation_angle = perturbation_angle
-
-        self.vel_angle = vel_angle
 
         self.star_pos: Array2D = np.empty((0, 3), dtype=np.double)
         self.star_vel: Array2D = np.empty_like(self.star_pos)
@@ -147,12 +139,10 @@ class Simulator:
     @property
     def sim_time(self) -> float:
         """Time to simulate in seconds"""
-
         return self.num_years * YEARS
 
     @property
     def time_step_in_seconds(self) -> float:
-
         return self.time_step * HOURS
 
     @property
@@ -165,16 +155,13 @@ class Simulator:
         )
 
     def time_points(self) -> Array1D:
-
         return np.linspace(0, self.sim_time, self.num_steps + 1)
 
     def time_points_in_years(self) -> Array1D:
-
         return self.time_points() / YEARS
 
     @property
     def lagrange_point(self) -> Array1D:
-
         return self.calc_lagrange_point()
 
     def calc_lagrange_point(self) -> Array1D:
@@ -243,7 +230,6 @@ class Simulator:
 
     @property
     def orbital_period(self) -> float:
-
         return self.calc_orbital_period()
 
     def calc_orbital_period(self) -> float:
@@ -304,9 +290,7 @@ class Simulator:
         self.planet_pos[0] = np.array((self.planet_distance * AU, 0, 0))
 
         # Perturbation of satellite's position #
-
         perturbation_size = self.perturbation_size * AU
-
         perturbation_angle = np.radians(self.actual_perturbation_angle)
 
         perturbation = perturbation_size * np.array(
@@ -316,7 +300,6 @@ class Simulator:
         self.sat_pos[0] = self.lagrange_point + perturbation
 
     def _initialize_velocities(self, init_cm_pos: Array1D):
-
         # orbits are counterclockwise so
         # angular velocity is in the positive z direction
         angular_vel = np.array((0, 0, self.angular_speed), dtype=np.double)
@@ -335,7 +318,6 @@ class Simulator:
         self.sat_vel[0] = speed * unit_vector(vel_angle)
 
     def _transform_to_cm_ref_frame(self, init_cm_pos: Array1D):
-
         self.star_pos[0] -= init_cm_pos
         self.planet_pos[0] -= init_cm_pos
         self.sat_pos[0] -= init_cm_pos
@@ -343,7 +325,6 @@ class Simulator:
         self.lagrange_point_trans = self.lagrange_point - init_cm_pos
 
     def _integrate(self):
-
         integrate(
             self.time_step_in_seconds,
             self.num_steps,
@@ -380,11 +361,8 @@ class Simulator:
         return transform_to_corotating(pos_trans, self.time_points(), angular_speed)
 
     def conservation_calculations(self) -> tuple[Array2D, Array2D, Array1D]:
-
         total_momentum = self.calc_total_linear_momentum()
-
         total_angular_momentum = self.calc_total_angular_momentum()
-
         total_energy = self.calc_total_energy()
 
         return total_momentum, total_angular_momentum, total_energy
@@ -414,9 +392,7 @@ class Simulator:
     def calc_total_energy(self) -> Array1D:
 
         d_planet_to_star = array_of_norms(self.star_pos - self.planet_pos)
-
         d_planet_to_sat = array_of_norms(self.sat_pos - self.planet_pos)
-
         d_star_to_sat = array_of_norms(self.sat_pos - self.star_pos)
 
         potential_energy = (
@@ -426,9 +402,7 @@ class Simulator:
         )
 
         mag_star_vel = array_of_norms(self.star_vel)
-
         mag_planet_vel = array_of_norms(self.planet_vel)
-
         mag_sat_vel = array_of_norms(self.sat_vel)
 
         kinetic_energy = (
