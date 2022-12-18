@@ -1,6 +1,6 @@
 # pylint: disable=no-name-in-module, invalid-name, missing-docstring
 import sys
-from typing import TypeVar
+from typing import TypeVar, TypeAlias
 
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
@@ -10,15 +10,15 @@ from lagrangepointsimulator import Simulator
 from lagrangepointgui.orbit_plotter import Plotter
 from lagrangepointgui.safe_eval import safe_eval as safeEval
 
-ParamsT = dict[str, tuple[str, str]]
+Params: TypeAlias = dict[str, tuple[str, str]]
 
 # parameter name: (default value, attribute name)
-simParams: ParamsT = {
+simParams: Params = {
     "number of years": ("10.0", "num_years"),
     "time step (hours)": ("1.0", "time_step"),
 }
 
-satParams: ParamsT = {
+satParams: Params = {
     "perturbation size": ("0.0", "perturbation_size"),
     "perturbation angle": ("", "perturbation_angle"),
     "initial speed": ("1.0", "speed"),
@@ -26,7 +26,7 @@ satParams: ParamsT = {
     "Lagrange label": ("L4", "lagrange_label"),
 }
 
-sysParams: ParamsT = {
+sysParams: Params = {
     "star mass": ("sun_mass", "star_mass"),
     "planet mass": ("earth_mass", "planet_mass"),
     "planet distance": ("1.0", "planet_distance"),
@@ -80,13 +80,13 @@ class SimUi(QtWidgets.QMainWindow):
 
         self._inputsLayout.addRow(buttonsLayout)
 
-    def _addParams(self, argLabelText: str, Params: ParamsT) -> None:
+    def _addParams(self, argLabelText: str, params: Params) -> None:
 
         argLabel = QtWidgets.QLabel(argLabelText)
         argLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._inputsLayout.addRow(argLabel)
 
-        for fieldText, (defaultValue, _) in Params.items():
+        for fieldText, (defaultValue, _) in params.items():
             fieldLine = QtWidgets.QLineEdit(defaultValue)
 
             self.inputFields[fieldText] = fieldLine
