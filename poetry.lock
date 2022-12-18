@@ -30,14 +30,6 @@ python-versions = ">=3.7"
 frozenlist = ">=1.1.0"
 
 [[package]]
-name = "altgraph"
-version = "0.17.3"
-description = "Python graph (network) package"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "astroid"
 version = "2.12.13"
 description = "An abstract syntax tree for Python with inference support."
@@ -184,14 +176,6 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
-name = "future"
-version = "0.18.2"
-description = "Clean single-source support for Python 3 and 2"
-category = "dev"
-optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-
-[[package]]
 name = "idna"
 version = "3.4"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -201,16 +185,16 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "isort"
-version = "5.11.2"
+version = "5.11.3"
 description = "A Python utility / library to sort Python imports."
 category = "dev"
 optional = false
 python-versions = ">=3.7.0"
 
 [package.extras]
-pipfile-deprecated-finder = ["pipreqs", "requirementslib"]
-requirements-deprecated-finder = ["pipreqs", "pip-api"]
 colors = ["colorama (>=0.4.3,<0.5.0)"]
+requirements-deprecated-finder = ["pip-api", "pipreqs"]
+pipfile-deprecated-finder = ["pipreqs", "requirementslib"]
 plugins = ["setuptools"]
 
 [[package]]
@@ -228,17 +212,6 @@ description = "lightweight wrapper around basic LLVM functionality"
 category = "main"
 optional = false
 python-versions = ">=3.7"
-
-[[package]]
-name = "macholib"
-version = "1.16.2"
-description = "Mach-O header analysis and editing"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-altgraph = ">=0.17"
 
 [[package]]
 name = "mccabe"
@@ -312,17 +285,6 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
-name = "pefile"
-version = "2022.5.30"
-description = "Python PE parsing module"
-category = "dev"
-optional = false
-python-versions = ">=3.6.0"
-
-[package.dependencies]
-future = "*"
-
-[[package]]
 name = "platformdirs"
 version = "2.6.0"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
@@ -351,35 +313,8 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
-name = "pyinstaller"
-version = "5.7.0"
-description = "PyInstaller bundles a Python application and all its dependencies into a single package."
-category = "dev"
-optional = false
-python-versions = "<3.12,>=3.7"
-
-[package.dependencies]
-altgraph = "*"
-macholib = {version = ">=1.8", markers = "sys_platform == \"darwin\""}
-pefile = {version = ">=2022.5.30", markers = "sys_platform == \"win32\""}
-pyinstaller-hooks-contrib = ">=2021.4"
-pywin32-ctypes = {version = ">=0.2.0", markers = "sys_platform == \"win32\""}
-
-[package.extras]
-encryption = ["tinyaes (>=1.0.0)"]
-hook_testing = ["pytest (>=2.7.3)", "execnet (>=1.5.0)", "psutil"]
-
-[[package]]
-name = "pyinstaller-hooks-contrib"
-version = "2022.14"
-description = "Community maintained hooks for PyInstaller"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[[package]]
 name = "pylint"
-version = "2.15.8"
+version = "2.15.9"
 description = "python code static checker"
 category = "dev"
 optional = false
@@ -388,7 +323,7 @@ python-versions = ">=3.7.2"
 [package.dependencies]
 astroid = ">=2.12.13,<=2.14.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
-dill = ">=0.2"
+dill = {version = ">=0.2", markers = "python_version < \"3.11\""}
 isort = ">=4.2.5,<6"
 mccabe = ">=0.6,<0.8"
 platformdirs = ">=2.2.0"
@@ -399,53 +334,6 @@ typing-extensions = {version = ">=3.10.0", markers = "python_version < \"3.10\""
 [package.extras]
 spelling = ["pyenchant (>=3.2,<4.0)"]
 testutils = ["gitpython (>3)"]
-
-[[package]]
-name = "pyqt6"
-version = "6.4.0"
-description = "Python bindings for the Qt cross platform application toolkit"
-category = "main"
-optional = false
-python-versions = ">=3.6.1"
-
-[package.dependencies]
-PyQt6-Qt6 = ">=6.4.0"
-PyQt6-sip = ">=13.4,<14"
-
-[[package]]
-name = "pyqt6-qt6"
-version = "6.4.1"
-description = "The subset of a Qt installation needed by PyQt6."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
-name = "pyqt6-sip"
-version = "13.4.0"
-description = "The sip module support for PyQt6"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[[package]]
-name = "pyqtgraph"
-version = "0.13.1"
-description = "Scientific Graphics and GUI Library for Python"
-category = "main"
-optional = false
-python-versions = ">=3.8"
-
-[package.dependencies]
-numpy = ">=1.20.0"
-
-[[package]]
-name = "pywin32-ctypes"
-version = "0.2.0"
-description = ""
-category = "dev"
-optional = false
-python-versions = "*"
 
 [[package]]
 name = "tomli"
@@ -509,12 +397,11 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.11"
-content-hash = "5a864ce4bd3ba5cdb37eabefb007a0a9781ffb42a2c290b701658c27f9f98ebc"
+content-hash = "748bb9b075911167bde7c3b59d5fcb2276b6b024d1829ee22293f12b0afc0d52"
 
 [metadata.files]
 aiohttp = []
 aiosignal = []
-altgraph = []
 astroid = []
 async-timeout = []
 attrs = []
@@ -530,14 +417,10 @@ flake8 = []
 flake8-bugbear = []
 flake8-comprehensions = []
 frozenlist = []
-future = [
-    {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
-]
 idna = []
 isort = []
 lazy-object-proxy = []
 llvmlite = []
-macholib = []
 mccabe = []
 multidict = []
 mypy = []
@@ -548,37 +431,10 @@ mypy-extensions = [
 numba = []
 numpy = []
 pathspec = []
-pefile = [
-    {file = "pefile-2022.5.30.tar.gz", hash = "sha256:a5488a3dd1fd021ce33f969780b88fe0f7eebb76eb20996d7318f307612a045b"},
-]
 platformdirs = []
 pycodestyle = []
 pyflakes = []
-pyinstaller = []
-pyinstaller-hooks-contrib = []
 pylint = []
-pyqt6 = []
-pyqt6-qt6 = []
-pyqt6-sip = [
-    {file = "PyQt6_sip-13.4.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:3ac7e0800180202dcc0c7035ff88c2a6f4a0f5acb20c4a19f71d807d0f7857b7"},
-    {file = "PyQt6_sip-13.4.0-cp310-cp310-manylinux1_x86_64.whl", hash = "sha256:bb4f2e2fdcf3a8dafe4256750bbedd9e7107c4fd8afa9c25be28423c36bb12b8"},
-    {file = "PyQt6_sip-13.4.0-cp310-cp310-win_amd64.whl", hash = "sha256:de601187055d684b36ebe6e800a5deacaa55b69d71ad43312b76422cfeae0e12"},
-    {file = "PyQt6_sip-13.4.0-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:83b446d247a92d119d507dbc94fc1f47389d8118a5b6232a2859951157319a30"},
-    {file = "PyQt6_sip-13.4.0-cp37-cp37m-manylinux1_x86_64.whl", hash = "sha256:802b0cfed19900183220c46895c2635f0dd062f2d275a25506423f911ef74db4"},
-    {file = "PyQt6_sip-13.4.0-cp37-cp37m-win_amd64.whl", hash = "sha256:2694ae67811cefb6ea3ee0e9995755b45e4952f4dcadec8c04300fd828f91c75"},
-    {file = "PyQt6_sip-13.4.0-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:9e03c780846fd5d71c06e33322fd11a05713d9cd410e3571d069ac9a84077647"},
-    {file = "PyQt6_sip-13.4.0-cp38-cp38-manylinux1_x86_64.whl", hash = "sha256:9c5231536e6153071b22175e46e368045fd08d772a90d772a0977d1166c7822c"},
-    {file = "PyQt6_sip-13.4.0-cp38-cp38-win_amd64.whl", hash = "sha256:cfdcd43e123bd55c155cfe7a33895033e6d25de90a48ed9c25a0ddd0196a810e"},
-    {file = "PyQt6_sip-13.4.0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:7b9bbb5fb880440a3a8e7fa3dff70473aa1128aaf7dc9fb6e30512eed4fd38f6"},
-    {file = "PyQt6_sip-13.4.0-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:fd2df2a9479b8ac858117bd55dc0ec0bd1ce6c8f3486b0cc5e860c0540a8bba0"},
-    {file = "PyQt6_sip-13.4.0-cp39-cp39-win_amd64.whl", hash = "sha256:3486914137f5336cff6e10a5e9d52c1e60ff883473938b45f267f794daeacb2f"},
-    {file = "PyQt6_sip-13.4.0.tar.gz", hash = "sha256:6d87a3ee5872d7511b76957d68a32109352caf3b7a42a01d9ee20032b350d979"},
-]
-pyqtgraph = []
-pywin32-ctypes = [
-    {file = "pywin32-ctypes-0.2.0.tar.gz", hash = "sha256:24ffc3b341d457d48e8922352130cf2644024a4ff09762a2261fd34c36ee5942"},
-    {file = "pywin32_ctypes-0.2.0-py2.py3-none-any.whl", hash = "sha256:9dc2d991b3479cc2df15930958b674a48a227d5361d413827a4cfd0b5876fc98"},
-]
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},

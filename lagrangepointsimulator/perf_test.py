@@ -2,7 +2,7 @@
 # pylint: disable=missing-docstring
 import time
 
-from simulation import Simulator
+from lagrangepointsimulator import Simulator
 
 NUM_SAMPLES = 400
 

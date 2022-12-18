@@ -5,8 +5,8 @@ from math import sqrt
 import numpy as np
 from numba import njit, prange  # type: ignore
 
-from .constants import G
-from .sim_types import Array1D, Array2D
+from lagrangepointsimulator.constants import G
+from lagrangepointsimulator.sim_types import Array1D, Array2D
 
 
 @njit()
