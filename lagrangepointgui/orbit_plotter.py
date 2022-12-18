@@ -3,7 +3,7 @@
 the orbits of the system simulated by an instance of the Simulator class.
 """
 from math import ceil
-from typing import Callable
+from typing import Callable, Any, Generator
 
 import pyqtgraph as pg  # type: ignore
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
@@ -46,7 +46,7 @@ class Plotter:
 
         self.period_of_animation = 33
 
-    def toggle_animation(self):
+    def toggle_animation(self) -> None:
         if self.timer.isActive():
 
             self.timer.stop()
@@ -66,7 +66,7 @@ class Plotter:
         return plot
 
     # noinspection PyUnresolvedReferences
-    def plot_orbits(self):
+    def plot_orbits(self) -> None:
 
         animate_inertial = self.plot_inertial_orbits()
         animate_corotating = self.plot_corotating_orbits()
@@ -75,7 +75,7 @@ class Plotter:
         self.timer.timeout.connect(animate_inertial)  # type: ignore
         self.timer.timeout.connect(animate_corotating)  # type: ignore
 
-    def plot_index_generator(self):
+    def plot_index_generator(self) -> Generator[int, None, None]:
         """This generator yields the index of the next point to plot."""
 
         i = 0
@@ -178,7 +178,7 @@ class Plotter:
 
         idx_gen = self.plot_index_generator()
 
-        def animate_plot():
+        def animate_plot() -> None:
             i = next(idx_gen)
 
             anim_plot.clear()
@@ -190,7 +190,9 @@ class Plotter:
         return animate_plot
 
     @staticmethod
-    def plot_point(scatter_plot: pg.ScatterPlotItem, pos: Array1D, **kwargs):
+    def plot_point(
+        scatter_plot: pg.ScatterPlotItem, pos: Array1D, **kwargs: Any
+    ) -> None:
         """Plots pos on scatter_plot.
         pos can be any subscript-able list with length >= 2. Only the first 2 elements are plotted.
         """
@@ -224,7 +226,7 @@ class Plotter:
 
         return animate_corotating_plot
 
-    def add_lagrange_point_to_corotating_plot(self):
+    def add_lagrange_point_to_corotating_plot(self) -> None:
 
         lagrange_point_plot = pg.ScatterPlotItem()
 
@@ -246,7 +248,7 @@ class Plotter:
 
         legend.addItem(plot_data_item, self.sim.lagrange_label)
 
-    def plot_conserved_quantities(self):
+    def plot_conserved_quantities(self) -> None:
         """Plots the relative change in the conserved quantities:
         linear and angular momenta, and energy"""
 
@@ -280,7 +282,7 @@ class Plotter:
         total_momentum: Array2D,
         init_planet_momentum: float,
         times_in_years: Array1D,
-    ):
+    ) -> None:
         """Plots the relative change in the linear momentum"""
 
         linear_momentum_plot = self.initialize_conserved_plot("Linear Momentum")
@@ -304,7 +306,7 @@ class Plotter:
 
     def plot_angular_momentum(
         self, total_angular_momentum: Array2D, times_in_years: Array1D
-    ):
+    ) -> None:
         """Plots the relative change in the angular momentum."""
 
         angular_momentum_plot = self.initialize_conserved_plot("Angular Momentum")
@@ -324,7 +326,7 @@ class Plotter:
     @staticmethod
     def plot_component(
         plot: pg.PlotWidget, times: Array1D, arr: Array2D, component: str
-    ):
+    ) -> None:
         """Plots a component of a 2D array against the times array.
         component must be one of the following: 'x', 'y', 'z'"""
 
@@ -340,14 +342,14 @@ class Plotter:
 
         plot.plot(times, arr, name=component, pen=pen)
 
-    def plot_energy(self, total_energy: Array1D, times_in_years: Array1D):
+    def plot_energy(self, total_energy: Array1D, times_in_years: Array1D) -> None:
         """Plots the relative change in the energy"""
 
         energy_plot = self.initialize_conserved_plot("Energy")
         energy_plot.plot(times_in_years, total_energy / total_energy[0] - 1)
 
     @staticmethod
-    def initialize_conserved_plot(quantity_name: str):
+    def initialize_conserved_plot(quantity_name: str) -> pg.PlotWidget:
         """Initializes the plot axes and title for the conserved quantities plots"""
 
         plot = Plotter.make_plot(title=f"Relative Change in {quantity_name} vs Time")

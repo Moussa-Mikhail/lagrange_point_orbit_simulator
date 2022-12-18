@@ -10,15 +10,15 @@ from lagrangepointsimulator import Simulator
 from lagrangepointgui.orbit_plotter import Plotter
 from lagrangepointgui.safe_eval import safe_eval as safeEval
 
-paramsT = dict[str, tuple[str, str]]
+ParamsT = dict[str, tuple[str, str]]
 
 # parameter name: (default value, attribute name)
-simParams: paramsT = {
+simParams: ParamsT = {
     "number of years": ("10.0", "num_years"),
     "time step (hours)": ("1.0", "time_step"),
 }
 
-satParams: paramsT = {
+satParams: ParamsT = {
     "perturbation size": ("0.0", "perturbation_size"),
     "perturbation angle": ("", "perturbation_angle"),
     "initial speed": ("1.0", "speed"),
@@ -26,14 +26,13 @@ satParams: paramsT = {
     "Lagrange label": ("L4", "lagrange_label"),
 }
 
-sysParams: paramsT = {
+sysParams: ParamsT = {
     "star mass": ("sun_mass", "star_mass"),
     "planet mass": ("earth_mass", "planet_mass"),
     "planet distance": ("1.0", "planet_distance"),
 }
 
 
-# codiga-disable
 class SimUi(QtWidgets.QMainWindow):
     def __init__(self, plotter: Plotter):
 
@@ -57,7 +56,7 @@ class SimUi(QtWidgets.QMainWindow):
         self._generalLayout.addWidget(self._plotter.corotating_plot)
         self.resize(self._generalLayout.sizeHint())
 
-    def _addInputFields(self):
+    def _addInputFields(self) -> None:
 
         self._inputsLayout = QtWidgets.QFormLayout()
 
@@ -73,7 +72,7 @@ class SimUi(QtWidgets.QMainWindow):
 
         self._generalLayout.addLayout(self._inputsLayout)
 
-    def _addButtons(self):
+    def _addButtons(self) -> None:
 
         buttons = ("Simulate", "Start/Stop")
 
@@ -86,7 +85,7 @@ class SimUi(QtWidgets.QMainWindow):
 
         self._inputsLayout.addRow(buttonsLayout)
 
-    def _addParams(self, argLabelText: str, Params: paramsT):
+    def _addParams(self, argLabelText: str, Params: ParamsT) -> None:
 
         argLabel = QtWidgets.QLabel(argLabelText)
 
@@ -101,13 +100,13 @@ class SimUi(QtWidgets.QMainWindow):
 
             self._inputsLayout.addRow(fieldText, fieldLine)
 
-    def updatePlots(self):
+    def updatePlots(self) -> None:
 
         self._plotted = True
 
         self._plotter.plot_orbits()
 
-    def toggleAnimation(self):
+    def toggleAnimation(self) -> None:
 
         if not self._plotted:
             errorMessage("No plots to animate.")
@@ -140,7 +139,7 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
         self._addReturnPressed()
 
-    def _connectSignals(self):
+    def _connectSignals(self) -> None:
 
         btnActions = {"Simulate": self._simulate, "Start/Stop": self._toggleAnimation}
 
@@ -149,12 +148,12 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
             btn.clicked.connect(action)  # type: ignore
 
-    def _addReturnPressed(self):
+    def _addReturnPressed(self) -> None:
 
         for field in self._view.inputFields.values():
             field.returnPressed.connect(self._simulate)  # type: ignore
 
-    def _simulate(self):
+    def _simulate(self) -> None:
 
         try:
 
@@ -222,12 +221,12 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
         return inputs
 
-    def _toggleAnimation(self):
+    def _toggleAnimation(self) -> None:
 
         self._view.toggleAnimation()
 
 
-def errorMessage(message: str):
+def errorMessage(message: str) -> None:
     errorMsg = QtWidgets.QErrorMessage()
 
     errorMsg.showMessage(message)
@@ -242,7 +241,7 @@ def _translateInputs(inputs: dict[str, T]) -> dict[str, T]:
     return {paramLabelsToAttribute[label]: v for label, v in inputs.items()}
 
 
-def main():
+def main() -> None:
     simApp = QtWidgets.QApplication(sys.argv)
 
     simApp.setFont(QFont("Arial", 10))
