@@ -23,6 +23,7 @@ def safe_eval(expr: str) -> int | float | None:
     try:
         translated_expr = translate(expr)
 
+        # codiga-disable
         res = eval(translated_expr, CONSTANTS)  # pylint: disable=eval-used
 
     except (NameError, SyntaxError, ZeroDivisionError) as err:
