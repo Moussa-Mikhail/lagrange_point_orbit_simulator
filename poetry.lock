@@ -1,35 +1,4 @@
 [[package]]
-name = "aiohttp"
-version = "3.8.3"
-description = "Async http client/server framework (asyncio)"
-category = "dev"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-aiosignal = ">=1.1.2"
-async-timeout = ">=4.0.0a3,<5.0"
-attrs = ">=17.3.0"
-charset-normalizer = ">=2.0,<3.0"
-frozenlist = ">=1.1.1"
-multidict = ">=4.5,<7.0"
-yarl = ">=1.0,<2.0"
-
-[package.extras]
-speedups = ["aiodns", "brotli", "cchardet"]
-
-[[package]]
-name = "aiosignal"
-version = "1.3.1"
-description = "aiosignal: a list of registered asynchronous callbacks"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-frozenlist = ">=1.1.0"
-
-[[package]]
 name = "altgraph"
 version = "0.17.3"
 description = "Python graph (network) package"
@@ -49,14 +18,6 @@ python-versions = ">=3.7.2"
 lazy-object-proxy = ">=1.4.0"
 typing-extensions = {version = ">=3.10", markers = "python_version < \"3.10\""}
 wrapt = {version = ">=1.11,<2", markers = "python_version < \"3.11\""}
-
-[[package]]
-name = "async-timeout"
-version = "4.0.2"
-description = "Timeout context manager for asyncio programs"
-category = "dev"
-optional = false
-python-versions = ">=3.6"
 
 [[package]]
 name = "attrs"
@@ -81,7 +42,6 @@ optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
-aiohttp = {version = ">=3.7.4", optional = true, markers = "extra == \"d\""}
 click = ">=8.0.0"
 mypy-extensions = ">=0.4.3"
 pathspec = ">=0.9.0"
@@ -94,17 +54,6 @@ colorama = ["colorama (>=0.4.3)"]
 d = ["aiohttp (>=3.7.4)"]
 jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2)"]
-
-[[package]]
-name = "charset-normalizer"
-version = "2.1.1"
-description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
-category = "dev"
-optional = false
-python-versions = ">=3.6.0"
-
-[package.extras]
-unicode_backport = ["unicodedata2"]
 
 [[package]]
 name = "click"
@@ -176,28 +125,12 @@ python-versions = ">=3.7"
 flake8 = ">=3.0,<3.2.0 || >3.2.0"
 
 [[package]]
-name = "frozenlist"
-version = "1.3.3"
-description = "A list-like structure which implements collections.abc.MutableSequence"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[[package]]
 name = "future"
 version = "0.18.2"
 description = "Clean single-source support for Python 3 and 2"
 category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-
-[[package]]
-name = "idna"
-version = "3.4"
-description = "Internationalized Domain Names in Applications (IDNA)"
-category = "dev"
-optional = false
-python-versions = ">=3.5"
 
 [[package]]
 name = "isort"
@@ -231,7 +164,7 @@ validateddescriptor = {git = "https://github.com/Moussa-Mikhail/validated-descri
 type = "git"
 url = "https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator.git"
 reference = "main"
-resolved_reference = "d21b80532fd843e4ac93b689a957f494e5a48ac6"
+resolved_reference = "392dbd036f3ea48ea120006095235173078156e6"
 
 [[package]]
 name = "lazy-object-proxy"
@@ -267,14 +200,6 @@ description = "McCabe checker, plugin for flake8"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
-
-[[package]]
-name = "multidict"
-version = "6.0.3"
-description = "multidict implementation"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
 
 [[package]]
 name = "mypy"
@@ -514,32 +439,16 @@ category = "dev"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 
-[[package]]
-name = "yarl"
-version = "1.8.2"
-description = "Yet another URL library"
-category = "dev"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-idna = ">=2.0"
-multidict = ">=4.0"
-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.11"
-content-hash = "262edcabd3836e1338658373f0efd6e08d5a5792f655e5a83076714a58929de9"
+content-hash = "d1a40d11c5241f1b169d826c623b24bd129fcc0eee89259f8a227ed6c49866f8"
 
 [metadata.files]
-aiohttp = []
-aiosignal = []
 altgraph = []
 astroid = []
-async-timeout = []
 attrs = []
 black = []
-charset-normalizer = []
 click = [
     {file = "click-8.1.3-py3-none-any.whl", hash = "sha256:bb4d8133cb15a609f44e8213d9b391b0809795062913b383c62be0ee95b1db48"},
     {file = "click-8.1.3.tar.gz", hash = "sha256:7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e"},
@@ -549,18 +458,15 @@ dill = []
 flake8 = []
 flake8-bugbear = []
 flake8-comprehensions = []
-frozenlist = []
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
 ]
-idna = []
 isort = []
 lagrangepointsimulator = []
 lazy-object-proxy = []
 llvmlite = []
 macholib = []
 mccabe = []
-multidict = []
 mypy = []
 mypy-extensions = [
     {file = "mypy_extensions-0.4.3-py2.py3-none-any.whl", hash = "sha256:090fedd75945a69ae91ce1303b5824f428daf5a028d2f6ab8a299250a846f15d"},
@@ -673,4 +579,3 @@ wrapt = [
     {file = "wrapt-1.14.1-cp39-cp39-win_amd64.whl", hash = "sha256:dee60e1de1898bde3b238f18340eec6148986da0455d8ba7848d50470a7a32fb"},
     {file = "wrapt-1.14.1.tar.gz", hash = "sha256:380a85cf89e0e69b7cfbe2ea9f765f004ff419f34194018a6827ac0e3edfed4d"},
 ]
-yarl = []
