@@ -5,10 +5,10 @@ from typing import TypeVar
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
+from lagrangepointsimulator import Simulator
 
-from simulation.simgui.orbit_plotter import Plotter
-from simulation.simgui.safe_eval import safe_eval as safeEval
-from simulation.simulator import Simulator
+from lagrangepointgui.orbit_plotter import Plotter
+from lagrangepointgui.safe_eval import safe_eval as safeEval
 
 paramsT = dict[str, tuple[str, str]]
 
@@ -33,6 +33,7 @@ sysParams: paramsT = {
 }
 
 
+# codiga-disable
 class SimUi(QtWidgets.QMainWindow):
     def __init__(self, plotter: Plotter):
 
@@ -44,22 +45,16 @@ class SimUi(QtWidgets.QMainWindow):
 
         self.setWindowTitle("Orbits near Lagrange Point")
 
-        self._generalLayout = QtWidgets.QHBoxLayout()
-
         self._centralWidget = QtWidgets.QWidget(self)
-
         self.setCentralWidget(self._centralWidget)
-
+        self._generalLayout = QtWidgets.QHBoxLayout()
         self._centralWidget.setLayout(self._generalLayout)
 
         self.inputFields: dict[str, QtWidgets.QLineEdit] = {}
-
         self._addInputFields()
 
         self._generalLayout.addWidget(self._plotter.inertial_plot)
-
         self._generalLayout.addWidget(self._plotter.corotating_plot)
-
         self.resize(self._generalLayout.sizeHint())
 
     def _addInputFields(self):

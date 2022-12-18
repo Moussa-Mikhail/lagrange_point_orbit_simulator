@@ -9,10 +9,11 @@ import pyqtgraph as pg  # type: ignore
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
 from numpy.linalg import norm
 
-from simulation import Simulator
-from simulation.simulator.constants import AU, HOURS
-from simulation.simulator.sim_types import Array1D, Array2D
+from lagrangepointsimulator import Simulator
+from lagrangepointsimulator.constants import AU, HOURS
+from lagrangepointsimulator.sim_types import Array1D, Array2D
 
+# codiga-disable
 AnimatePlotFunc = Callable[[], None]
 
 

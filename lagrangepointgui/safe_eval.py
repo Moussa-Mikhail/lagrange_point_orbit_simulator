@@ -1,5 +1,5 @@
 """Contains a function to safely evaluate input expressions."""
-from simulation.simulator.constants import CONSTANTS  # noqa: F401
+from lagrangepointsimulator.constants import CONSTANTS  # noqa: F401
 
 allowed_chars = set("0123456789.+-*/()")
 
