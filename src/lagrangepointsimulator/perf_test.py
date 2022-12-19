@@ -20,7 +20,7 @@ def simulate_with_reallocation():
     sim = Simulator()
     start = time.perf_counter()
     for _ in range(NUM_SAMPLES):
-        sim._allocate_arrays()
+        sim.time_step *= (1-1e-4)
         sim.simulate()
     end = time.perf_counter()
     print(f"With reallocation: {(end - start) / NUM_SAMPLES} seconds per simulation")
