@@ -4,7 +4,7 @@ import time
 
 from lagrangepointsimulator import Simulator
 
-NUM_SAMPLES = 400
+NUM_SAMPLES = 1000
 
 
 def simulate_without_reallocation():
@@ -20,8 +20,8 @@ def simulate_with_reallocation():
     sim = Simulator()
     start = time.perf_counter()
     for _ in range(NUM_SAMPLES):
-        sim.simulate()
         sim._allocate_arrays()
+        sim.simulate()
     end = time.perf_counter()
     print(f"With reallocation: {(end - start) / NUM_SAMPLES} seconds per simulation")
 
