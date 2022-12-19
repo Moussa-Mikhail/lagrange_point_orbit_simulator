@@ -63,8 +63,8 @@ class SimUi(QtWidgets.QMainWindow):
         self._addButtons()
 
         self._addParams("Simulation Parameters", simParams)
-        self._addParams("Satellite Parameters", satParams)
         self._addParams("System Parameters", sysParams)
+        self._addParams("Satellite Parameters", satParams)
 
         self._generalLayout.addLayout(self._inputsLayout)
 
@@ -93,7 +93,6 @@ class SimUi(QtWidgets.QMainWindow):
             self._inputsLayout.addRow(fieldText, fieldLine)
 
     def updatePlots(self) -> None:
-
         self._plotted = True
         self._plotter.plot_orbits()
 
