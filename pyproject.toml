@@ -4,6 +4,10 @@ version = "0.1.0"
 description = "Simulates orbits near Lagrange Points"
 authors = ["Moussa Mikhail <moussamikhail56@gmail.com>"]
 license = "GPL3"
+readme = "README.md"
+repository = "https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator"
+keywords = ["lagrange point", "orbit", "simulation", "physics", "gui"]
+classifiers = ["Topic :: Scientific/Engineering :: Physics", "Topic :: Scientific/Engineering :: Visualization", "Topic :: Scientific/Engineering :: Astronomy"]
 packages = [
 	{ include = "src/lagrangepointsimulator" }
 ]
@@ -14,7 +18,7 @@ validateddescriptor = {git = "https://github.com/Moussa-Mikhail/validated-descri
 numpy = "^1.23.4"
 numba = "^0.56.3"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pylint = "^2.15.4"
 flake8-comprehensions = "^3.8.0"
 flake8-bugbear = "^22.3.23"
