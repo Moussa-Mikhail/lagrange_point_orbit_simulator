@@ -12,10 +12,10 @@ import numpy as np
 # shortens function call
 from numpy.linalg import norm
 
-from lagrangepointsimulator import descriptors
-from lagrangepointsimulator.constants import AU, EARTH_MASS, HOURS, SUN_MASS, YEARS, G
-from lagrangepointsimulator.numba_funcs import integrate, transform_to_corotating
-from lagrangepointsimulator.sim_types import Array1D, Array2D
+from . import descriptors
+from .constants import AU, EARTH_MASS, HOURS, SUN_MASS, YEARS, G
+from .numba_funcs import integrate, transform_to_corotating
+from .sim_types import Array1D, Array2D
 
 
 def array_of_norms(arr_2d: Array2D) -> Array1D:
