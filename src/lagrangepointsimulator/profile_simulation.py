@@ -2,7 +2,7 @@
 import cProfile
 import pstats
 
-from lagrangepointsimulator import Simulator
+from .simulator import Simulator
 
 sim = Simulator()
 

@@ -1,4 +1,3 @@
 # pylint: disable=missing-module-docstring
+from . import constants, sim_types
 from .simulator import Simulator
-from . import constants
-from . import sim_types

@@ -14,7 +14,10 @@ from numpy.linalg import norm
 
 from . import descriptors
 from .constants import AU, EARTH_MASS, HOURS, SUN_MASS, YEARS, G
-from .numba_funcs import integrate, transform_to_corotating
+from .numba_funcs import (
+    integrate as nb_integrate,
+    transform_to_corotating as nb_transform_to_corotating,
+)
 from .sim_types import Array1D, Array2D
 
 
@@ -214,7 +217,6 @@ class Simulator:
 
     @property
     def actual_perturbation_angle(self) -> float:
-
         if self.perturbation_angle is None:
             return self.default_perturbation_angle()
 
@@ -222,7 +224,6 @@ class Simulator:
 
     @property
     def actual_vel_angle(self) -> float:
-
         if self.vel_angle is None:
             return self.default_perturbation_angle() + 90.0
 
@@ -240,16 +241,13 @@ class Simulator:
 
     @property
     def angular_speed(self) -> float:
-
         return 2 * np.pi / self.orbital_period
 
-    def simulate(self):
-
+    def simulate(self) -> None:
         self._initialize_arrays()
-
         self._integrate()
 
-    def _initialize_arrays(self):
+    def _initialize_arrays(self) -> None:
         # Initializes the arrays of positions and velocities
         # so that their initial values correspond to the input parameters
 
@@ -266,24 +264,18 @@ class Simulator:
         )
 
         self._initialize_velocities(init_cm_pos)
-
         self._transform_to_cm_ref_frame(init_cm_pos)
 
-    def _allocate_arrays(self):
+    def _allocate_arrays(self) -> None:
 
         self.star_pos = np.empty((self.num_steps + 1, 3), dtype=np.double)
-
         self.star_vel = np.empty_like(self.star_pos)
-
         self.planet_pos = np.empty_like(self.star_pos)
-
         self.planet_vel = np.empty_like(self.star_pos)
-
         self.sat_pos = np.empty_like(self.star_pos)
-
         self.sat_vel = np.empty_like(self.star_pos)
 
-    def _initialize_positions(self):
+    def _initialize_positions(self) -> None:
 
         self.star_pos[0] = np.array((0, 0, 0))
 
@@ -299,7 +291,7 @@ class Simulator:
 
         self.sat_pos[0] = self.lagrange_point + perturbation
 
-    def _initialize_velocities(self, init_cm_pos: Array1D):
+    def _initialize_velocities(self, init_cm_pos: Array1D) -> None:
         # orbits are counterclockwise so
         # angular velocity is in the positive z direction
         angular_vel = np.array((0, 0, self.angular_speed), dtype=np.double)
@@ -317,15 +309,15 @@ class Simulator:
 
         self.sat_vel[0] = speed * unit_vector(vel_angle)
 
-    def _transform_to_cm_ref_frame(self, init_cm_pos: Array1D):
+    def _transform_to_cm_ref_frame(self, init_cm_pos: Array1D) -> None:
         self.star_pos[0] -= init_cm_pos
         self.planet_pos[0] -= init_cm_pos
         self.sat_pos[0] -= init_cm_pos
 
         self.lagrange_point_trans = self.lagrange_point - init_cm_pos
 
-    def _integrate(self):
-        integrate(
+    def _integrate(self) -> None:
+        nb_integrate(
             self.time_step_in_seconds,
             self.num_steps,
             self.star_mass,
@@ -355,10 +347,8 @@ class Simulator:
         ) / (self.star_mass + self.planet_mass + self.SAT_MASS)
 
     def transform_to_corotating(self, pos_trans: Array2D) -> Array2D:
-
         angular_speed = self.angular_speed * np.sign(self.time_step_in_seconds)
-
-        return transform_to_corotating(pos_trans, self.time_points(), angular_speed)
+        return nb_transform_to_corotating(pos_trans, self.time_points(), angular_speed)
 
     def conservation_calculations(self) -> tuple[Array2D, Array2D, Array1D]:
         total_momentum = self.calc_total_linear_momentum()

@@ -27,7 +27,6 @@ def safe_eval(expr: str) -> int | float | None:
         res = eval(translated_expr, CONSTANTS)  # pylint: disable=eval-used
 
     except (NameError, SyntaxError, ZeroDivisionError) as err:
-
         raise ValueError(str(err)) from err
 
     if not isinstance(res, (int, float)):

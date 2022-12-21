@@ -35,7 +35,6 @@ sysParams: Params = {
 
 class SimUi(QtWidgets.QMainWindow):
     def __init__(self, plotter: Plotter):
-
         super().__init__()
 
         self._plotter = plotter
@@ -56,7 +55,6 @@ class SimUi(QtWidgets.QMainWindow):
         self.resize(self._generalLayout.sizeHint())
 
     def _addInputFields(self) -> None:
-
         self._inputsLayout = QtWidgets.QFormLayout()
 
         self.buttons: dict[str, QtWidgets.QPushButton] = {}
@@ -69,11 +67,9 @@ class SimUi(QtWidgets.QMainWindow):
         self._generalLayout.addLayout(self._inputsLayout)
 
     def _addButtons(self) -> None:
-
-        buttons = ("Simulate", "Start/Stop")
         buttonsLayout = QtWidgets.QHBoxLayout()
 
-        for btnText in buttons:
+        for btnText in ("Simulate", "Start/Stop"):
             self.buttons[btnText] = QtWidgets.QPushButton(btnText)
 
             buttonsLayout.addWidget(self.buttons[btnText])
@@ -81,7 +77,6 @@ class SimUi(QtWidgets.QMainWindow):
         self._inputsLayout.addRow(buttonsLayout)
 
     def _addParams(self, argLabelText: str, params: Params) -> None:
-
         argLabel = QtWidgets.QLabel(argLabelText)
         argLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._inputsLayout.addRow(argLabel)
@@ -97,10 +92,8 @@ class SimUi(QtWidgets.QMainWindow):
         self._plotter.plot_orbits()
 
     def toggleAnimation(self) -> None:
-
         if not self._plotted:
             errorMessage("No plots to animate.")
-
             return
 
         self._plotter.toggle_animation()
@@ -128,6 +121,7 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
     def _connectSignals(self) -> None:
 
+        # TODO: move to static constant and pass to view.
         btnActions = {"Simulate": self._simulate, "Start/Stop": self._toggleAnimation}
 
         for btnText, btn in self._view.buttons.items():
@@ -154,14 +148,12 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
                 setattr(self._model, attr, value)
 
         except (TypeError, ValueError) as e:
-
             msg = str(e)
 
             for paramLabel, attr in paramLabelsToAttribute.items():
                 msg = msg.replace(attr, paramLabel)
 
             errorMessage(msg)
-
             return
 
         self._model.simulate()
@@ -215,15 +207,11 @@ def _translateInputs(inputs: dict[str, T]) -> dict[str, T]:
 
 def main() -> None:
     simApp = QtWidgets.QApplication(sys.argv)
-
     simApp.setFont(QFont("Arial", 10))
 
     sim = Simulator()
-
     plotter = Plotter(sim)
-
     view = SimUi(plotter)
-
     view.show()
 
     ctrl = SimCtrl(model=sim, view=view)  # noqa: F841 # pylint: disable=unused-variable

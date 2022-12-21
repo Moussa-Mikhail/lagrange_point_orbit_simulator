@@ -48,11 +48,9 @@ class Plotter:
 
     def toggle_animation(self) -> None:
         if self.timer.isActive():
-
             self.timer.stop()
 
         else:
-
             self.timer.start(self.period_of_animation)
 
     @staticmethod
@@ -147,6 +145,7 @@ class Plotter:
 
         plot.addItem(anim_plot)
 
+        # TODO: refactor type into type alias
         star_args: dict[str, str | int] = {
             "pen": "y",
             "brush": "y",
@@ -171,9 +170,7 @@ class Plotter:
         # The purpose of this is to add the bodies to the plot legend
         # and plot their initial positions
         Plotter.plot_point(anim_plot, star_pos[0], **star_args)
-
         Plotter.plot_point(anim_plot, planet_pos[0], **planet_args)
-
         Plotter.plot_point(anim_plot, sat_pos[0], **sat_args)
 
         idx_gen = self.plot_index_generator()
