@@ -14,6 +14,7 @@ def norm(vector: Array1D) -> float:
     return sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2])
 
 
+# pylint: disable=too-many-arguments
 @njit()
 def calc_acceleration(
     star_mass: float,
@@ -51,6 +52,7 @@ def calc_acceleration(
         )
 
 
+# pylint: disable=too-many-arguments, too-many-locals
 @njit()
 def integrate(
     time_step: float,

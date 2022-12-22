@@ -40,6 +40,7 @@ def calc_period_from_semi_major_axis(
     return sqrt(period_squared)
 
 
+# pylint: disable=too-many-instance-attributes
 class Simulator:
     """This class holds parameters defining a satellites orbit and simulates it.
     Once an instance of the class has been created it can be used by calling the simulate method.
@@ -103,6 +104,7 @@ class Simulator:
     planet_distance = descriptors.positive_float()
     lagrange_label = descriptors.lagrange_label_desc()
 
+    # pylint: disable=too-many-arguments
     def __init__(
         self,
         num_years: float = 100.0,
