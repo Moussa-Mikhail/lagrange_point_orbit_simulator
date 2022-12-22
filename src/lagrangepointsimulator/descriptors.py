@@ -1,6 +1,5 @@
 # pylint: disable=missing-function-docstring
 """Holds descriptor factory functions"""
-from typing import Optional
 
 from validateddescriptor import ValidatedDescriptor, value_check_factory
 
@@ -29,8 +28,8 @@ def float_desc() -> ValidatedDescriptor[float]:
     return ValidatedDescriptor[float](float)
 
 
-def optional_float_desc() -> ValidatedDescriptor[Optional[float]]:
-    return ValidatedDescriptor[Optional[float]](float | None)
+def optional_float_desc() -> ValidatedDescriptor[float | None]:
+    return ValidatedDescriptor[float | None](float | None)
 
 
 lagrange_labels = ("L1", "L2", "L3", "L4", "L5")
