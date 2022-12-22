@@ -2,7 +2,7 @@
 # pylint: disable=missing-docstring
 import time
 
-from .simulator import Simulator
+from src.lagrangepointsimulator.simulator import Simulator
 
 NUM_SAMPLES = 1000
 
@@ -28,4 +28,4 @@ def simulate_with_reallocation() -> None:
 
 simulate_without_reallocation()
 
-simulate_with_reallocation()
+# simulate_with_reallocation()
