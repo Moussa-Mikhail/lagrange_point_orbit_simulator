@@ -7,8 +7,8 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 
 from src.lagrangepointsimulator import Simulator
-from .orbit_plotter import Plotter
-from .safe_eval import safe_eval as safeEval
+from src.lagrangepointgui.orbit_plotter import Plotter
+from src.lagrangepointgui.safe_eval import safe_eval as safeEval
 
 Params: TypeAlias = dict[str, tuple[str, str]]
 
