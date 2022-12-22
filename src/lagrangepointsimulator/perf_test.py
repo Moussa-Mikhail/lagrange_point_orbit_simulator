@@ -7,7 +7,7 @@ from .simulator import Simulator
 NUM_SAMPLES = 1000
 
 
-def simulate_without_reallocation():
+def simulate_without_reallocation() -> None:
     sim = Simulator()
     start = time.perf_counter()
     for _ in range(NUM_SAMPLES):
@@ -16,7 +16,7 @@ def simulate_without_reallocation():
     print(f"Without reallocation: {(end - start) / NUM_SAMPLES} seconds per simulation")
 
 
-def simulate_with_reallocation():
+def simulate_with_reallocation() -> None:
     sim = Simulator()
     start = time.perf_counter()
     for _ in range(NUM_SAMPLES):

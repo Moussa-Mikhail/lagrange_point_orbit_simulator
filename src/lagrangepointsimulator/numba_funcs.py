@@ -27,7 +27,7 @@ def calc_acceleration(
     r_planet_to_star: Array1D,
     r_sat_to_star: Array1D,
     r_sat_to_planet: Array1D,
-):
+) -> None:
     for j in range(3):
         # vector from planet to star
         r_planet_to_star[j] = star_pos[j] - planet_pos[j]
@@ -63,7 +63,7 @@ def integrate(
     planet_vel: Array2D,
     sat_pos: Array2D,
     sat_vel: Array2D,
-):
+) -> None:
     star_accel = np.empty(3, dtype=np.double)
     planet_accel = np.empty_like(star_accel)
     sat_accel = np.empty_like(star_accel)
