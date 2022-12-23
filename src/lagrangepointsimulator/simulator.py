@@ -15,8 +15,8 @@ from numpy.linalg import norm
 from . import descriptors
 from .constants import AU, EARTH_MASS, HOURS, SUN_MASS, YEARS, G
 from .numba_funcs import (
-    integrate as nb_integrate,
     transform_to_corotating as nb_transform_to_corotating,
+    ThreeBodyIntegrator,
 )
 from .sim_types import Array1D, Array2D
 
@@ -319,7 +319,7 @@ class Simulator:
         self.lagrange_point_trans = self.lagrange_point - init_cm_pos
 
     def _integrate(self) -> None:
-        nb_integrate(
+        integrator = ThreeBodyIntegrator(
             self.time_step_in_seconds,
             self.num_steps,
             self.star_mass,
@@ -331,6 +331,8 @@ class Simulator:
             self.sat_pos,
             self.sat_vel,
         )
+
+        integrator.integrate()
 
     def calc_center_of_mass(
         self,

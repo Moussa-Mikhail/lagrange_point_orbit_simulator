@@ -3,7 +3,8 @@
 from math import sqrt
 
 import numpy as np
-from numba import njit, prange  # type: ignore
+from numba import njit, prange, float64, int64  # type: ignore
+from numba.experimental import jitclass  # type: ignore
 
 from .constants import G
 from .sim_types import Array1D, Array2D
@@ -122,6 +123,158 @@ def integrate(
             )
 
             sat_pos[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel[k, j] * time_step
+
+
+spec = [
+    ("time_step", float64),
+    ("num_steps", int64),
+    ("star_mass", float64),
+    ("planet_mass", float64),
+    ("star_pos", float64[:, ::1]),
+    ("star_vel", float64[:, ::1]),
+    ("planet_pos", float64[:, ::1]),
+    ("planet_vel", float64[:, ::1]),
+    ("sat_pos", float64[:, ::1]),
+    ("sat_vel", float64[:, ::1]),
+    ("_star_accel", float64[::1]),
+    ("_planet_accel", float64[::1]),
+    ("_sat_accel", float64[::1]),
+    ("_star_intermediate_pos", float64[::1]),
+    ("_planet_intermediate_pos", float64[::1]),
+    ("_sat_intermediate_pos", float64[::1]),
+    ("_r_planet_to_star", float64[::1]),
+    ("_r_sat_to_star", float64[::1]),
+    ("_r_sat_to_planet", float64[::1]),
+]
+
+
+@jitclass(spec)
+class ThreeBodyIntegrator:  # pylint: disable=too-many-instance-attributes, too-few-public-methods
+    def __init__(
+        self,
+        time_step: float,
+        num_steps: int,
+        star_mass: float,
+        planet_mass: float,
+        star_pos: Array2D,
+        star_vel: Array2D,
+        planet_pos: Array2D,
+        planet_vel: Array2D,
+        sat_pos: Array2D,
+        sat_vel: Array2D,
+    ):
+        self.time_step = time_step
+        self.num_steps = num_steps
+
+        self.star_mass = star_mass
+        self.planet_mass = planet_mass
+
+        self.star_pos = star_pos
+        self.star_vel = star_vel
+        self.planet_pos = planet_pos
+        self.planet_vel = planet_vel
+        self.sat_pos = sat_pos
+        self.sat_vel = sat_vel
+
+        self._star_intermediate_pos = np.empty(3, dtype=np.double)
+        self._planet_intermediate_pos = np.empty_like(self._star_intermediate_pos)
+        self._sat_intermediate_pos = np.empty_like(self._star_intermediate_pos)
+
+        self._r_planet_to_star = np.empty_like(self._star_intermediate_pos)
+        self._r_sat_to_star = np.empty_like(self._star_intermediate_pos)
+        self._r_sat_to_planet = np.empty_like(self._star_intermediate_pos)
+
+        self._star_accel = np.empty_like(self._star_intermediate_pos)
+        self._planet_accel = np.empty_like(self._star_intermediate_pos)
+        self._sat_accel = np.empty_like(self._star_intermediate_pos)
+
+    def integrate(self) -> None:
+        for k in range(1, self.num_steps + 1):
+            self._calc_intermediate_pos(k)
+
+            self._calc_acceleration()
+
+            self._vel_update(k)
+
+            self._pos_update(k)
+
+    def _calc_intermediate_pos(self, k: int) -> None:
+        for j in range(3):
+            # intermediate position calculation
+            self._star_intermediate_pos[j] = (
+                self.star_pos[k - 1, j] + 0.5 * self.star_vel[k - 1, j] * self.time_step
+            )
+
+            self._planet_intermediate_pos[j] = (
+                self.planet_pos[k - 1, j]
+                + 0.5 * self.planet_vel[k - 1, j] * self.time_step
+            )
+
+            self._sat_intermediate_pos[j] = (
+                self.sat_pos[k - 1, j] + 0.5 * self.sat_vel[k - 1, j] * self.time_step
+            )
+
+    def _calc_acceleration(self) -> None:
+        for j in range(3):
+            self._r_planet_to_star[j] = (
+                self._star_intermediate_pos[j] - self._planet_intermediate_pos[j]
+            )
+            self._r_sat_to_star[j] = (
+                self._star_intermediate_pos[j] - self._sat_intermediate_pos[j]
+            )
+            self._r_sat_to_planet[j] = (
+                self._planet_intermediate_pos[j] - self._sat_intermediate_pos[j]
+            )
+
+        d_planet_to_star = norm(self._r_planet_to_star)
+        d_sat_to_star = norm(self._r_sat_to_star)
+        d_sat_to_planet = norm(self._r_sat_to_planet)
+
+        for j in range(3):
+            self._star_accel[j] = (
+                -G
+                * self.planet_mass
+                * self._r_planet_to_star[j]
+                / d_planet_to_star**3
+            )
+
+            self._planet_accel[j] = (
+                G * self.star_mass * self._r_planet_to_star[j] / d_planet_to_star**3
+            )
+
+            self._sat_accel[j] = (
+                G * self.star_mass * self._r_sat_to_star[j] / d_sat_to_star**3
+                + G * self.planet_mass * self._r_sat_to_planet[j] / d_sat_to_planet**3
+            )
+
+    def _vel_update(self, k: int) -> None:
+        for j in range(3):
+            self.star_vel[k, j] = (
+                self.star_vel[k - 1, j] + self._star_accel[j] * self.time_step
+            )
+            self.planet_vel[k, j] = (
+                self.planet_vel[k - 1, j] + self._planet_accel[j] * self.time_step
+            )
+            self.sat_vel[k, j] = (
+                self.sat_vel[k - 1, j] + self._sat_accel[j] * self.time_step
+            )
+
+    def _pos_update(self, k: int) -> None:
+        for j in range(3):
+            self.star_pos[k, j] = (
+                self._star_intermediate_pos[j]
+                + 0.5 * self.star_vel[k, j] * self.time_step
+            )
+
+            self.planet_pos[k, j] = (
+                self._planet_intermediate_pos[j]
+                + 0.5 * self.planet_vel[k, j] * self.time_step
+            )
+
+            self.sat_pos[k, j] = (
+                self._sat_intermediate_pos[j]
+                + 0.5 * self.sat_vel[k, j] * self.time_step
+            )
 
 
 @njit(parallel=True)
