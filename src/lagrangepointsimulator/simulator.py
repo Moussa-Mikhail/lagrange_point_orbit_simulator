@@ -13,7 +13,7 @@ import numpy as np
 from numpy.linalg import norm
 
 from . import descriptors
-from .constants import AU, EARTH_MASS, HOURS, SUN_MASS, YEARS, G
+from .constants import AU, EARTH_MASS, G, HOURS, SUN_MASS, YEARS
 from .numba_funcs import (
     integrate as nb_integrate,
     transform_to_corotating as nb_transform_to_corotating,
@@ -30,12 +30,8 @@ def unit_vector(angle: float) -> Array1D:
     return np.array([np.cos(angle), np.sin(angle), 0])
 
 
-def calc_period_from_semi_major_axis(
-    semi_major_axis: float, star_mass: float, planet_mass: float
-) -> float:
-    period_squared = (
-        4 * np.pi**2 * semi_major_axis**3 / (G * (star_mass + planet_mass))
-    )
+def calc_period_from_semi_major_axis(semi_major_axis: float, star_mass: float, planet_mass: float) -> float:
+    period_squared = 4 * np.pi**2 * semi_major_axis**3 / (G * (star_mass + planet_mass))
 
     return sqrt(period_squared)
 
@@ -118,7 +114,6 @@ class Simulator:
         planet_mass: float = EARTH_MASS,
         planet_distance: float = 1.0,
     ):
-
         self.num_years = num_years
         self.time_step = time_step
 
@@ -152,12 +147,7 @@ class Simulator:
 
     @property
     def num_steps(self) -> int:
-
-        return (
-            0
-            if self.time_step_in_seconds == 0
-            else ceil(abs(self.sim_time / self.time_step_in_seconds))
-        )
+        return 0 if self.time_step_in_seconds == 0 else ceil(abs(self.sim_time / self.time_step_in_seconds))
 
     def time_points(self) -> Array1D:
         return np.linspace(0, self.sim_time, self.num_steps + 1)
@@ -170,52 +160,33 @@ class Simulator:
         return self.calc_lagrange_point()
 
     def calc_lagrange_point(self) -> Array1D:
-
         planet_distance_meters = self.planet_distance * AU
 
-        hill_radius: float = planet_distance_meters * (
-            self.planet_mass / (3 * self.star_mass)
-        ) ** (1 / 3)
+        hill_radius: float = planet_distance_meters * (self.planet_mass / (3 * self.star_mass)) ** (1 / 3)
 
         match self.lagrange_label:
-
             case "L1":
-                return planet_distance_meters * np.array((1, 0, 0)) - np.array(
-                    (hill_radius, 0, 0)
-                )
+                return planet_distance_meters * np.array((1, 0, 0)) - np.array((hill_radius, 0, 0))
 
             case "L2":
-                return planet_distance_meters * np.array((1, 0, 0)) + np.array(
-                    (hill_radius, 0, 0)
-                )
+                return planet_distance_meters * np.array((1, 0, 0)) + np.array((hill_radius, 0, 0))
 
             case "L3":
-                l3_dist = (
-                    planet_distance_meters * 7 / 12 * self.planet_mass / self.star_mass
-                )
+                l3_dist = planet_distance_meters * 7 / 12 * self.planet_mass / self.star_mass
 
-                return -planet_distance_meters * np.array((1, 0, 0)) - np.array(
-                    (l3_dist, 0, 0)
-                )
+                return -planet_distance_meters * np.array((1, 0, 0)) - np.array((l3_dist, 0, 0))
 
             case "L4":
-
                 return planet_distance_meters * unit_vector(np.pi / 3)
 
             case "L5":
-
                 return planet_distance_meters * unit_vector(-np.pi / 3)
 
             case _:
-                raise ValueError(
-                    "Invalid Lagrange point label. Must be one of ('L1', 'L2', 'L3', 'L4', 'L5')"
-                )
+                raise ValueError("Invalid Lagrange point label. Must be one of ('L1', 'L2', 'L3', 'L4', 'L5')")
 
     def default_perturbation_angle(self) -> float:
-
-        return {"L1": 0.0, "L2": 0.0, "L3": 180.0, "L4": 60.0, "L5": -60.0}[
-            self.lagrange_label
-        ]
+        return {"L1": 0.0, "L2": 0.0, "L3": 180.0, "L4": 60.0, "L5": -60.0}[self.lagrange_label]
 
     @property
     def actual_perturbation_angle(self) -> float:
@@ -236,10 +207,7 @@ class Simulator:
         return self.calc_orbital_period()
 
     def calc_orbital_period(self) -> float:
-
-        return calc_period_from_semi_major_axis(
-            self.planet_distance * AU, self.star_mass, self.planet_mass
-        )
+        return calc_period_from_semi_major_axis(self.planet_distance * AU, self.star_mass, self.planet_mass)
 
     @property
     def angular_speed(self) -> float:
@@ -261,15 +229,12 @@ class Simulator:
         # we set up conditions so that the star and planet have circular orbits
         # about the center of mass
         # velocities have to be defined relative to the CM
-        init_cm_pos = self.calc_center_of_mass(
-            self.star_pos[0], self.planet_pos[0], self.sat_pos[0]
-        )
+        init_cm_pos = self.calc_center_of_mass(self.star_pos[0], self.planet_pos[0], self.sat_pos[0])
 
         self._initialize_velocities(init_cm_pos)
         self._transform_to_cm_ref_frame(init_cm_pos)
 
     def _allocate_arrays(self) -> None:
-
         self.star_pos = np.empty((self.num_steps + 1, 3), dtype=np.double)
         self.star_vel = np.empty_like(self.star_pos)
         self.planet_pos = np.empty_like(self.star_pos)
@@ -278,7 +243,6 @@ class Simulator:
         self.sat_vel = np.empty_like(self.star_pos)
 
     def _initialize_positions(self) -> None:
-
         self.star_pos[0] = np.array((0, 0, 0))
 
         self.planet_pos[0] = np.array((self.planet_distance * AU, 0, 0))
@@ -287,9 +251,7 @@ class Simulator:
         perturbation_size = self.perturbation_size * AU
         perturbation_angle = np.radians(self.actual_perturbation_angle)
 
-        perturbation = perturbation_size * np.array(
-            (np.cos(perturbation_angle), np.sin(perturbation_angle), 0)
-        )
+        perturbation = perturbation_size * np.array((np.cos(perturbation_angle), np.sin(perturbation_angle), 0))
 
         self.sat_pos[0] = self.lagrange_point + perturbation
 
@@ -343,9 +305,7 @@ class Simulator:
         """
 
         return (
-            self.star_mass * star_pos_or_vel
-            + self.planet_mass * planet_pos_or_vel
-            + self.SAT_MASS * sat_pos_or_vel
+            self.star_mass * star_pos_or_vel + self.planet_mass * planet_pos_or_vel + self.SAT_MASS * sat_pos_or_vel
         ) / (self.star_mass + self.planet_mass + self.SAT_MASS)
 
     def transform_to_corotating(self, pos_trans: Array2D) -> Array2D:
@@ -360,29 +320,18 @@ class Simulator:
         return total_momentum, total_angular_momentum, total_energy
 
     def calc_total_linear_momentum(self) -> Array2D:
-
-        return (
-            self.star_mass * self.star_vel
-            + self.planet_mass * self.planet_vel
-            + self.SAT_MASS * self.sat_vel
-        )
+        return self.star_mass * self.star_vel + self.planet_mass * self.planet_vel + self.SAT_MASS * self.sat_vel
 
     def calc_total_angular_momentum(self) -> Array2D:
+        angular_momentum_star: Array2D = np.cross(self.star_pos, self.star_mass * self.star_vel)
 
-        angular_momentum_star: Array2D = np.cross(
-            self.star_pos, self.star_mass * self.star_vel
-        )
-
-        angular_momentum_planet = np.cross(
-            self.planet_pos, self.planet_mass * self.planet_vel
-        )
+        angular_momentum_planet = np.cross(self.planet_pos, self.planet_mass * self.planet_vel)
 
         angular_momentum_sat = np.cross(self.sat_pos, self.SAT_MASS * self.sat_vel)
 
         return angular_momentum_star + angular_momentum_planet + angular_momentum_sat
 
     def calc_total_energy(self) -> Array1D:
-
         d_planet_to_star = array_of_norms(self.star_pos - self.planet_pos)
         d_planet_to_sat = array_of_norms(self.sat_pos - self.planet_pos)
         d_star_to_sat = array_of_norms(self.sat_pos - self.star_pos)

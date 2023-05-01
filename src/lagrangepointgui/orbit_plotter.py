@@ -3,7 +3,7 @@
 the orbits of the system simulated by an instance of the Simulator class.
 """
 from math import ceil
-from typing import Callable, Any, Generator
+from typing import Any, Callable, Generator
 
 import pyqtgraph as pg  # type: ignore
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
@@ -27,18 +27,13 @@ class Plotter:
     }
 
     def __init__(self, sim: Simulator):
-
         self.sim = sim
 
-        self.inertial_plot = Plotter.make_plot(
-            title="Orbits in Inertial Coordinate System"
-        )
+        self.inertial_plot = Plotter.make_plot(title="Orbits in Inertial Coordinate System")
 
         self.inertial_plot.setAspectLocked(True)
 
-        self.corotating_plot = Plotter.make_plot(
-            title="Orbits in Co-Rotating Coordinate System"
-        )
+        self.corotating_plot = Plotter.make_plot(title="Orbits in Co-Rotating Coordinate System")
 
         self.corotating_plot.setAspectLocked(True)
 
@@ -55,7 +50,6 @@ class Plotter:
 
     @staticmethod
     def make_plot(title: str = "") -> pg.PlotWidget:
-
         plot = pg.PlotWidget(title=title)
 
         plot.setLabel("bottom", "x", units="AU")
@@ -65,7 +59,6 @@ class Plotter:
 
     # noinspection PyUnresolvedReferences
     def plot_orbits(self) -> None:
-
         animate_inertial = self.plot_inertial_orbits()
         animate_corotating = self.plot_corotating_orbits()
 
@@ -88,7 +81,6 @@ class Plotter:
         rate = ceil(50 * time_step_default / abs(self.sim.time_step_in_seconds))
 
         while True:
-
             i = i + rate
 
             if i >= self.sim.num_steps:
@@ -187,9 +179,7 @@ class Plotter:
         return animate_plot
 
     @staticmethod
-    def plot_point(
-        scatter_plot: pg.ScatterPlotItem, pos: Array1D, **kwargs: Any
-    ) -> None:
+    def plot_point(scatter_plot: pg.ScatterPlotItem, pos: Array1D, **kwargs: Any) -> None:
         """Plots pos on scatter_plot.
         pos can be any subscript-able list with length >= 2. Only the first 2 elements are plotted.
         """
@@ -200,10 +190,7 @@ class Plotter:
         )
 
     def plot_inertial_orbits(self) -> AnimatePlotFunc:
-
-        return self.plot_orbit(
-            self.inertial_plot, self.sim.star_pos, self.sim.planet_pos, self.sim.sat_pos
-        )
+        return self.plot_orbit(self.inertial_plot, self.sim.star_pos, self.sim.planet_pos, self.sim.sat_pos)
 
     def plot_corotating_orbits(self) -> AnimatePlotFunc:
         """Plots the orbits of the system simulated in the corotating frame"""
@@ -224,7 +211,6 @@ class Plotter:
         return animate_corotating_plot
 
     def add_lagrange_point_to_corotating_plot(self) -> None:
-
         lagrange_point_plot = pg.ScatterPlotItem()
 
         self.corotating_plot.addItem(lagrange_point_plot)
@@ -256,9 +242,7 @@ class Plotter:
         ) = self.sim.conservation_calculations()
 
         # Conversion to float is just to satisfy mypy
-        init_planet_momentum = float(
-            norm(self.sim.planet_mass * self.sim.planet_vel[0])
-        )
+        init_planet_momentum = float(norm(self.sim.planet_mass * self.sim.planet_vel[0]))
 
         # slice the arrays so that we only plot at most 10**5 points.
         arr_step = self.array_step()
@@ -301,17 +285,13 @@ class Plotter:
                 component,
             )
 
-    def plot_angular_momentum(
-        self, total_angular_momentum: Array2D, times_in_years: Array1D
-    ) -> None:
+    def plot_angular_momentum(self, total_angular_momentum: Array2D, times_in_years: Array1D) -> None:
         """Plots the relative change in the angular momentum."""
 
         angular_momentum_plot = self.initialize_conserved_plot("Angular Momentum")
 
         for component, (idx, _) in Plotter.component_to_plot_args.items():
-            normalized_angular_momentum = (
-                total_angular_momentum[:, idx] / total_angular_momentum[0, idx] - 1
-            )
+            normalized_angular_momentum = total_angular_momentum[:, idx] / total_angular_momentum[0, idx] - 1
 
             Plotter.plot_component(
                 angular_momentum_plot,
@@ -321,9 +301,7 @@ class Plotter:
             )
 
     @staticmethod
-    def plot_component(
-        plot: pg.PlotWidget, times: Array1D, arr: Array2D, component: str
-    ) -> None:
+    def plot_component(plot: pg.PlotWidget, times: Array1D, arr: Array2D, component: str) -> None:
         """Plots a component of a 2D array against the times array.
         component must be one of the following: 'x', 'y', 'z'"""
 
@@ -331,9 +309,7 @@ class Plotter:
             idx, pen = Plotter.component_to_plot_args[component]
 
         except KeyError as err:
-            raise ValueError(
-                f"component must be one of the following: x, y, z. Got {component}"
-            ) from err
+            raise ValueError(f"component must be one of the following: x, y, z. Got {component}") from err
 
         arr = arr[:, idx]
 

@@ -34,9 +34,7 @@ def optional_float_desc() -> ValidatedDescriptor[float | None]:
 
 lagrange_labels = ("L1", "L2", "L3", "L4", "L5")
 
-is_lagrange_label = value_check_factory(
-    lambda x: x in lagrange_labels, f"one of {lagrange_labels}"
-)
+is_lagrange_label = value_check_factory(lambda x: x in lagrange_labels, f"one of {lagrange_labels}")
 
 
 def lagrange_label_desc() -> ValidatedDescriptor[str]:

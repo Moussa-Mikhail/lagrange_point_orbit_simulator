@@ -81,17 +81,11 @@ def integrate(
     for k in range(1, num_steps + 1):
         for j in range(3):
             # intermediate position calculation
-            star_intermediate_pos[j] = (
-                star_pos[k - 1, j] + 0.5 * star_vel[k - 1, j] * time_step
-            )
+            star_intermediate_pos[j] = star_pos[k - 1, j] + 0.5 * star_vel[k - 1, j] * time_step
 
-            planet_intermediate_pos[j] = (
-                planet_pos[k - 1, j] + 0.5 * planet_vel[k - 1, j] * time_step
-            )
+            planet_intermediate_pos[j] = planet_pos[k - 1, j] + 0.5 * planet_vel[k - 1, j] * time_step
 
-            sat_intermediate_pos[j] = (
-                sat_pos[k - 1, j] + 0.5 * sat_vel[k - 1, j] * time_step
-            )
+            sat_intermediate_pos[j] = sat_pos[k - 1, j] + 0.5 * sat_vel[k - 1, j] * time_step
 
         # acceleration calculation
         calc_acceleration(
@@ -117,17 +111,13 @@ def integrate(
             # position update
             star_pos[k, j] = star_intermediate_pos[j] + 0.5 * star_vel[k, j] * time_step
 
-            planet_pos[k, j] = (
-                planet_intermediate_pos[j] + 0.5 * planet_vel[k, j] * time_step
-            )
+            planet_pos[k, j] = planet_intermediate_pos[j] + 0.5 * planet_vel[k, j] * time_step
 
             sat_pos[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel[k, j] * time_step
 
 
 @njit(parallel=True)
-def transform_to_corotating(
-    pos_trans: Array2D, times: Array1D, angular_speed: float
-) -> Array2D:
+def transform_to_corotating(pos_trans: Array2D, times: Array1D, angular_speed: float) -> Array2D:
     """Transforms pos_trans to a frame of reference that rotates at a rate of angular_speed.
     pos_trans is an array of positions measured relative to the center of rotation.
     """

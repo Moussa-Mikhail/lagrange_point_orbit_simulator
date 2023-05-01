@@ -1,14 +1,14 @@
 # pylint: disable=no-name-in-module, invalid-name, missing-docstring
 import sys
-from typing import TypeVar, TypeAlias
+from typing import TypeAlias, TypeVar
 
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 
-from src.lagrangepointsimulator import Simulator
 from src.lagrangepointgui.orbit_plotter import Plotter
 from src.lagrangepointgui.safe_eval import safe_eval as safeEval
+from src.lagrangepointsimulator import Simulator
 
 Params: TypeAlias = dict[str, tuple[str, str]]
 
@@ -102,9 +102,7 @@ class SimUi(QtWidgets.QMainWindow):
 allParams = simParams | satParams | sysParams
 
 # used to translate param labels used in gui to attribute names
-paramLabelsToAttribute = {
-    paramLabel: attribute for paramLabel, (_, attribute) in allParams.items()
-}
+paramLabelsToAttribute = {paramLabel: attribute for paramLabel, (_, attribute) in allParams.items()}
 
 
 class SimCtrl:  # pylint: disable=too-few-public-methods
@@ -113,14 +111,12 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         model: Simulator,
         view: SimUi,
     ):
-
         self._model = model
         self._view = view
         self._connectSignals()
         self._addReturnPressed()
 
     def _connectSignals(self) -> None:
-
         # TODO: move to static constant and pass to view.
         btnActions = {"Simulate": self._simulate, "Start/Stop": self._toggleAnimation}
 
@@ -129,7 +125,6 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
             btn.clicked.connect(action)  # type: ignore
 
     def _addReturnPressed(self) -> None:
-
         for field in self._view.inputFields.values():
             field.returnPressed.connect(self._simulate)  # type: ignore
 
@@ -160,11 +155,9 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         self._view.updatePlots()
 
     def _getSimulationInputs(self) -> dict[str, str | float | None]:
-
         inputs: dict[str, str | float | None] = {}
 
         for fieldText, field in self._view.inputFields.items():
-
             fieldValue = field.text()
 
             if fieldText == "Lagrange label":
@@ -175,10 +168,7 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
                 value = safeEval(fieldValue)
 
             except ValueError as e:
-
-                raise ValueError(
-                    f"Invalid expression in field '{fieldText}'.\n{e}"
-                ) from e
+                raise ValueError(f"Invalid expression in field '{fieldText}'.\n{e}") from e
 
             if value is None:
                 inputs[fieldText] = value
