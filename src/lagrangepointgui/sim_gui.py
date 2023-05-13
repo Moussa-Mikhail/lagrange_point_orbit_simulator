@@ -13,12 +13,12 @@ from src.lagrangepointsimulator import Simulator
 Params: TypeAlias = dict[str, tuple[str, str]]
 
 # parameter name: (default value, attribute name)
-simParams: Params = {
+SIM_PARAMS: Params = {
     "number of years": ("10.0", "num_years"),
     "time step (hours)": ("1.0", "time_step"),
 }
 
-satParams: Params = {
+SAT_PARAMS: Params = {
     "perturbation size": ("0.0", "perturbation_size"),
     "perturbation angle": ("", "perturbation_angle"),
     "initial speed": ("1.0", "speed"),
@@ -26,7 +26,7 @@ satParams: Params = {
     "Lagrange label": ("L4", "lagrange_label"),
 }
 
-sysParams: Params = {
+SYS_PARAMS: Params = {
     "star mass": ("sun_mass", "star_mass"),
     "planet mass": ("earth_mass", "planet_mass"),
     "planet distance": ("1.0", "planet_distance"),
@@ -60,9 +60,9 @@ class SimUi(QtWidgets.QMainWindow):
         self.buttons: dict[str, QtWidgets.QPushButton] = {}
         self._addButtons()
 
-        self._addParams("Simulation Parameters", simParams)
-        self._addParams("System Parameters", sysParams)
-        self._addParams("Satellite Parameters", satParams)
+        self._addParams("Simulation Parameters", SIM_PARAMS)
+        self._addParams("System Parameters", SYS_PARAMS)
+        self._addParams("Satellite Parameters", SAT_PARAMS)
 
         self._generalLayout.addLayout(self._inputsLayout)
 
@@ -99,17 +99,17 @@ class SimUi(QtWidgets.QMainWindow):
         self._plotter.toggle_animation()
 
 
-allParams = simParams | satParams | sysParams
+ALL_PARAMS = SIM_PARAMS | SAT_PARAMS | SYS_PARAMS
 
 # used to translate param labels used in gui to attribute names
-paramLabelsToAttribute = {paramLabel: attribute for paramLabel, (_, attribute) in allParams.items()}
+PARAM_LABELS_TO_ATTRIBUTE = {paramLabel: attribute for paramLabel, (_, attribute) in ALL_PARAMS.items()}
 
 
 T = TypeVar("T")
 
 
 def _translateInputs(inputs: dict[str, T]) -> dict[str, T]:
-    return {paramLabelsToAttribute[label]: v for label, v in inputs.items()}
+    return {PARAM_LABELS_TO_ATTRIBUTE[label]: v for label, v in inputs.items()}
 
 
 class SimCtrl:  # pylint: disable=too-few-public-methods
@@ -152,7 +152,7 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         except (TypeError, ValueError) as e:
             msg = str(e)
 
-            for paramLabel, attr in paramLabelsToAttribute.items():
+            for paramLabel, attr in PARAM_LABELS_TO_ATTRIBUTE.items():
                 msg = msg.replace(attr, paramLabel)
 
             errorMessage(msg)
