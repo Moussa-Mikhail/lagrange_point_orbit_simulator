@@ -204,7 +204,7 @@ def main() -> None:
     view = SimUi(plotter)
     view.show()
 
-    ctrl = SimCtrl(model=sim, view=view)  # noqa: F841 # pylint: disable=unused-variable
+    _ = SimCtrl(model=sim, view=view)
 
     sys.exit(simApp.exec())
 

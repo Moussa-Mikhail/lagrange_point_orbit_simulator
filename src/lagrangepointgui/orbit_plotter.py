@@ -57,7 +57,6 @@ class Plotter:
 
         return plot
 
-    # noinspection PyUnresolvedReferences
     def plot_orbits(self) -> None:
         animate_inertial = self.plot_inertial_orbits()
         animate_corotating = self.plot_corotating_orbits()
