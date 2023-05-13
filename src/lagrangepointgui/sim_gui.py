@@ -68,10 +68,8 @@ class SimUi(QtWidgets.QMainWindow):
 
     def _addButtons(self) -> None:
         buttonsLayout = QtWidgets.QHBoxLayout()
-
         for btnText in ("Simulate", "Start/Stop"):
             self.buttons[btnText] = QtWidgets.QPushButton(btnText)
-
             buttonsLayout.addWidget(self.buttons[btnText])
 
         self._inputsLayout.addRow(buttonsLayout)
@@ -83,7 +81,6 @@ class SimUi(QtWidgets.QMainWindow):
 
         for fieldText, (defaultValue, _) in params.items():
             fieldLine = QtWidgets.QLineEdit(defaultValue)
-
             self.inputFields[fieldText] = fieldLine
             self._inputsLayout.addRow(fieldText, fieldLine)
 
@@ -104,7 +101,6 @@ ALL_PARAMS = SIM_PARAMS | SAT_PARAMS | SYS_PARAMS
 # used to translate param labels used in gui to attribute names
 PARAM_LABELS_TO_ATTRIBUTE = {paramLabel: attribute for paramLabel, (_, attribute) in ALL_PARAMS.items()}
 
-
 T = TypeVar("T")
 
 
@@ -124,9 +120,7 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         self._addReturnPressed()
 
     def _connectSignals(self) -> None:
-        # TODO: move to static constant and pass to view.
         btnActions = {"Simulate": self._simulate, "Start/Stop": self._toggleAnimation}
-
         for btnText, btn in self._view.buttons.items():
             action = btnActions[btnText]
             btn.clicked.connect(action)  # type: ignore
@@ -151,7 +145,6 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
         except (TypeError, ValueError) as e:
             msg = str(e)
-
             for paramLabel, attr in PARAM_LABELS_TO_ATTRIBUTE.items():
                 msg = msg.replace(attr, paramLabel)
 
@@ -163,14 +156,12 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
     def _getSimulationInputs(self) -> dict[str, str | float | None]:
         inputs: dict[str, str | float | None] = {}
-
         for fieldText, field in self._view.inputFields.items():
             fieldValue = field.text()
 
             if fieldText == "Lagrange label":
                 inputs[fieldText] = fieldValue
                 continue
-
             try:
                 value = safeEval(fieldValue)
 
@@ -204,7 +195,7 @@ def main() -> None:
     view = SimUi(plotter)
     view.show()
 
-    _ = SimCtrl(model=sim, view=view)
+    _ = SimCtrl(sim, view)
 
     sys.exit(simApp.exec())
 
