@@ -105,6 +105,13 @@ allParams = simParams | satParams | sysParams
 paramLabelsToAttribute = {paramLabel: attribute for paramLabel, (_, attribute) in allParams.items()}
 
 
+T = TypeVar("T")
+
+
+def _translateInputs(inputs: dict[str, T]) -> dict[str, T]:
+    return {paramLabelsToAttribute[label]: v for label, v in inputs.items()}
+
+
 class SimCtrl:  # pylint: disable=too-few-public-methods
     def __init__(
         self,
@@ -186,13 +193,6 @@ def errorMessage(message: str) -> None:
     errorMsg = QtWidgets.QErrorMessage()
     errorMsg.showMessage(message)
     errorMsg.exec()
-
-
-T = TypeVar("T")
-
-
-def _translateInputs(inputs: dict[str, T]) -> dict[str, T]:
-    return {paramLabelsToAttribute[label]: v for label, v in inputs.items()}
 
 
 def main() -> None:
