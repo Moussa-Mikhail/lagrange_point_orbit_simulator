@@ -9,13 +9,13 @@ from .constants import G
 from .sim_types import Array1D, Array2D
 
 
-@njit()
+@njit(cache=True)
 def norm(vector: Array1D) -> float:
     return sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2])
 
 
 # pylint: disable=too-many-arguments
-@njit()
+@njit(cache=True)
 def calc_acceleration(
     star_mass: float,
     planet_mass: float,
@@ -53,7 +53,7 @@ def calc_acceleration(
 
 
 # pylint: disable=too-many-arguments, too-many-locals
-@njit()
+@njit(cache=True)
 def integrate(
     time_step: float,
     num_steps: int,
@@ -116,7 +116,7 @@ def integrate(
             sat_pos[k, j] = sat_intermediate_pos[j] + 0.5 * sat_vel[k, j] * time_step
 
 
-@njit(parallel=True)
+@njit(parallel=True, cache=True)
 def transform_to_corotating(pos_trans: Array2D, times: Array1D, angular_speed: float) -> Array2D:
     """Transforms pos_trans to a frame of reference that rotates at a rate of angular_speed.
     pos_trans is an array of positions measured relative to the center of rotation.
