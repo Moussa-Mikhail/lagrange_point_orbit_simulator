@@ -23,18 +23,22 @@ MOON_MASS = 7.34767309 * 10**22
 JUPITER_MASS: float = 1.89813 * 10**27
 
 # distance between Earth and Sun in AU
-SUN_EARTH_DISTANCE = 0.9954
+SUN_EARTH_DIST = 0.9954
 
-SUN_JUPITER_DISTANCE = 4.953
+SUN_JUPITER_DIST = 4.953
 
-EARTH_MOON_DISTANCE = 0.002617
+EARTH_MOON_DIST = 0.002617
 
-CONSTANTS: dict[str, float] = {
-    "SUN_MASS": SUN_MASS,
-    "EARTH_MASS": EARTH_MASS,
-    "MOON_MASS": MOON_MASS,
-    "JUPITER_MASS": JUPITER_MASS,
-    "SUN_EARTH_DISTANCE": SUN_EARTH_DISTANCE,
-    "SUN_JUPITER_DISTANCE": SUN_JUPITER_DISTANCE,
-    "EARTH_MOON_DISTANCE": EARTH_MOON_DISTANCE,
+CONSTANTS: dict[str, float | int] = {
+    "G": G,
+    "AU": AU,
+    "years": YEARS,
+    "hours": HOURS,
+    "sun_mass": SUN_MASS,
+    "earth_mass": EARTH_MASS,
+    "moon_mass": MOON_MASS,
+    "jupiter_mass": JUPITER_MASS,
+    "sun_earth_dist": SUN_EARTH_DIST,
+    "sun_jupiter_dist": SUN_JUPITER_DIST,
+    "earth_moon_dist": EARTH_MOON_DIST,
 }

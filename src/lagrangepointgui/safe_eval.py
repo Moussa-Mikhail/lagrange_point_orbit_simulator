@@ -14,17 +14,13 @@ def safe_eval(expr: str) -> int | float | None:
         return None
 
     cleaned_expr = remove_constants(expr)
-
     chars_in_expr = set(cleaned_expr)
 
     if not chars_in_expr.issubset(allowed_chars):
-        raise ValueError("invalid name or operator in expression.")
+        raise ValueError("invalid constant or operator in expression.")
 
     try:
-        translated_expr = translate(expr)
-
-        # codiga-disable
-        res = eval(translated_expr, CONSTANTS)  # pylint: disable=eval-used
+        res = eval(expr, CONSTANTS)  # pylint: disable=eval-used
 
     except (NameError, SyntaxError, ZeroDivisionError) as err:
         raise ValueError(str(err)) from err
@@ -35,19 +31,10 @@ def safe_eval(expr: str) -> int | float | None:
     return res
 
 
-def translate(expr: str) -> str:
-    """translate constants in the expression to uppercase"""
-
-    for constant_name in CONSTANTS:
-        expr = expr.replace(constant_name.lower(), constant_name)
-
-    return expr
-
-
 def remove_constants(expr: str) -> str:
     """remove constants in the expression"""
 
     for constant_name in CONSTANTS:
-        expr = expr.replace(constant_name.lower(), "")
+        expr = expr.replace(constant_name, "")
 
     return expr
