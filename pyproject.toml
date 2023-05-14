@@ -57,3 +57,7 @@ ignore = ["E501"]
 [tool.pylint]
 extension-pkg-allow-list = "PyQt6"
 disable = ["line-too-long", "too-few-public-methods"]
+
+[tool.mypy]
+disallow_untyped_defs = true
+exclude = ["dist"]
