@@ -3,7 +3,7 @@ import sys
 from typing import Callable, TypeAlias, TypeVar
 
 from PyQt6 import QtWidgets
-from PyQt6.QtCore import QObject, QRunnable, Qt, pyqtSignal, QThreadPool
+from PyQt6.QtCore import QObject, QRunnable, QThreadPool, Qt, pyqtSignal
 from PyQt6.QtGui import QFont
 
 from src.lagrangepointgui.orbit_plotter import Plotter
