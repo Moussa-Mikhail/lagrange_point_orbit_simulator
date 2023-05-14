@@ -129,23 +129,22 @@ def transform_to_corotating(pos_trans: Array2D, times: Array1D, angular_speed: f
     # the inverse is R(-w*t)
     # at each time t we apply the matrix R(-w*t) to the position vector
 
-    pos_corotating = np.empty_like(pos_trans)
+    num_steps = pos_trans.shape[0]
+
+    pos_corotating = np.empty(dtype=pos_trans.dtype, shape=(num_steps, 2))
 
     for i in prange(pos_trans.shape[0]):
         time: float = times[i]
 
         angle = -angular_speed * time
 
-        c: float = np.cos(angle)
-        s: float = np.sin(angle)
+        cos: float = np.cos(angle)
+        sin: float = np.sin(angle)
 
-        pos_trans_x: float = pos_trans[i, 0]
-        pos_trans_y: float = pos_trans[i, 1]
+        x, y = pos_trans[i, :2]
 
-        pos_corotating[i, 0] = c * pos_trans_x - s * pos_trans_y
+        pos_corotating[i, 0] = cos * x - sin * y
 
-        pos_corotating[i, 1] = s * pos_trans_x + c * pos_trans_y
-
-    pos_corotating[:, 2] = pos_trans[:, 2]
+        pos_corotating[i, 1] = sin * x + cos * y
 
     return pos_corotating
