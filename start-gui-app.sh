@@ -1,1 +1,1 @@
-start dist/sim_gui/sim_gui
+exec dist/sim_gui/sim_gui
