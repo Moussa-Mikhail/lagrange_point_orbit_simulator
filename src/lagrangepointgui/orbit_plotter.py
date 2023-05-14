@@ -3,7 +3,7 @@
 the orbits of the system simulated by an instance of the Simulator class.
 """
 from math import ceil
-from typing import Any, Callable, Generator
+from typing import Any, Callable, Generator, TypeAlias
 
 import pyqtgraph as pg  # type: ignore
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
@@ -13,8 +13,9 @@ from src.lagrangepointsimulator import Simulator
 from src.lagrangepointsimulator.constants import AU, HOURS
 from src.lagrangepointsimulator.sim_types import Array1D, Array2D
 
-# codiga-disable
-AnimatePlotFunc = Callable[[], None]
+PlotArgs: TypeAlias = dict[str, str | int]
+
+AnimatePlotFunc: TypeAlias = Callable[[], None]
 
 
 class Plotter:
@@ -30,21 +31,17 @@ class Plotter:
         self.sim = sim
 
         self.inertial_plot = Plotter.make_plot(title="Orbits in Inertial Coordinate System")
-
         self.inertial_plot.setAspectLocked(True)
 
         self.corotating_plot = Plotter.make_plot(title="Orbits in Co-Rotating Coordinate System")
-
         self.corotating_plot.setAspectLocked(True)
 
         self.timer = QTimer()
-
         self.period_of_animation = 33
 
     def toggle_animation(self) -> None:
         if self.timer.isActive():
             self.timer.stop()
-
         else:
             self.timer.start(self.period_of_animation)
 
@@ -52,9 +49,8 @@ class Plotter:
         self.timer.stop()
 
     @staticmethod
-    def make_plot(title: str = "") -> pg.PlotWidget:
+    def make_plot(title: str) -> pg.PlotWidget:
         plot = pg.PlotWidget(title=title)
-
         plot.setLabel("bottom", "x", units="AU")
         plot.setLabel("left", "y", units="AU")
 
@@ -70,9 +66,6 @@ class Plotter:
 
     def plot_index_generator(self) -> Generator[int, None, None]:
         """This generator yields the index of the next point to plot."""
-
-        i = 0
-
         time_step_default = 1 * HOURS
 
         # maximum rate of plot update is too slow
@@ -81,7 +74,7 @@ class Plotter:
         # animated motion is the same regardless of
         # num_steps or num_years
         rate = ceil(50 * time_step_default / abs(self.sim.time_step_in_seconds))
-
+        i = 0
         while True:
             i = i + rate
 
@@ -96,7 +89,7 @@ class Plotter:
         # i.e. if points_plotted_step = 10 then plot every 10th point
         points_plotted_step = int((self.sim.num_steps + 1) / num_points_to_plot)
 
-        return 1 if points_plotted_step == 0 else points_plotted_step
+        return points_plotted_step or 1
 
     def plot_orbit(
         self,
@@ -110,62 +103,51 @@ class Plotter:
         """
 
         plot.clear()
+        plot.disableAutoRange()
 
         legend = plot.addLegend()
-
         legend.clear()
 
         arr_step = self.array_step()
 
-        plot.plot(
-            star_pos[::arr_step, :2] / AU,
-            pen="y",
-            name="Star",
-        )
-
-        plot.plot(
-            planet_pos[::arr_step, :2] / AU,
-            pen="b",
-            name="Planet",
-        )
-
-        plot.plot(
-            sat_pos[::arr_step, :2] / AU,
-            pen="g",
-            name="Satellite",
-        )
-
-        anim_plot = pg.ScatterPlotItem()
-
-        plot.addItem(anim_plot)
-
-        # TODO: refactor type into type alias
-        star_args: dict[str, str | int] = {
+        star_args: PlotArgs = {
             "pen": "y",
             "brush": "y",
             "size": 10,
             "name": "Star",
         }
 
-        planet_args: dict[str, str | int] = {
+        planet_args: PlotArgs = {
             "pen": "b",
             "brush": "b",
             "size": 10,
             "name": "Planet",
         }
 
-        sat_args: dict[str, str | int] = {
+        sat_args: PlotArgs = {
             "pen": "g",
             "brush": "g",
             "size": 10,
             "name": "Satellite",
         }
 
+        plot.plot(star_pos[::arr_step, :2] / AU, **star_args)
+
+        plot.plot(planet_pos[::arr_step, :2] / AU, **planet_args)
+
+        plot.plot(sat_pos[::arr_step, :2] / AU, **sat_args)
+
+        anim_plot = pg.ScatterPlotItem()
+
+        plot.addItem(anim_plot)
+
         # The purpose of this is to add the bodies to the plot legend
         # and plot their initial positions
         Plotter.plot_point(anim_plot, star_pos[0], **star_args)
         Plotter.plot_point(anim_plot, planet_pos[0], **planet_args)
         Plotter.plot_point(anim_plot, sat_pos[0], **sat_args)
+
+        plot.autoRange()
 
         idx_gen = self.plot_index_generator()
 
