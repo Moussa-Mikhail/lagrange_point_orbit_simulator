@@ -30,10 +30,10 @@ class Plotter:
     def __init__(self, sim: Simulator):
         self.sim = sim
 
-        self.inertial_plot = Plotter.make_plot(title="Orbits in Inertial Coordinate System")
+        self.inertial_plot = Plotter.make_plot(title="Orbit in Inertial Coordinate System")
         self.inertial_plot.setAspectLocked(True)
 
-        self.corotating_plot = Plotter.make_plot(title="Orbits in Co-Rotating Coordinate System")
+        self.corotating_plot = Plotter.make_plot(title="Orbit in Co-Rotating Coordinate System")
         self.corotating_plot.setAspectLocked(True)
 
         self.timer = QTimer()
