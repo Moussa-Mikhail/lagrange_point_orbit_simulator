@@ -709,7 +709,7 @@ testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -845,4 +845,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "880511479fcfb12698d8b719a107180827a3a40f67999a73339db7331a1d0743"
+content-hash = "265b4bbd99a7266f9ffdc0433d304a8019871b44c8f4e4fc7765fe92ae39af8a"

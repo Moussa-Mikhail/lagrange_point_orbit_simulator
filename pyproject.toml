@@ -18,6 +18,7 @@ python = ">=3.9,<3.11"
 validateddescriptor = {git = "https://github.com/Moussa-Mikhail/validated-descriptor.git", rev = "main"}
 numpy = ">=1.23.4"
 numba = ">=0.56.3"
+tomli = { version = ">=2.0.1", python = "<3.11" }
 
 [tool.poetry.group.dev.dependencies]
 pylint = ">2.15.4"
