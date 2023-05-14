@@ -48,6 +48,9 @@ class Plotter:
         else:
             self.timer.start(self.period_of_animation)
 
+    def stop_animation(self) -> None:
+        self.timer.stop()
+
     @staticmethod
     def make_plot(title: str = "") -> pg.PlotWidget:
         plot = pg.PlotWidget(title=title)

@@ -1,9 +1,9 @@
 # pylint: disable=no-name-in-module, invalid-name, missing-docstring
 import sys
-from typing import TypeAlias, TypeVar
+from typing import Callable, TypeAlias, TypeVar
 
 from PyQt6 import QtWidgets
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QObject, QRunnable, Qt, pyqtSignal, QThreadPool
 from PyQt6.QtGui import QFont
 
 from src.lagrangepointgui.orbit_plotter import Plotter
@@ -95,6 +95,9 @@ class SimUi(QtWidgets.QMainWindow):
 
         self._plotter.toggle_animation()
 
+    def stopAnimation(self) -> None:
+        self._plotter.stop_animation()
+
 
 ALL_PARAMS = SIM_PARAMS | SAT_PARAMS | SYS_PARAMS
 
@@ -106,6 +109,22 @@ T = TypeVar("T")
 
 def _translateInputs(inputs: dict[str, T]) -> dict[str, T]:
     return {PARAM_LABELS_TO_ATTRIBUTE[label]: v for label, v in inputs.items()}
+
+
+class WorkerSignals(QObject):
+    finished = pyqtSignal()
+
+
+class Runnable(QRunnable):
+    def __init__(self, simulate: Callable[[], None]) -> None:
+        super().__init__()
+        self.simulate = simulate
+        self.signals = WorkerSignals()
+
+    def run(self) -> None:
+        self.simulate()
+        # noinspection PyUnresolvedReferences
+        self.signals.finished.emit()
 
 
 class SimCtrl:  # pylint: disable=too-few-public-methods
@@ -151,8 +170,24 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
             errorMessage(msg)
             return
 
-        self._model.simulate()
-        self._view.updatePlots()
+        self._simulate_thread()
+
+    def _enableButtons(self) -> None:
+        for btn in self._view.buttons.values():
+            btn.setEnabled(True)
+
+    # noinspection PyUnresolvedReferences
+    def _simulate_thread(self) -> None:
+        runnable = Runnable(self._model.simulate)
+        runnable.signals.finished.connect(self._view.updatePlots)
+        buttons = self._view.buttons
+        runnable.signals.finished.connect(self._enableButtons)
+        for btn in buttons.values():
+            btn.setEnabled(False)
+        self._view.stopAnimation()
+
+        pool = QThreadPool.globalInstance()
+        pool.start(runnable)
 
     def _getSimulationInputs(self) -> dict[str, str | float | None]:
         inputs: dict[str, str | float | None] = {}
