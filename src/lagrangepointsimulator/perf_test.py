@@ -1,29 +1,31 @@
 """This script measures how long a simulation takes to run."""
 # pylint: disable=missing-docstring
-import time
 
-from src.lagrangepointsimulator.simulator import Simulator
+from timeit import timeit
 
 NUM_SAMPLES = 1000
 
 
 def simulate_without_reallocation() -> None:
-    sim = Simulator()
-    start = time.perf_counter()
-    for _ in range(NUM_SAMPLES):
-        sim.simulate()
-    end = time.perf_counter()
-    print(f"Without reallocation: {(end - start) / NUM_SAMPLES} seconds per simulation")
+    print(
+        timeit(
+            "sim.simulate()",
+            setup="from src.lagrangepointsimulator.simulator import Simulator; sim = Simulator()",
+            number=NUM_SAMPLES,
+        )
+        / NUM_SAMPLES
+    )
 
 
 def simulate_with_reallocation() -> None:
-    sim = Simulator()
-    start = time.perf_counter()
-    for _ in range(NUM_SAMPLES):
-        sim.time_step *= 1 - 1e-4
-        sim.simulate()
-    end = time.perf_counter()
-    print(f"With reallocation: {(end - start) / NUM_SAMPLES} seconds per simulation")
+    print(
+        timeit(
+            "sim.time_step *= 1 - 1 / (NUM_SAMPLES * 100); sim.simulate()",
+            setup="from src.lagrangepointsimulator.simulator import Simulator; sim = Simulator()",
+            number=NUM_SAMPLES,
+        )
+        / NUM_SAMPLES
+    )
 
 
 simulate_without_reallocation()
