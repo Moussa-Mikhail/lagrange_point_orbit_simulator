@@ -12,24 +12,24 @@ def non_negative_int() -> ValidatedDescriptor[int]:
     return ValidatedDescriptor[int](int, [is_non_negative])
 
 
-def non_negative_float() -> ValidatedDescriptor[float]:
-    return ValidatedDescriptor[float](float, [is_non_negative])
+def non_negative_float() -> ValidatedDescriptor[float | int]:
+    return ValidatedDescriptor[float | int](float | int, [is_non_negative])
 
 
-def positive_float() -> ValidatedDescriptor[float]:
-    return ValidatedDescriptor[float](float, [is_positive])
+def positive_float() -> ValidatedDescriptor[float | int]:
+    return ValidatedDescriptor[float | int](float | int, [is_positive])
 
 
 def bool_desc() -> ValidatedDescriptor[bool]:
     return ValidatedDescriptor[bool](bool)
 
 
-def float_desc() -> ValidatedDescriptor[float]:
-    return ValidatedDescriptor[float](float)
+def float_desc() -> ValidatedDescriptor[float | int]:
+    return ValidatedDescriptor[float | int](float | int)
 
 
-def optional_float_desc() -> ValidatedDescriptor[float | None]:
-    return ValidatedDescriptor[float | None](float | None)
+def optional_float_desc() -> ValidatedDescriptor[float | int | None]:
+    return ValidatedDescriptor[float | int | None](float | int | None)
 
 
 lagrange_labels = ("L1", "L2", "L3", "L4", "L5")
