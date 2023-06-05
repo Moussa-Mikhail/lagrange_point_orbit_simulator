@@ -179,7 +179,7 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
     def _simulate(self) -> None:
         try:
-            simulationInputs = self._getSimulationInputs()
+            simulationInputs = self._getSimParams()
 
         except ValueError as e:
             errorMessage(str(e))
@@ -201,7 +201,7 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
         self._simulate_thread()
 
-    def _getSimulationInputs(self) -> dict[str, str | float | None]:
+    def _getSimParams(self) -> dict[str, str | float | None]:
         inputs: dict[str, str | float | None] = {}
         for fieldText, field in self._view.inputFields.items():
             fieldValue = field.text()
@@ -214,10 +214,6 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
             except ValueError as e:
                 raise ValueError(f"Invalid expression in field '{fieldText}'.\n{e}") from e
-
-            if value is None:
-                inputs[fieldText] = value
-                continue
 
             inputs[fieldText] = value
 
