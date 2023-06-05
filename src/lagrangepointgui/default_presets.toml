@@ -1,0 +1,8 @@
+[constants]
+# Kilograms
+moon_mass = 7.34767309e22
+jupiter_mass = 1.89813e27
+
+# AU
+sun_jupiter_dist = 4.953
+earth_moon_dist = 0.002617
