@@ -11,13 +11,18 @@ import os
 from pathlib import Path
 
 dir_path = Path(os.path.realpath(__file__)).parent
+# if running from app set dir_path to the "sim_gui" directory
+# otherwise keep it as the "lagrangepointgui" directory
 if "sim_gui" in dir_path.parts:
     dir_path = dir_path.parent.parent
 
 default_presets_path = os.path.join(dir_path, "default_presets.toml")
 user_presets_path = os.path.join(dir_path, "user_presets.toml")
 
-ParamPresets: TypeAlias = dict[str, dict[str, float | int]]
+Expr: TypeAlias = float | int | str
+Bases: TypeAlias = list[str]
+
+ParamPresets: TypeAlias = dict[str, dict[str, Expr | Bases]]
 Constants: TypeAlias = dict[str, float | int]
 
 
@@ -29,10 +34,13 @@ def read_presets() -> tuple[ParamPresets, Constants]:
 
 
 def _read_preset(file_path: str) -> tuple[ParamPresets, Constants]:
-    with open(file_path, "rb") as file:
-        presets = tomllib.load(file)
+    try:
+        with open(file_path, "rb") as file:
+            presets = tomllib.load(file)
+    except FileNotFoundError:
+        return {}, {}
 
-    params: dict[str, dict[str, float | int]] = presets.get("params", {})
-    constants: dict[str, float | int] = presets.get("constants", {})
+    params = presets.get("presets", {})
+    constants = presets.get("constants", {})
 
     return params, constants

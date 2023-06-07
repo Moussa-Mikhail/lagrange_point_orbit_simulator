@@ -136,6 +136,7 @@ thesis notes.txt
 *.csv
 simulation/profile_simulation.py
 *Profile.prof
+user_presets.toml
 
 # Pycharm
 .idea/
