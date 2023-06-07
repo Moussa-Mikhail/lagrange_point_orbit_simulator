@@ -1,6 +1,6 @@
 # pylint: disable=no-name-in-module, invalid-name, missing-docstring
 import sys
-from typing import Callable, TypeAlias, TypeVar
+from typing import Callable, TypeAlias, TypeVar, cast
 
 from PyQt6.QtCore import QObject, QRunnable, QThreadPool, Qt, pyqtSignal
 from PyQt6.QtGui import QFont
@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
+from src.lagrangepointgui.presets import read_presets
 from src.lagrangepointgui.orbit_plotter import Plotter
 from src.lagrangepointgui.safe_eval import safe_eval as safeEval
 from src.lagrangepointsimulator import Simulator
@@ -47,6 +48,7 @@ SYS_PARAMS: Params = {
 }
 
 
+# pylint: disable=too-many-instance-attributes
 class SimUi(QMainWindow):
     def __init__(self, plotter: Plotter):
         super().__init__()
@@ -61,7 +63,6 @@ class SimUi(QMainWindow):
         self._generalLayout = QHBoxLayout()
         self._centralWidget.setLayout(self._generalLayout)
 
-        self.inputFields: dict[str, QLineEdit] = {}
         self._addInputFields()
 
         self._generalLayout.addWidget(self._plotter.inertial_plot)
@@ -69,10 +70,16 @@ class SimUi(QMainWindow):
         self.resize(self._generalLayout.sizeHint())
 
     def _addInputFields(self) -> None:
+        self.inputFields: dict[str, QLineEdit] = {}
         self._inputsLayout = QFormLayout()
 
         self.buttons: dict[str, QPushButton] = {}
         self._addButtons()
+
+        self.presetBox = QComboBox()
+        presets, _ = read_presets()
+        self.presetBox.addItems(presets)
+        self._inputsLayout.addRow("Presets", self.presetBox)
 
         self._addParams("Simulation Parameters", SIM_PARAMS)
         self._addParams("System Parameters", SYS_PARAMS)
@@ -89,8 +96,8 @@ class SimUi(QMainWindow):
 
         self._inputsLayout.addRow(buttonsLayout)
 
-    def _addParams(self, argLabelText: str, params: Params) -> None:
-        argLabel = QLabel(argLabelText)
+    def _addParams(self, paramCategory: str, params: Params) -> None:
+        argLabel = QLabel(paramCategory)
         argLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._inputsLayout.addRow(argLabel)
 
@@ -172,6 +179,25 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         for btnText, btn in self._view.buttons.items():
             action = btnActions[btnText]
             btn.clicked.connect(action)  # type: ignore
+
+        self._view.presetBox.activated.connect(self._applySelectedPreset)  # type: ignore
+
+    def _applySelectedPreset(self) -> None:
+        presetName = self._view.presetBox.currentText()
+        self._applyPreset(presetName)
+
+    def _applyPreset(self, presetName: str) -> None:
+        preset = read_presets()[0][presetName]
+        bases = cast(list[str], preset.get("bases", []))
+        for base in bases:
+            self._applyPreset(base)
+
+        for paramLabel, value in preset.items():
+            if paramLabel == "bases":
+                continue
+
+            field = self._view.inputFields[paramLabel]
+            field.setText(str(value))
 
     def _addReturnPressed(self) -> None:
         for field in self._view.inputFields.values():
