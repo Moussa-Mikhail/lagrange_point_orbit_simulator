@@ -9,14 +9,14 @@ earth_moon_dist = 0.00257
 
 # Values can be ints, float, or valid python expressions
 [presets]
-"Default" = {bases = ["Sun Earth", "Default Sat Parameters"]}
-"Sun Earth" = {"star mass" = "sun_mass", "planet mass" = "earth_mass", "planet distance" = 1.0}
-"Sun Jupiter" = {"star mass" = "sun_mass", "planet mass" = "jupiter_mass", "planet distance" = "sun_jupiter_dist"}
-"Earth Moon" = {"star mass" = "earth_mass", "planet mass" = "moon_mass", "planet distance" = "earth_moon_dist"}
-"Default Sat Parameters" = {"perturbation size" = 0.0, "perturbation angle" = "", "initial speed" = 1.0, "initial velocity angle" = "", "Lagrange label" = "L4"}
-"Goes Through L4" = {bases = ["Default"], "initial velocity angle" = 160.0}
-"L4 -> L5 -> L4" = {bases = ["Default"], "initial velocity angle" = 120.0}
-"Normal Orbit" = {bases = ["Default"], "perturbation size" = 0.1, "initial speed" = 0.9045}
-"Mass Ratio Limit" = {bases = ["Default"], "planet mass" = "sun_mass/25", "perturbation size" = 0.02, "initial speed" = 1.006, "initial velocity angle" = 152.0}
-"Weird Orbit" = {bases = ["Default"], "Lagrange label" = "L1", "perturbation size" = 0.1, "initial speed" = 0.9135}
-"Weird Orbit 2" = {bases = ["Weird Orbit"], "perturbation size" = 0.05, "initial speed" = 0.96}
+"Default" = { bases = ["Sun Earth", "Default Sat Parameters"] }
+"Sun Earth" = { "star mass" = "sun_mass", "planet mass" = "earth_mass", "planet distance" = 1.0 }
+"Sun Jupiter" = { "star mass" = "sun_mass", "planet mass" = "jupiter_mass", "planet distance" = "sun_jupiter_dist" }
+"Earth Moon" = { "star mass" = "earth_mass", "planet mass" = "moon_mass", "planet distance" = "earth_moon_dist" }
+"Default Sat Parameters" = { "perturbation size" = 0.0, "perturbation angle" = "", "initial speed" = 1.0, "initial velocity angle" = "", "Lagrange label" = "L4" }
+"Goes Through L4" = { bases = ["Default"], "initial velocity angle" = 160.0 }
+"L4 -> L5 -> L4" = { bases = ["Default"], "initial velocity angle" = 120.0 }
+"Normal Orbit" = { bases = ["Default"], "perturbation size" = 0.1, "initial speed" = 0.9045 }
+"Mass Ratio Limit" = { bases = ["Default"], "planet mass" = "sun_mass/25", "perturbation size" = 0.02, "initial speed" = 1.006, "initial velocity angle" = 152.0 }
+"Weird Orbit" = { bases = ["Default"], "Lagrange label" = "L1", "perturbation size" = 0.1, "initial speed" = 0.9135 }
+"Weird Orbit 2" = { bases = ["Weird Orbit"], "perturbation size" = 0.05, "initial speed" = 0.96 }

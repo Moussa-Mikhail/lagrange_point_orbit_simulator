@@ -309,7 +309,7 @@ class Simulator:
         angular_speed = self.angular_speed * np.sign(self.time_step_in_seconds)
         return nb_transform_to_corotating(pos_trans, self.time_points(), angular_speed)
 
-    def conservation_calculations(self) -> tuple[Array2D, Array2D, Array1D]:
+    def calc_conserved_quantities(self) -> tuple[Array2D, Array2D, Array1D]:
         total_momentum = self.calc_total_linear_momentum()
         total_angular_momentum = self.calc_total_angular_momentum()
         total_energy = self.calc_total_energy()

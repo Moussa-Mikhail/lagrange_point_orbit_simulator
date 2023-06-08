@@ -1,6 +1,6 @@
 """Contains a function to safely evaluate input expressions."""
-from src.lagrangepointsimulator.constants import CONSTANTS  # noqa: F401
 from src.lagrangepointgui.presets import read_presets
+from src.lagrangepointsimulator.constants import CONSTANTS  # noqa: F401
 
 allowed_chars = set("0123456789.+-*/()e")
 

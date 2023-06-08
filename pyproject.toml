@@ -27,6 +27,7 @@ flake8-bugbear = ">=22.3.23"
 flake8 = ">=6.0.0"
 mypy = ">=0.991"
 black = ">=22.12.0"
+ruff = "^0.0.272"
 
 [tool.poetry.group.gui]
 optional = true
@@ -50,13 +51,23 @@ select = ["E", "F", "B"]
 # Never enforce `E501` (line length violations).
 ignore = ["E501"]
 
-# Ignore `E402` (import violations) in all `__init__.py` files, and in `path/to/file.py`.
+# Ignore `E402` (import violations) in all `__init__.py` files.
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["E402", "F401"]
 
+# Don't autofix unused variables
+unfixable = ["F841"]
+
 [tool.pylint]
 extension-pkg-allow-list = "PyQt6"
-disable = ["line-too-long", "too-few-public-methods"]
+disable = ["line-too-long", "too-few-public-methods", "W0511"]
+# Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
+# number of processors available to use.
+jobs=0
+
+# When enabled, pylint would attempt to guess common misconfiguration and emit
+# user-friendly hints instead of false-positive error messages.
+suggestion-mode = "yes"
 
 [tool.mypy]
 disallow_untyped_defs = true

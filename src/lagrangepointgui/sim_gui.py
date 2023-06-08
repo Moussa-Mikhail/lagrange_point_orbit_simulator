@@ -1,6 +1,6 @@
 # pylint: disable=no-name-in-module, invalid-name, missing-docstring
 import sys
-from typing import Callable, TypeAlias, TypeVar, cast
+from typing import Callable, Iterable, TypeAlias, TypeVar, cast
 
 from PyQt6.QtCore import QObject, QRunnable, QThreadPool, Qt, pyqtSignal
 from PyQt6.QtGui import QFont
@@ -14,11 +14,12 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QMainWindow,
     QPushButton,
+    QVBoxLayout,
     QWidget,
 )
 
-from src.lagrangepointgui.presets import read_presets
 from src.lagrangepointgui.orbit_plotter import Plotter
+from src.lagrangepointgui.presets import read_presets as readPresets
 from src.lagrangepointgui.safe_eval import safe_eval as safeEval
 from src.lagrangepointsimulator import Simulator
 
@@ -56,28 +57,38 @@ class SimUi(QMainWindow):
         self._plotter = plotter
         self._plotted = False
 
-        self.setWindowTitle("Orbits near Lagrange Point")
+        self.setWindowTitle("Orbits near Lagrange Points")
 
-        self._centralWidget = QWidget(self)
-        self.setCentralWidget(self._centralWidget)
+        centralWidget = QWidget(self)
+        self.setCentralWidget(centralWidget)
+
+        mainLayout = QVBoxLayout()
+        centralWidget.setLayout(mainLayout)
+
         self._generalLayout = QHBoxLayout()
-        self._centralWidget.setLayout(self._generalLayout)
-
         self._addInputFields()
-
         self._generalLayout.addWidget(self._plotter.inertial_plot)
         self._generalLayout.addWidget(self._plotter.corotating_plot)
-        self.resize(self._generalLayout.sizeHint())
+        mainLayout.addLayout(self._generalLayout)
+
+        conservedPlotsLayout = QHBoxLayout()
+        conservedPlotsLayout.addWidget(self._plotter.linear_momentum_plot)
+        conservedPlotsLayout.addWidget(self._plotter.angular_momentum_plot)
+        conservedPlotsLayout.addWidget(self._plotter.energy_plot)
+        mainLayout.addLayout(conservedPlotsLayout)
+
+        self.resize(mainLayout.sizeHint())
 
     def _addInputFields(self) -> None:
         self.inputFields: dict[str, QLineEdit] = {}
         self._inputsLayout = QFormLayout()
+        self._generalLayout.addLayout(self._inputsLayout)
 
         self.buttons: dict[str, QPushButton] = {}
         self._addButtons()
 
         self.presetBox = QComboBox()
-        presets, _ = read_presets()
+        presets, _ = readPresets()
         self.presetBox.addItems(presets)
         self._inputsLayout.addRow("Presets", self.presetBox)
 
@@ -86,15 +97,13 @@ class SimUi(QMainWindow):
         self._addParams("Satellite Parameters", SAT_PARAMS)
         self._addLagrangeLabel()
 
-        self._generalLayout.addLayout(self._inputsLayout)
-
     def _addButtons(self) -> None:
         buttonsLayout = QHBoxLayout()
-        for btnText in ("Simulate", "Start/Stop"):
+        self._inputsLayout.addRow(buttonsLayout)
+
+        for btnText in ("Simulate", "Start/Stop", "Plot Conserved"):
             self.buttons[btnText] = QPushButton(btnText)
             buttonsLayout.addWidget(self.buttons[btnText])
-
-        self._inputsLayout.addRow(buttonsLayout)
 
     def _addParams(self, paramCategory: str, params: Params) -> None:
         argLabel = QLabel(paramCategory)
@@ -134,6 +143,16 @@ class SimUi(QMainWindow):
     def stopAnimation(self) -> None:
         self._plotter.stop_animation()
 
+    def calcConservedQuantities(self) -> None:
+        self._plotter.get_conserved_quantities()
+
+    def plotConservedQuantites(self) -> None:
+        if not self._plotted:
+            errorMessage("No data to plot.")
+            return
+
+        self._plotter.plot_conserved_quantities()
+
 
 ALL_PARAMS = SIM_PARAMS | SAT_PARAMS | LAGRANGE_PARAM | SYS_PARAMS
 
@@ -152,13 +171,13 @@ class WorkerSignals(QObject):
 
 
 class Runnable(QRunnable):
-    def __init__(self, simulate: Callable[[], None]) -> None:
+    def __init__(self, expensiveFunc: Callable[[], None]) -> None:
         super().__init__()
-        self.simulate = simulate
+        self.expensiveFunc = expensiveFunc
         self.signals = WorkerSignals()
 
     def run(self) -> None:
-        self.simulate()
+        self.expensiveFunc()
         # noinspection PyUnresolvedReferences
         self.signals.finished.emit()
 
@@ -175,7 +194,11 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         self._addReturnPressed()
 
     def _connectSignals(self) -> None:
-        btnActions = {"Simulate": self._simulate, "Start/Stop": self._toggleAnimation}
+        btnActions = {
+            "Simulate": self._simulate,
+            "Start/Stop": self._toggleAnimation,
+            "Plot Conserved": self._plotConservedQuantites,
+        }
         for btnText, btn in self._view.buttons.items():
             action = btnActions[btnText]
             btn.clicked.connect(action)  # type: ignore
@@ -187,7 +210,7 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         self._applyPreset(presetName)
 
     def _applyPreset(self, presetName: str) -> None:
-        preset = read_presets()[0][presetName]
+        preset = readPresets()[0][presetName]
         bases = cast(list[str], preset.get("bases", []))
         for base in bases:
             self._applyPreset(base)
@@ -225,7 +248,7 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
             errorMessage(msg)
             return
 
-        self._simulate_thread()
+        self._simulateThread()
 
     def _getSimParams(self) -> dict[str, str | float | None]:
         inputs: dict[str, str | float | None] = {}
@@ -237,7 +260,6 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
                 continue
             try:
                 value = safeEval(fieldValue)
-
             except ValueError as e:
                 raise ValueError(f"Invalid expression in field '{fieldText}'.\n{e}") from e
 
@@ -245,26 +267,40 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
         return inputs
 
-    # noinspection PyUnresolvedReferences
-    def _simulate_thread(self) -> None:
-        runnable = Runnable(self._model.simulate)
-        runnable.signals.finished.connect(self._view.updatePlots)
-        runnable.signals.finished.connect(self._enableButtons)
-
-        buttons = self._view.buttons
-        for btn in buttons.values():
-            btn.setEnabled(False)
+    def _simulateThread(self) -> None:
         self._view.stopAnimation()
-
-        pool = QThreadPool.globalInstance()
-        pool.start(runnable)
+        self._runExpensiveCalc(self._model.simulate, [self._view.updatePlots])
 
     def _enableButtons(self) -> None:
         for btn in self._view.buttons.values():
             btn.setEnabled(True)
 
+    def _disableButtons(self) -> None:
+        for btn in self._view.buttons.values():
+            btn.setEnabled(False)
+
     def _toggleAnimation(self) -> None:
         self._view.toggleAnimation()
+
+    def _plotConservedQuantites(self) -> None:
+        self._runExpensiveCalc(self._view.calcConservedQuantities, [self._view.plotConservedQuantites])
+
+    # noinspection PyUnresolvedReferences
+    def _runExpensiveCalc(
+        self,
+        expensiveCalc: Callable[[], None],
+        onFinishFuncs: Iterable[Callable[[], None]] = (),
+    ) -> None:
+        self._disableButtons()
+
+        runnable = Runnable(expensiveCalc)
+
+        onFinishFuncs = (*onFinishFuncs, self._enableButtons)
+        for func in onFinishFuncs:
+            runnable.signals.finished.connect(func)
+
+        pool = QThreadPool.globalInstance()
+        pool.start(runnable)
 
 
 def errorMessage(message: str) -> None:
