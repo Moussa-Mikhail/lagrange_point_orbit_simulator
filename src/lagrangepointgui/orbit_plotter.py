@@ -3,14 +3,14 @@
 the orbits of the system simulated by an instance of the Simulator class.
 """
 from math import ceil
-from typing import Any, Callable, Generator, TypeAlias
+from typing import Any, Callable, Generator, TypeAlias, cast
 
 import pyqtgraph as pg  # type: ignore
 from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
 from numpy.linalg import norm
 
 from src.lagrangepointsimulator import Simulator
-from src.lagrangepointsimulator.constants import AU, HOURS
+from src.lagrangepointsimulator.constants import AU, HOURS, YEARS
 from src.lagrangepointsimulator.sim_types import Array1D, Array2D
 
 PlotArgs: TypeAlias = dict[str, str | int]
@@ -30,20 +30,21 @@ class Plotter:
     def __init__(self, sim: Simulator):
         self.sim = sim
 
-        self.inertial_plot = Plotter.make_plot(title="Orbit in Inertial Coordinate System")
+        self.inertial_plot = Plotter.make_plot("Orbit in Inertial Coordinate System")
         self.inertial_plot.setAspectLocked(True)
 
-        self.corotating_plot = Plotter.make_plot(title="Orbit in Co-Rotating Coordinate System")
+        self.corotating_plot = Plotter.make_plot("Orbit in Co-Rotating Coordinate System")
         self.corotating_plot.setAspectLocked(True)
 
         self.timer = QTimer()
-        self.period_of_animation = 33
+        # 30 fps
+        self.timer.setInterval(33)
 
     def toggle_animation(self) -> None:
         if self.timer.isActive():
             self.timer.stop()
         else:
-            self.timer.start(self.period_of_animation)
+            self.timer.start()
 
     def stop_animation(self) -> None:
         self.timer.stop()
@@ -60,7 +61,6 @@ class Plotter:
         animate_inertial = self.plot_inertial_orbits()
         animate_corotating = self.plot_corotating_orbits()
 
-        self.timer = QTimer()
         self.timer.timeout.connect(animate_inertial)  # type: ignore
         self.timer.timeout.connect(animate_corotating)  # type: ignore
 
@@ -73,7 +73,9 @@ class Plotter:
         # inversely proportional to time_step so that
         # animated motion is the same regardless of
         # num_steps or num_years
-        rate = ceil(50 * time_step_default / abs(self.sim.time_step_in_seconds))
+        rate = ceil(
+            100 / 3 * time_step_default / abs(self.sim.time_step_in_seconds) * self.sim.orbital_period / (1 * YEARS)
+        )
         i = 0
         while True:
             i = i + rate
@@ -190,11 +192,11 @@ class Plotter:
             sat_pos_corotating,
         )
 
-        self.add_lagrange_point_to_corotating_plot()
+        self._add_lagrange_point_to_corotating_plot()
 
         return animate_corotating_plot
 
-    def add_lagrange_point_to_corotating_plot(self) -> None:
+    def _add_lagrange_point_to_corotating_plot(self) -> None:
         lagrange_point_plot = pg.ScatterPlotItem()
 
         self.corotating_plot.addItem(lagrange_point_plot)
@@ -225,8 +227,7 @@ class Plotter:
             total_energy,
         ) = self.sim.conservation_calculations()
 
-        # Conversion to float is just to satisfy mypy
-        init_planet_momentum = float(norm(self.sim.planet_mass * self.sim.planet_vel[0]))
+        init_planet_momentum = cast(float, (norm(self.sim.planet_mass * self.sim.planet_vel[0])))
 
         # slice the arrays so that we only plot at most 10**5 points.
         arr_step = self.array_step()

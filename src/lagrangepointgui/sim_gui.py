@@ -249,8 +249,9 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
     def _simulate_thread(self) -> None:
         runnable = Runnable(self._model.simulate)
         runnable.signals.finished.connect(self._view.updatePlots)
-        buttons = self._view.buttons
         runnable.signals.finished.connect(self._enableButtons)
+
+        buttons = self._view.buttons
         for btn in buttons.values():
             btn.setEnabled(False)
         self._view.stopAnimation()

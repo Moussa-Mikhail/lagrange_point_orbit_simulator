@@ -204,9 +204,6 @@ class Simulator:
 
     @property
     def orbital_period(self) -> float:
-        return self.calc_orbital_period()
-
-    def calc_orbital_period(self) -> float:
         return calc_period_from_semi_major_axis(self.planet_distance * AU, self.star_mass, self.planet_mass)
 
     @property
