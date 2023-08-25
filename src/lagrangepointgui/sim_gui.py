@@ -56,6 +56,9 @@ class SimUi(QMainWindow):
 
         self._plotter = plotter
         self._plotted = False
+        self.inputFields: dict[str, QLineEdit] = {}
+        self.presetBox = QComboBox()
+        self.buttons: dict[str, QPushButton] = {}
 
         self.setWindowTitle("Orbits near Lagrange Points")
 
@@ -65,57 +68,54 @@ class SimUi(QMainWindow):
         mainLayout = QVBoxLayout()
         centralWidget.setLayout(mainLayout)
 
-        self._generalLayout = QHBoxLayout()
-        self._addInputFields()
-        self._generalLayout.addWidget(self._plotter.inertial_plot)
-        self._generalLayout.addWidget(self._plotter.corotating_plot)
-        mainLayout.addLayout(self._generalLayout)
+        inputAndOrbitsLayout = QHBoxLayout()
+        mainLayout.addLayout(inputAndOrbitsLayout)
+
+        inputsLayout = QFormLayout()
+        inputAndOrbitsLayout.addLayout(inputsLayout)
+        self._addButtons(inputsLayout)
+        self._addInputFields(inputsLayout)
+        inputAndOrbitsLayout.addWidget(self._plotter.inertial_plot)
+        inputAndOrbitsLayout.addWidget(self._plotter.corotating_plot)
 
         conservedPlotsLayout = QHBoxLayout()
+        mainLayout.addLayout(conservedPlotsLayout)
+
         conservedPlotsLayout.addWidget(self._plotter.linear_momentum_plot)
         conservedPlotsLayout.addWidget(self._plotter.angular_momentum_plot)
         conservedPlotsLayout.addWidget(self._plotter.energy_plot)
-        mainLayout.addLayout(conservedPlotsLayout)
 
         self.resize(mainLayout.sizeHint())
 
-    def _addInputFields(self) -> None:
-        self.inputFields: dict[str, QLineEdit] = {}
-        self._inputsLayout = QFormLayout()
-        self._generalLayout.addLayout(self._inputsLayout)
-
-        self.buttons: dict[str, QPushButton] = {}
-        self._addButtons()
-
-        self.presetBox = QComboBox()
-        presets, _ = readPresets()
-        self.presetBox.addItems(presets)
-        self._inputsLayout.addRow("Presets", self.presetBox)
-
-        self._addParams("Simulation Parameters", SIM_PARAMS)
-        self._addParams("System Parameters", SYS_PARAMS)
-        self._addParams("Satellite Parameters", SAT_PARAMS)
-        self._addLagrangeLabel()
-
-    def _addButtons(self) -> None:
+    def _addButtons(self, inputsLayout: QFormLayout) -> None:
         buttonsLayout = QHBoxLayout()
-        self._inputsLayout.addRow(buttonsLayout)
+        inputsLayout.addRow(buttonsLayout)
 
         for btnText in ("Simulate", "Start/Stop", "Plot Conserved"):
             self.buttons[btnText] = QPushButton(btnText)
             buttonsLayout.addWidget(self.buttons[btnText])
 
-    def _addParams(self, paramCategory: str, params: Params) -> None:
+    def _addInputFields(self, inputsLayout: QFormLayout) -> None:
+        presets, _ = readPresets()
+        self.presetBox.addItems(presets)
+        inputsLayout.addRow("Presets", self.presetBox)
+
+        self._addParams("Simulation Parameters", SIM_PARAMS, inputsLayout)
+        self._addParams("System Parameters", SYS_PARAMS, inputsLayout)
+        self._addParams("Satellite Parameters", SAT_PARAMS, inputsLayout)
+        self._addLagrangeLabel(inputsLayout)
+
+    def _addParams(self, paramCategory: str, params: Params, inputsLayout: QFormLayout) -> None:
         argLabel = QLabel(paramCategory)
         argLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._inputsLayout.addRow(argLabel)
+        inputsLayout.addRow(argLabel)
 
         for fieldText, (defaultValue, _) in params.items():
             fieldLine = QLineEdit(defaultValue)
             self.inputFields[fieldText] = fieldLine
-            self._inputsLayout.addRow(fieldText, fieldLine)
+            inputsLayout.addRow(fieldText, fieldLine)
 
-    def _addLagrangeLabel(self) -> None:
+    def _addLagrangeLabel(self, inputsLayout: QFormLayout) -> None:
         fieldText = LAGRANGE_LABEL
         defaultValue = LAGRANGE_PARAM[fieldText][0]
         fieldLine = QLineEdit()
@@ -127,7 +127,7 @@ class SimUi(QMainWindow):
         box.setLineEdit(fieldLine)
 
         self.inputFields[fieldText] = fieldLine
-        self._inputsLayout.addRow(fieldText, box)
+        inputsLayout.addRow(fieldText, box)
 
     def updatePlots(self) -> None:
         self._plotted = True
