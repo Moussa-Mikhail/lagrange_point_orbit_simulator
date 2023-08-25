@@ -6,6 +6,7 @@ from PyQt6.QtCore import QObject, QRunnable, QThreadPool, Qt, pyqtSignal
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QApplication,
+    QCheckBox,
     QComboBox,
     QErrorMessage,
     QFormLayout,
@@ -59,6 +60,7 @@ class SimUi(QMainWindow):
         self.inputFields: dict[str, QLineEdit] = {}
         self.presetBox = QComboBox()
         self.buttons: dict[str, QPushButton] = {}
+        self.autoPlotConserved = QCheckBox("Auto Plot Conserved")
 
         self.setWindowTitle("Orbits near Lagrange Points")
 
@@ -94,6 +96,8 @@ class SimUi(QMainWindow):
         for btnText in ("Simulate", "Start/Stop", "Plot Conserved"):
             self.buttons[btnText] = QPushButton(btnText)
             buttonsLayout.addWidget(self.buttons[btnText])
+
+        buttonsLayout.addWidget(self.autoPlotConserved)
 
     def _addInputFields(self, inputsLayout: QFormLayout) -> None:
         presets, _ = readPresets()
@@ -250,6 +254,9 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
         self._view.stopAnimation()
         self._runExpensiveCalc(self._model.simulate, self._view.updatePlots)
+
+        if self._view.autoPlotConserved.isChecked():
+            self._plotConservedQuantites()
 
     def _getSimParams(self) -> dict[str, str | float | None]:
         inputs: dict[str, str | float | None] = {}
