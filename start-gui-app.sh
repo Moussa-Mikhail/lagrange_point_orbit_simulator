@@ -1,1 +1,1 @@
-exec dist/sim_gui/sim_gui
+dist/sim_gui/sim_gui
