@@ -7,7 +7,9 @@ jupiter_mass = 1.89813e27
 sun_jupiter_dist = 5.2
 earth_moon_dist = 0.00257
 
-# Values can be ints, float, or valid python expressions
+# Values can be ints, float, or any valid python expression.
+
+# Bases are applied in the order they're written, overwriting existing values.
 [presets]
 "Default" = { bases = ["Sun Earth", "Default Sat Parameters"] }
 "Sun Earth" = { "star mass" = "sun_mass", "planet mass" = "earth_mass", "planet distance" = 1.0 }
@@ -20,3 +22,6 @@ earth_moon_dist = 0.00257
 "Mass Ratio Limit" = { bases = ["Default"], "planet mass" = "sun_mass/25", "perturbation size" = 0.02, "initial speed" = 1.006, "initial velocity angle" = 152.0 }
 "Weird Orbit" = { bases = ["Default"], "Lagrange label" = "L1", "perturbation size" = 0.1, "initial speed" = 0.9135 }
 "Weird Orbit 2" = { bases = ["Weird Orbit"], "perturbation size" = 0.05, "initial speed" = 0.96 }
+
+# To create your own presets simply create a file named user_presets.toml following the format shown above
+# and place it in the same directory as this file.
