@@ -1,6 +1,6 @@
 # pylint: disable=no-name-in-module, invalid-name, missing-docstring
 import sys
-from typing import Callable, Iterable, TypeAlias, TypeVar, cast
+from typing import Callable, TypeAlias, TypeVar, cast
 
 from PyQt6.QtCore import QObject, QRunnable, QThreadPool, Qt, pyqtSignal
 from PyQt6.QtGui import QFont
@@ -248,7 +248,8 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
             errorMessage(msg)
             return
 
-        self._simulateThread()
+        self._view.stopAnimation()
+        self._runExpensiveCalc(self._model.simulate, self._view.updatePlots)
 
     def _getSimParams(self) -> dict[str, str | float | None]:
         inputs: dict[str, str | float | None] = {}
@@ -267,10 +268,6 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
         return inputs
 
-    def _simulateThread(self) -> None:
-        self._view.stopAnimation()
-        self._runExpensiveCalc(self._model.simulate, [self._view.updatePlots])
-
     def _enableButtons(self) -> None:
         for btn in self._view.buttons.values():
             btn.setEnabled(True)
@@ -283,23 +280,23 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         self._view.toggleAnimation()
 
     def _plotConservedQuantites(self) -> None:
-        self._runExpensiveCalc(self._view.calcConservedQuantities, [self._view.plotConservedQuantites])
+        self._runExpensiveCalc(self._view.calcConservedQuantities, self._view.plotConservedQuantites)
 
     # noinspection PyUnresolvedReferences
     def _runExpensiveCalc(
         self,
         expensiveCalc: Callable[[], None],
-        onFinishFuncs: Iterable[Callable[[], None]] = (),
+        onFinishFunc: Callable[[], None],
     ) -> None:
         self._disableButtons()
 
         runnable = Runnable(expensiveCalc)
 
-        onFinishFuncs = (*onFinishFuncs, self._enableButtons)
-        for func in onFinishFuncs:
-            runnable.signals.finished.connect(func)
+        runnable.signals.finished.connect(self._enableButtons)
+        runnable.signals.finished.connect(onFinishFunc)
 
         pool = QThreadPool.globalInstance()
+        assert pool is not None
         pool.start(runnable)
 
 
