@@ -2,6 +2,7 @@
 """This module contains the Plotter class which is responsible for plotting
 the orbits of the system simulated by an instance of the Simulator class.
 """
+from contextlib import suppress
 from math import ceil
 from typing import Any, Callable, Generator, TypeAlias, cast
 
@@ -71,10 +72,8 @@ class Plotter:
         animate_inertial = self.plot_inertial_orbits()
         animate_corotating = self.plot_corotating_orbits()
 
-        try:
+        with suppress(TypeError):
             self.timer.timeout.disconnect()  # type: ignore
-        except TypeError:
-            pass
 
         self.timer.timeout.connect(animate_inertial)  # type: ignore
         self.timer.timeout.connect(animate_corotating)  # type: ignore

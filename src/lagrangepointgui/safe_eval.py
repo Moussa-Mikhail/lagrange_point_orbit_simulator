@@ -35,7 +35,7 @@ def _validate_expr(expr: str, constants: dict[str, float | int]) -> None:
     cleaned_expr = _remove_constants(expr, constants)
     chars_in_expr = set(cleaned_expr)
     if not chars_in_expr.issubset(allowed_chars):
-        raise ValueError("invalid constant or operator in expression.")
+        raise ValueError("invalid constant or syntax in expression.")
 
 
 def _remove_constants(expr: str, constants: dict[str, float | int]) -> str:

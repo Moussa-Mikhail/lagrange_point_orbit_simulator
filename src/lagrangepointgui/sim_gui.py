@@ -187,11 +187,7 @@ class Runnable(QRunnable):
 
 
 class SimCtrl:  # pylint: disable=too-few-public-methods
-    def __init__(
-        self,
-        model: Simulator,
-        view: SimUi,
-    ):
+    def __init__(self, model: Simulator, view: SimUi):
         self._model = model
         self._view = view
         self._connectSignals()
@@ -214,7 +210,8 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         self._applyPreset(presetName)
 
     def _applyPreset(self, presetName: str) -> None:
-        preset = readPresets()[0][presetName]
+        presets, _ = readPresets()
+        preset = presets[presetName]
         bases = cast(list[str], preset.get("bases", []))
         for base in bases:
             self._applyPreset(base)
@@ -290,11 +287,7 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         self._runExpensiveCalc(self._view.calcConservedQuantities, self._view.plotConservedQuantites)
 
     # noinspection PyUnresolvedReferences
-    def _runExpensiveCalc(
-        self,
-        expensiveCalc: Callable[[], None],
-        onFinishFunc: Callable[[], None],
-    ) -> None:
+    def _runExpensiveCalc(self, expensiveCalc: Callable[[], None], onFinishFunc: Callable[[], None]) -> None:
         self._disableButtons()
 
         runnable = Runnable(expensiveCalc)
