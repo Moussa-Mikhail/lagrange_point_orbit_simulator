@@ -506,9 +506,9 @@ reference = "main"
 resolved_reference = "574aa1e8ba468be3d3c744eb8f36e0bb7e9a9624"
 
 [extras]
-gui = ["pyqt6", "pyqtgraph"]
+gui = ["pyqt6", "pyqtgraph", "tomli"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "b927f8113686fd97dada6d409cb629bac3d82dc111063f40216cae94707749c1"
+content-hash = "6c157b85ac599c34eef6af326c43ac754724989e9402a6dbbeaeb94f37e2a889"

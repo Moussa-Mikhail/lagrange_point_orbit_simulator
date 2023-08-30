@@ -9,8 +9,8 @@ repository = "https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator"
 keywords = ["lagrange point", "orbit", "simulation", "physics", "gui"]
 classifiers = ["Topic :: Scientific/Engineering :: Physics", "Topic :: Scientific/Engineering :: Visualization", "Topic :: Scientific/Engineering :: Astronomy"]
 packages = [
-	{ include = "src/lagrangepointsimulator" },
-	{ include = "src/lagrangepointgui"}
+    { include = "src/lagrangepointsimulator" },
+    { include = "src/lagrangepointgui"}
 ]
 
 [tool.poetry.dependencies]
@@ -18,7 +18,7 @@ python = ">=3.9,<3.11"
 validateddescriptor = {git = "https://github.com/Moussa-Mikhail/validated-descriptor.git", rev = "main"}
 numpy = ">=1.23.4"
 numba = ">=0.56.3"
-tomli = { version = ">=2.0.1", python = "<3.11" }
+tomli = { version = ">=2.0.1", python = "<3.11", optional = true }
 pyqt6 = { version = ">=6.4.0", optional = true }
 pyqtgraph = { version = ">=0.13.1", optional = true }
 
@@ -31,7 +31,7 @@ ruff = ">=0.0.272"
 pyinstaller = ">=5.11.0"
 
 [tool.poetry.extras]
-gui = ["pyqt6", "pyqtgraph"]
+gui = ["pyqt6", "pyqtgraph", "tomli"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -50,17 +50,6 @@ ignore = ["E501"]
 
 # Don't autofix unused variables
 unfixable = ["F841"]
-
-[tool.pylint]
-extension-pkg-allow-list = "PyQt6"
-disable = ["line-too-long", "too-few-public-methods", "W0511"]
-# Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
-# number of processors available to use.
-jobs=0
-
-# When enabled, pylint would attempt to guess common misconfiguration and emit
-# user-friendly hints instead of false-positive error messages.
-suggestion-mode = "yes"
 
 [tool.mypy]
 disallow_untyped_defs = true
