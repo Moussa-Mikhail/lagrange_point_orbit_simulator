@@ -54,3 +54,6 @@ unfixable = ["F841"]
 [tool.mypy]
 disallow_untyped_defs = true
 exclude = ["dist"]
+
+[tool.black]
+line-length = 120
