@@ -20,7 +20,32 @@ PlotArgs: TypeAlias = dict[str, str | int]
 AnimatePlotFunc: TypeAlias = Callable[[], None]
 
 
-# pylint: disable=too-many-instance-attributes
+def _create_orbit_plot(title: str) -> pg.PlotWidget:
+    plot = pg.PlotWidget(title=title)
+    plot.setLabel("bottom", "x", units="AU")
+    plot.setLabel("left", "y", units="AU")
+
+    return plot
+
+
+def _plot_components(plot: pg.PlotWidget, arr: Array2D, times: Array1D) -> None:
+    for component, (idx, pen) in Plotter.component_to_plot_args.items():
+        arr_component = arr[:, idx]
+        plot.plot(times, arr_component, name=component, pen=pen)
+
+
+def _create_conserved_plot(quantity_name: str) -> pg.PlotWidget:
+    """Initializes the plot axes and title for the conserved quantities plots"""
+
+    plot = pg.PlotWidget(title=f"Relative Change in {quantity_name} vs Time")
+
+    plot.setLabel("bottom", "Time", units="years")
+    plot.setLabel("left", f"Relative Change in {quantity_name}")
+    plot.addLegend()
+
+    return plot
+
+
 class Plotter:
     """Plots the orbits produced by a Simulator"""
 
@@ -33,23 +58,23 @@ class Plotter:
     def __init__(self, sim: Simulator):
         self.sim = sim
 
-        self.inertial_plot = Plotter._initialize_orbit_plot("Orbit in Inertial Coordinate System")
+        self.inertial_plot = _create_orbit_plot("Orbit in Inertial Coordinate System")
         self.inertial_plot.setAspectLocked(True)
 
-        self.corotating_plot = Plotter._initialize_orbit_plot("Orbit in Co-Rotating Coordinate System")
+        self.corotating_plot = _create_orbit_plot("Orbit in Co-Rotating Coordinate System")
         self.corotating_plot.setAspectLocked(True)
 
         self.timer = QTimer()
-        # 30 fps
+        # 33 milliseconds -> 30 fps
         self.timer.setInterval(33)
 
         self._total_momentum: Array2D = np.array([[]])
         self._total_angular_momentum: Array2D = np.empty_like(self._total_momentum)
         self._total_energy: Array1D = np.array([])
 
-        self.linear_momentum_plot = Plotter._initialize_conserved_plot("Linear Momentum")
-        self.angular_momentum_plot = Plotter._initialize_conserved_plot("Angular Momentum")
-        self.energy_plot = Plotter._initialize_conserved_plot("Energy")
+        self.linear_momentum_plot = _create_conserved_plot("Linear Momentum")
+        self.angular_momentum_plot = _create_conserved_plot("Angular Momentum")
+        self.energy_plot = _create_conserved_plot("Energy")
 
     def toggle_animation(self) -> None:
         if self.timer.isActive():
@@ -60,17 +85,9 @@ class Plotter:
     def stop_animation(self) -> None:
         self.timer.stop()
 
-    @staticmethod
-    def _initialize_orbit_plot(title: str) -> pg.PlotWidget:
-        plot = pg.PlotWidget(title=title)
-        plot.setLabel("bottom", "x", units="AU")
-        plot.setLabel("left", "y", units="AU")
-
-        return plot
-
-    def plot_orbits(self) -> None:
-        animate_inertial = self.plot_inertial_orbits()
-        animate_corotating = self.plot_corotating_orbits()
+    def plot_orbit_inertial_and_corotating(self) -> None:
+        animate_inertial = self.plot_inertial_orbit()
+        animate_corotating = self.plot_corotating_orbit()
 
         with suppress(TypeError):
             self.timer.timeout.disconnect()  # type: ignore
@@ -188,10 +205,10 @@ class Plotter:
             **kwargs,
         )
 
-    def plot_inertial_orbits(self) -> AnimatePlotFunc:
+    def plot_inertial_orbit(self) -> AnimatePlotFunc:
         return self.plot_orbit(self.inertial_plot, self.sim.star_pos, self.sim.planet_pos, self.sim.sat_pos)
 
-    def plot_corotating_orbits(self) -> AnimatePlotFunc:
+    def plot_corotating_orbit(self) -> AnimatePlotFunc:
         """Plots the orbits of the system simulated in the corotating frame"""
 
         star_pos_corotating = self.sim.transform_to_corotating(self.sim.star_pos)
@@ -244,13 +261,13 @@ class Plotter:
         self.energy_plot.clear()
 
         total_momentum = self._total_momentum[::arr_step]
-        self.plot_linear_momentum(total_momentum, times_in_years)
+        self.plot_relative_change_in_linear_momentum(total_momentum, times_in_years)
 
         total_angular_momentum = self._total_angular_momentum[::arr_step]
-        self.plot_angular_momentum(total_angular_momentum, times_in_years)
+        self.plot_relative_change_in_angular_momentum(total_angular_momentum, times_in_years)
 
         total_energy = self._total_energy[::arr_step]
-        self.plot_energy(total_energy, times_in_years)
+        self.plot_relative_change_in_energy(total_energy, times_in_years)
 
     def get_conserved_quantities(self) -> None:
         (
@@ -263,13 +280,11 @@ class Plotter:
         self._total_angular_momentum = total_angular_momentum
         self._total_energy = total_energy
 
-    def plot_linear_momentum(
+    def plot_relative_change_in_linear_momentum(
         self,
         total_momentum: Array2D,
         times_in_years: Array1D,
     ) -> None:
-        """Plots the relative change in the linear momentum"""
-
         # total linear momentum is initially approx. 0.
         # due to this any variation will make it seem as if it is not conserved.
         # however the variation is insignificant compared to
@@ -283,11 +298,11 @@ class Plotter:
         init_planet_momentum = cast(float, (norm(self.sim.planet_mass * self.sim.planet_vel[0])))
         normalized_linear_momentum: Array2D = total_momentum / init_planet_momentum
 
-        Plotter._plot_components(self.linear_momentum_plot, normalized_linear_momentum, times_in_years)
+        _plot_components(self.linear_momentum_plot, normalized_linear_momentum, times_in_years)
 
-    def plot_angular_momentum(self, total_angular_momentum: Array2D, times_in_years: Array1D) -> None:
-        """Plots the relative change in the angular momentum."""
-
+    def plot_relative_change_in_angular_momentum(
+        self, total_angular_momentum: Array2D, times_in_years: Array1D
+    ) -> None:
         # Ignore 0/0 division warning
         with np.errstate(invalid="ignore"):
             normalized_angular_momentum: Array2D = total_angular_momentum / total_angular_momentum[0] - 1
@@ -297,27 +312,7 @@ class Plotter:
         # For our purposes a normalized value of 0 makes more sense.
         normalized_angular_momentum = np.nan_to_num(normalized_angular_momentum, nan=0.0)
 
-        Plotter._plot_components(self.angular_momentum_plot, normalized_angular_momentum, times_in_years)
+        _plot_components(self.angular_momentum_plot, normalized_angular_momentum, times_in_years)
 
-    @staticmethod
-    def _plot_components(plot: pg.PlotWidget, arr: Array2D, times: Array1D) -> None:
-        for component, (idx, pen) in Plotter.component_to_plot_args.items():
-            arr_component = arr[:, idx]
-            plot.plot(times, arr_component, name=component, pen=pen)
-
-    def plot_energy(self, total_energy: Array1D, times_in_years: Array1D) -> None:
-        """Plots the relative change in the energy"""
-
+    def plot_relative_change_in_energy(self, total_energy: Array1D, times_in_years: Array1D) -> None:
         self.energy_plot.plot(times_in_years, total_energy / total_energy[0] - 1)
-
-    @staticmethod
-    def _initialize_conserved_plot(quantity_name: str) -> pg.PlotWidget:
-        """Initializes the plot axes and title for the conserved quantities plots"""
-
-        plot = pg.PlotWidget(title=f"Relative Change in {quantity_name} vs Time")
-
-        plot.setLabel("bottom", "Time", units="years")
-        plot.setLabel("left", f"Relative Change in {quantity_name}")
-        plot.addLegend()
-
-        return plot

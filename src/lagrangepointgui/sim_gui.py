@@ -1,6 +1,6 @@
 # pylint: disable=no-name-in-module, invalid-name, missing-docstring
 import sys
-from typing import Callable, TypeAlias, TypeVar, cast
+from typing import Callable, TypeAlias, cast
 
 from PyQt6.QtCore import QObject, QRunnable, QThreadPool, Qt, pyqtSignal
 from PyQt6.QtGui import QFont
@@ -28,13 +28,13 @@ LAGRANGE_LABEL = "Lagrange label"
 
 Params: TypeAlias = dict[str, tuple[str, str]]
 
-# parameter name: (default value, attribute name)
-SIM_PARAMS: Params = {
+# parameter label in gui: (default value, attribute name in Simulator
+SIMULATION_PARAMS: Params = {
     "number of years": ("10.0", "num_years"),
     "time step (hours)": ("1.0", "time_step"),
 }
 
-SAT_PARAMS: Params = {
+SATELLITE_PARAMS: Params = {
     "perturbation size": ("0.0", "perturbation_size"),
     "perturbation angle": ("", "perturbation_angle"),
     "initial speed": ("1.0", "speed"),
@@ -43,15 +43,16 @@ SAT_PARAMS: Params = {
 
 LAGRANGE_PARAM: Params = {LAGRANGE_LABEL: ("L4", "lagrange_label")}
 
-SYS_PARAMS: Params = {
+SYSTEM_PARAMS: Params = {
     "star mass": ("sun_mass", "star_mass"),
     "planet mass": ("earth_mass", "planet_mass"),
     "planet distance": ("1.0", "planet_distance"),
 }
 
+Input = str | float | None
 
-# pylint: disable=too-many-instance-attributes
-class SimUi(QMainWindow):
+
+class _SimUi(QMainWindow):
     def __init__(self, plotter: Plotter):
         super().__init__()
 
@@ -104,9 +105,9 @@ class SimUi(QMainWindow):
         self.presetBox.addItems(presets)
         inputsLayout.addRow("Presets", self.presetBox)
 
-        self._addParams("Simulation Parameters", SIM_PARAMS, inputsLayout)
-        self._addParams("System Parameters", SYS_PARAMS, inputsLayout)
-        self._addParams("Satellite Parameters", SAT_PARAMS, inputsLayout)
+        self._addParams("Simulation Parameters", SIMULATION_PARAMS, inputsLayout)
+        self._addParams("System Parameters", SYSTEM_PARAMS, inputsLayout)
+        self._addParams("Satellite Parameters", SATELLITE_PARAMS, inputsLayout)
         self._addLagrangeLabel(inputsLayout)
 
     def _addParams(self, paramCategory: str, params: Params, inputsLayout: QFormLayout) -> None:
@@ -114,32 +115,31 @@ class SimUi(QMainWindow):
         argLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         inputsLayout.addRow(argLabel)
 
-        for fieldText, (defaultValue, _) in params.items():
-            fieldLine = QLineEdit(defaultValue)
-            self.inputFields[fieldText] = fieldLine
-            inputsLayout.addRow(fieldText, fieldLine)
+        for fieldLabel, (defaultValue, _) in params.items():
+            field = QLineEdit(defaultValue)
+            self.inputFields[fieldLabel] = field
+            inputsLayout.addRow(fieldLabel, field)
 
     def _addLagrangeLabel(self, inputsLayout: QFormLayout) -> None:
-        fieldText = LAGRANGE_LABEL
-        defaultValue = LAGRANGE_PARAM[fieldText][0]
-        fieldLine = QLineEdit()
-        fieldLine.setReadOnly(True)
+        defaultValue = LAGRANGE_PARAM[LAGRANGE_LABEL][0]
+        field = QLineEdit()
+        field.setReadOnly(True)
 
         box = QComboBox()
         box.addItems([f"L{i}" for i in range(1, 6)])
         box.setCurrentText(defaultValue)
-        box.setLineEdit(fieldLine)
+        box.setLineEdit(field)
 
-        self.inputFields[fieldText] = fieldLine
-        inputsLayout.addRow(fieldText, box)
+        self.inputFields[LAGRANGE_LABEL] = field
+        inputsLayout.addRow(LAGRANGE_LABEL, box)
 
-    def updatePlots(self) -> None:
+    def updateOrbitPlots(self) -> None:
         self._plotted = True
-        self._plotter.plot_orbits()
+        self._plotter.plot_orbit_inertial_and_corotating()
 
     def toggleAnimation(self) -> None:
         if not self._plotted:
-            errorMessage("No plots to animate.")
+            _displayErrorMessage("No plots to animate.")
             return
 
         self._plotter.toggle_animation()
@@ -152,22 +152,40 @@ class SimUi(QMainWindow):
 
     def plotConservedQuantites(self) -> None:
         if not self._plotted:
-            errorMessage("No data to plot.")
+            _displayErrorMessage("No data to plot.")
             return
 
         self._plotter.plot_conserved_quantities()
 
+    def getInputs(self) -> dict[str, Input]:
+        """Get the parameters from the input fields. Returns a dict of parameter label to value.
+        Raises a ValueError if any of the numerical fields can't be evaluated."""
+        inputs: dict[str, Input] = {}
+        for fieldLabel, field in self.inputFields.items():
+            fieldText = field.text()
 
-ALL_PARAMS = SIM_PARAMS | SAT_PARAMS | LAGRANGE_PARAM | SYS_PARAMS
+            if fieldLabel == LAGRANGE_LABEL:
+                inputs[fieldLabel] = fieldText
+                continue
 
-# used to translate param labels used in gui to attribute names
-PARAM_LABELS_TO_ATTRIBUTE = {paramLabel: attribute for paramLabel, (_, attribute) in ALL_PARAMS.items()}
+            try:
+                value = safeEval(fieldText)
+            except ValueError as e:
+                raise ValueError(f"Invalid expression in field '{fieldLabel}'.\n{e}") from e
 
-T = TypeVar("T")
+            inputs[fieldLabel] = value
+
+        return inputs
 
 
-def _translateInputs(inputs: dict[str, T]) -> dict[str, T]:
-    return {PARAM_LABELS_TO_ATTRIBUTE[label]: v for label, v in inputs.items()}
+ALL_PARAMS = SIMULATION_PARAMS | SATELLITE_PARAMS | LAGRANGE_PARAM | SYSTEM_PARAMS
+
+# used to translate param labels used in gui to attribute names in simulator class
+PARAM_LABEL_TO_ATTRIBUTE_NAME = {paramLabel: attribute for paramLabel, (_, attribute) in ALL_PARAMS.items()}
+
+
+def _translateInputs(inputs: dict[str, Input]) -> dict[str, Input]:
+    return {PARAM_LABEL_TO_ATTRIBUTE_NAME[label]: v for label, v in inputs.items()}
 
 
 class WorkerSignals(QObject):
@@ -186,8 +204,8 @@ class Runnable(QRunnable):
         self.signals.finished.emit()
 
 
-class SimCtrl:  # pylint: disable=too-few-public-methods
-    def __init__(self, model: Simulator, view: SimUi):
+class _SimCtrl:
+    def __init__(self, model: Simulator, view: _SimUi):
         self._model = model
         self._view = view
         self._connectSignals()
@@ -229,48 +247,32 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
 
     def _simulate(self) -> None:
         try:
-            simulationInputs = self._getSimParams()
+            paramLabelToValue = self._view.getInputs()
 
         except ValueError as e:
-            errorMessage(str(e))
+            _displayErrorMessage(str(e))
             return
 
-        translatedInputs = _translateInputs(simulationInputs)
+        attributeNameToValue = _translateInputs(paramLabelToValue)
 
         try:
-            for attr, value in translatedInputs.items():
-                setattr(self._model, attr, value)
+            for attributeName, value in attributeNameToValue.items():
+                setattr(self._model, attributeName, value)
 
         except (TypeError, ValueError) as e:
             msg = str(e)
-            for paramLabel, attr in PARAM_LABELS_TO_ATTRIBUTE.items():
-                msg = msg.replace(attr, paramLabel)
+            # replace attribute names with parameter labels
+            for paramLabel, attributeName in PARAM_LABEL_TO_ATTRIBUTE_NAME.items():
+                msg = msg.replace(attributeName, paramLabel)
 
-            errorMessage(msg)
+            _displayErrorMessage(msg)
             return
 
         self._view.stopAnimation()
-        self._runExpensiveCalc(self._model.simulate, self._view.updatePlots)
+        self._runInThread(self._model.simulate, self._view.updateOrbitPlots)
 
         if self._view.autoPlotConserved.isChecked():
             self._plotConservedQuantites()
-
-    def _getSimParams(self) -> dict[str, str | float | None]:
-        inputs: dict[str, str | float | None] = {}
-        for fieldText, field in self._view.inputFields.items():
-            fieldValue = field.text()
-
-            if fieldText == LAGRANGE_LABEL:
-                inputs[fieldText] = fieldValue
-                continue
-            try:
-                value = safeEval(fieldValue)
-            except ValueError as e:
-                raise ValueError(f"Invalid expression in field '{fieldText}'.\n{e}") from e
-
-            inputs[fieldText] = value
-
-        return inputs
 
     def _enableButtons(self) -> None:
         for btn in self._view.buttons.values():
@@ -284,10 +286,11 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         self._view.toggleAnimation()
 
     def _plotConservedQuantites(self) -> None:
-        self._runExpensiveCalc(self._view.calcConservedQuantities, self._view.plotConservedQuantites)
+        self._runInThread(self._view.calcConservedQuantities, self._view.plotConservedQuantites)
 
     # noinspection PyUnresolvedReferences
-    def _runExpensiveCalc(self, expensiveCalc: Callable[[], None], onFinishFunc: Callable[[], None]) -> None:
+    def _runInThread(self, expensiveCalc: Callable[[], None], onFinishFunc: Callable[[], None]) -> None:
+        """Run an expensive calculation in a separate thread."""
         self._disableButtons()
 
         runnable = Runnable(expensiveCalc)
@@ -300,7 +303,8 @@ class SimCtrl:  # pylint: disable=too-few-public-methods
         pool.start(runnable)
 
 
-def errorMessage(message: str) -> None:
+def _displayErrorMessage(message: str) -> None:
+    """Display an error message in a dialog box."""
     errorMsg = QErrorMessage()
     errorMsg.showMessage(message)
     errorMsg.exec()
@@ -312,10 +316,10 @@ def main() -> None:
 
     sim = Simulator()
     plotter = Plotter(sim)
-    view = SimUi(plotter)
+    view = _SimUi(plotter)
     view.show()
 
-    _ = SimCtrl(sim, view)
+    _ = _SimCtrl(sim, view)
 
     sys.exit(simApp.exec())
 
