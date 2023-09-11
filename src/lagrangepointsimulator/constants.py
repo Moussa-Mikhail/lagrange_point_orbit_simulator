@@ -1,5 +1,3 @@
-# pylint: disable=invalid-name, missing-docstring
-
 # universal gravitational constant in meters^3*1/kilograms*1/seconds^2
 G = 6.67430 * 10**-11
 

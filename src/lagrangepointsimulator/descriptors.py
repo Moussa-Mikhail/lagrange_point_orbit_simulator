@@ -1,4 +1,3 @@
-# pylint: disable=missing-function-docstring
 """Holds descriptor factory functions"""
 
 from validateddescriptor import ValidatedDescriptor, value_check_factory

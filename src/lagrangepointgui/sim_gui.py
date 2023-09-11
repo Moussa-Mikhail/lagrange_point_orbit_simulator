@@ -1,8 +1,9 @@
-# pylint: disable=no-name-in-module, invalid-name, missing-docstring
+# ruff: noqa: N802 N803 N806 N812
 import sys
-from typing import Callable, TypeAlias, cast
+from collections.abc import Callable
+from typing import TypeAlias, cast
 
-from PyQt6.QtCore import QObject, QRunnable, QThreadPool, Qt, pyqtSignal
+from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QApplication,
@@ -49,11 +50,11 @@ SYSTEM_PARAMS: Params = {
     "planet distance": ("1.0", "planet_distance"),
 }
 
-Input = str | float | None
+Input: TypeAlias = str | float | None
 
 
 class _SimUi(QMainWindow):
-    def __init__(self, plotter: Plotter):
+    def __init__(self, plotter: Plotter) -> None:
         super().__init__()
 
         self._plotter = plotter
@@ -170,8 +171,9 @@ class _SimUi(QMainWindow):
 
             try:
                 value = safeEval(fieldText)
-            except ValueError as e:
-                raise ValueError(f"Invalid expression in field '{fieldLabel}'.\n{e}") from e
+            except (ValueError, TypeError) as e:
+                msg = f"Invalid expression in field '{fieldLabel}'.\n{e}"
+                raise ValueError(msg) from e
 
             inputs[fieldLabel] = value
 
@@ -205,7 +207,7 @@ class Runnable(QRunnable):
 
 
 class _SimCtrl:
-    def __init__(self, model: Simulator, view: _SimUi):
+    def __init__(self, model: Simulator, view: _SimUi) -> None:
         self._model = model
         self._view = view
         self._connectSignals()
@@ -298,9 +300,11 @@ class _SimCtrl:
         runnable.signals.finished.connect(self._enableButtons)
         runnable.signals.finished.connect(onFinishFunc)
 
-        pool = QThreadPool.globalInstance()
-        assert pool is not None
-        pool.start(runnable)
+        if pool := QThreadPool.globalInstance():
+            pool.start(runnable)
+        else:
+            msg = "Unable to find thread pool."
+            raise RuntimeError(msg)
 
 
 def _displayErrorMessage(message: str) -> None:

@@ -1,2 +1,1 @@
-# pylint: disable=missing-module-docstring
-from .orbit_plotter import Plotter
+from src.lagrangepointgui.orbit_plotter import Plotter

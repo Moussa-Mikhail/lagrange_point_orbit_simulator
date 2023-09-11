@@ -1,12 +1,10 @@
-# pylint: disable=missing-docstring, not-an-iterable, invalid-name
-
 from math import sqrt
 
 import numpy as np
 from numba import njit, prange  # type: ignore
 
-from .constants import G
-from .sim_types import Array1D, Array2D
+from src.lagrangepointsimulator.constants import G
+from src.lagrangepointsimulator.sim_types import Array1D, Array2D
 
 
 @njit(cache=True)
@@ -14,11 +12,10 @@ def inverse_norm_cubed(vector: Array1D) -> float:
     return sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]) ** -3
 
 
-# pylint: disable=too-many-arguments, too-many-locals
 @njit(cache=True)
 def calc_acceleration(
-    G_star: float,
-    G_planet: float,
+    g_star: float,
+    g_planet: float,
     star_pos: Array1D,
     planet_pos: Array1D,
     sat_pos: Array1D,
@@ -38,10 +35,10 @@ def calc_acceleration(
     d_sat_to_star_inverse_cubed = inverse_norm_cubed(sat_to_star)
     d_sat_to_planet_inverse_cubed = inverse_norm_cubed(sat_to_planet)
 
-    star_planet_coeff = G_planet * d_planet_to_star_inverse_cubed
-    planet_star_coeff = G_star * d_planet_to_star_inverse_cubed
-    sat_star_coeff = G_star * d_sat_to_star_inverse_cubed
-    sat_planet_coeff = G_planet * d_sat_to_planet_inverse_cubed
+    star_planet_coeff = g_planet * d_planet_to_star_inverse_cubed
+    planet_star_coeff = g_star * d_planet_to_star_inverse_cubed
+    sat_star_coeff = g_star * d_sat_to_star_inverse_cubed
+    sat_planet_coeff = g_planet * d_sat_to_planet_inverse_cubed
 
     for j in range(3):
         star_accel[j] = -star_planet_coeff * planet_to_star[j]
@@ -52,7 +49,6 @@ def calc_acceleration(
         sat_accel[j] = sat_star_coeff * sat_to_star[j] + sat_planet_coeff * sat_to_planet[j]
 
 
-# pylint: disable=too-many-arguments, too-many-locals
 @njit(cache=True)
 def integrate(
     time_step: float,
@@ -80,8 +76,8 @@ def integrate(
 
     half_time_step = 0.5 * time_step
 
-    G_star = G * star_mass
-    G_planet = G * planet_mass
+    g_star = G * star_mass
+    g_planet = G * planet_mass
 
     for k in range(1, num_steps + 1):
         for j in range(3):
@@ -92,8 +88,8 @@ def integrate(
             sat_intermediate_pos[j] = sat_pos[k - 1, j] + sat_vel[k - 1, j] * half_time_step
 
         calc_acceleration(
-            G_star,
-            G_planet,
+            g_star,
+            g_planet,
             star_intermediate_pos,
             planet_intermediate_pos,
             sat_intermediate_pos,

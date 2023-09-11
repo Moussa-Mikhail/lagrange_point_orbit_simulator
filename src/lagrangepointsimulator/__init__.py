@@ -1,3 +1,2 @@
-# pylint: disable=missing-module-docstring
-from . import constants, sim_types
-from .simulator import Simulator
+from src.lagrangepointsimulator import constants, sim_types
+from src.lagrangepointsimulator.simulator import Simulator

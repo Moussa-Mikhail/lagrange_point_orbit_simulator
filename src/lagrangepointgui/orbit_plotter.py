@@ -1,15 +1,15 @@
-# pylint: disable=missing-function-docstring
-"""This module contains the Plotter class which is responsible for plotting
+"""Contains the Plotter class which is responsible for plotting
 the orbits of the system simulated by an instance of the Simulator class.
 """
+from collections.abc import Callable, Generator
 from contextlib import suppress
 from math import ceil
-from typing import Any, Callable, Generator, TypeAlias, cast
+from typing import TypeAlias, cast
 
 import numpy as np
-import pyqtgraph as pg  # type: ignore
-from PyQt6.QtCore import QTimer  # pylint: disable=no-name-in-module
+import pyqtgraph as pg  # type: ignore[import]
 from numpy.linalg import norm
+from PyQt6.QtCore import QTimer
 
 from src.lagrangepointsimulator import Simulator
 from src.lagrangepointsimulator.constants import AU, HOURS, YEARS
@@ -28,15 +28,21 @@ def _create_orbit_plot(title: str) -> pg.PlotWidget:
     return plot
 
 
+COMPONENT_TO_PLOT_ARGS: dict[str, tuple[int, str]] = {
+    "x": (0, "r"),
+    "y": (1, "g"),
+    "z": (2, "b"),
+}
+
+
 def _plot_components(plot: pg.PlotWidget, arr: Array2D, times: Array1D) -> None:
-    for component, (idx, pen) in Plotter.component_to_plot_args.items():
+    for component, (idx, pen) in COMPONENT_TO_PLOT_ARGS.items():
         arr_component = arr[:, idx]
         plot.plot(times, arr_component, name=component, pen=pen)
 
 
 def _create_conserved_plot(quantity_name: str) -> pg.PlotWidget:
-    """Initializes the plot axes and title for the conserved quantities plots"""
-
+    """Initializes the plot axes and title for the conserved quantities plots."""
     plot = pg.PlotWidget(title=f"Relative Change in {quantity_name} vs Time")
 
     plot.setLabel("bottom", "Time", units="years")
@@ -47,15 +53,9 @@ def _create_conserved_plot(quantity_name: str) -> pg.PlotWidget:
 
 
 class Plotter:
-    """Plots the orbits produced by a Simulator"""
+    """Plots the orbits produced by a Simulator."""
 
-    component_to_plot_args: dict[str, tuple[int, str]] = {
-        "x": (0, "r"),
-        "y": (1, "g"),
-        "z": (2, "b"),
-    }
-
-    def __init__(self, sim: Simulator):
+    def __init__(self, sim: Simulator) -> None:
         self.sim = sim
 
         self.inertial_plot = _create_orbit_plot("Orbit in Inertial Coordinate System")
@@ -105,7 +105,7 @@ class Plotter:
         # animated motion is the same regardless of
         # num_steps or num_years
         rate = ceil(
-            100 / 3 * time_step_default / abs(self.sim.time_step_in_seconds) * self.sim.orbital_period / (1 * YEARS)
+            100 / 3 * time_step_default / abs(self.sim.time_step_in_seconds) * self.sim.orbital_period / (1 * YEARS),
         )
         i = 0
         while True:
@@ -134,7 +134,6 @@ class Plotter:
         """Plotting logic common to both inertial and corotating plots.
         Returns a function which is called by the timer to animate the plot.
         """
-
         # TODO: Refactor this to avoid duplication of code
 
         plot.clear()
@@ -175,9 +174,9 @@ class Plotter:
 
         # The purpose of this is to add the bodies to the plot legend
         # and plot their initial positions
-        Plotter.plot_point(anim_plot, star_pos[0], **star_args)
-        Plotter.plot_point(anim_plot, planet_pos[0], **planet_args)
-        Plotter.plot_point(anim_plot, sat_pos[0], **sat_args)
+        Plotter.plot_point(anim_plot, star_pos[0], star_args)
+        Plotter.plot_point(anim_plot, planet_pos[0], planet_args)
+        Plotter.plot_point(anim_plot, sat_pos[0], sat_args)
 
         plot.autoRange()
 
@@ -188,29 +187,27 @@ class Plotter:
 
             anim_plot.clear()
 
-            Plotter.plot_point(anim_plot, star_pos[i], **star_args)
-            Plotter.plot_point(anim_plot, planet_pos[i], **planet_args)
-            Plotter.plot_point(anim_plot, sat_pos[i], **sat_args)
+            Plotter.plot_point(anim_plot, star_pos[i], star_args)
+            Plotter.plot_point(anim_plot, planet_pos[i], planet_args)
+            Plotter.plot_point(anim_plot, sat_pos[i], sat_args)
 
         return animate_plot
 
     @staticmethod
-    def plot_point(scatter_plot: pg.ScatterPlotItem, pos: Array1D, **kwargs: Any) -> None:
+    def plot_point(scatter_plot: pg.ScatterPlotItem, pos: Array1D, args: PlotArgs) -> None:
         """Plots pos on scatter_plot.
         pos can be any subscript-able list with length >= 2. Only the first 2 elements are plotted.
         """
-
         scatter_plot.addPoints(
             pos=[pos[:2] / AU],
-            **kwargs,
+            **args,
         )
 
     def plot_inertial_orbit(self) -> AnimatePlotFunc:
         return self.plot_orbit(self.inertial_plot, self.sim.star_pos, self.sim.planet_pos, self.sim.sat_pos)
 
     def plot_corotating_orbit(self) -> AnimatePlotFunc:
-        """Plots the orbits of the system simulated in the corotating frame"""
-
+        """Plots the orbits of the system simulated in the corotating frame."""
         star_pos_corotating = self.sim.transform_to_corotating(self.sim.star_pos)
         planet_pos_corotating = self.sim.transform_to_corotating(self.sim.planet_pos)
         sat_pos_corotating = self.sim.transform_to_corotating(self.sim.sat_pos)
@@ -249,8 +246,8 @@ class Plotter:
 
     def plot_conserved_quantities(self) -> None:
         """Plots the relative change in the conserved quantities:
-        linear and angular momenta, and energy"""
-
+        linear and angular momenta, and energy.
+        """
         # slice the arrays so that we only plot at most 10**5 points.
         arr_step = self.array_step()
 
@@ -301,7 +298,9 @@ class Plotter:
         _plot_components(self.linear_momentum_plot, normalized_linear_momentum, times_in_years)
 
     def plot_relative_change_in_angular_momentum(
-        self, total_angular_momentum: Array2D, times_in_years: Array1D
+        self,
+        total_angular_momentum: Array2D,
+        times_in_years: Array1D,
     ) -> None:
         # Ignore 0/0 division warning
         with np.errstate(invalid="ignore"):

@@ -16,8 +16,8 @@ dir_path = Path(os.path.realpath(__file__)).parent
 if "sim_gui" in dir_path.parts:
     dir_path = dir_path.parent.parent
 
-default_presets_path = os.path.join(dir_path, "default_presets.toml")
-user_presets_path = os.path.join(dir_path, "user_presets.toml")
+default_presets_path = dir_path / "default_presets.toml"
+user_presets_path = dir_path / "user_presets.toml"
 
 Expr: TypeAlias = float | int | str
 Bases: TypeAlias = list[str]
@@ -33,9 +33,9 @@ def read_presets() -> tuple[ParamPresets, Constants]:
     return default_params | user_params, default_consts | user_consts
 
 
-def _read_preset(file_path: str) -> tuple[ParamPresets, Constants]:
+def _read_preset(file_path: Path) -> tuple[ParamPresets, Constants]:
     try:
-        with open(file_path, "rb") as file:
+        with Path.open(file_path, "rb") as file:
             presets = tomllib.load(file)
     except FileNotFoundError:
         return {}, {}

@@ -1,5 +1,4 @@
 """This script measures how long a simulation takes to run."""
-# pylint: disable=missing-docstring
 
 from timeit import timeit
 
@@ -29,5 +28,3 @@ def simulate_with_reallocation() -> None:
 
 
 simulate_without_reallocation()
-
-# simulate_with_reallocation()

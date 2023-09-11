@@ -1,4 +1,3 @@
-# pylint: disable=invalid-name, missing-function-docstring
 """This module contains the Simulator class
 which holds parameters defining a satellites orbit near a Lagrange point and simulates
 that orbit.
@@ -8,17 +7,13 @@ It assumes that both the star and planet are undergoing uniform circular motion.
 from math import ceil, sqrt
 
 import numpy as np
-
-# shortens function call
 from numpy.linalg import norm
 
-from . import descriptors
-from .constants import AU, EARTH_MASS, G, HOURS, SUN_MASS, YEARS
-from .numba_funcs import (
-    integrate as nb_integrate,
-    transform_to_corotating as nb_transform_to_corotating,
-)
-from .sim_types import Array1D, Array2D
+from src.lagrangepointsimulator import descriptors
+from src.lagrangepointsimulator.constants import AU, EARTH_MASS, HOURS, SUN_MASS, YEARS, G
+from src.lagrangepointsimulator.numba_funcs import integrate as nb_integrate
+from src.lagrangepointsimulator.numba_funcs import transform_to_corotating as nb_transform_to_corotating
+from src.lagrangepointsimulator.sim_types import Array1D, Array2D
 
 
 def array_of_norms(arr_2d: Array2D) -> Array1D:
@@ -100,7 +95,6 @@ class Simulator:
     planet_distance = descriptors.positive_float()
     lagrange_label = descriptors.lagrange_label_desc()
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         num_years: float = 100.0,
@@ -113,7 +107,7 @@ class Simulator:
         star_mass: float = SUN_MASS,
         planet_mass: float = EARTH_MASS,
         planet_distance: float = 1.0,
-    ):
+    ) -> None:
         self.num_years = num_years
         self.time_step = time_step
 
@@ -183,7 +177,8 @@ class Simulator:
                 return planet_distance_meters * unit_vector(-np.pi / 3)
 
             case _:
-                raise ValueError("Invalid Lagrange point label. Must be one of ('L1', 'L2', 'L3', 'L4', 'L5')")
+                msg = "Invalid Lagrange point label. Must be one of ('L1', 'L2', 'L3', 'L4', 'L5')"
+                raise ValueError(msg)
 
     def default_perturbation_angle(self) -> float:
         return {"L1": 0.0, "L2": 0.0, "L3": 180.0, "L4": 60.0, "L5": -60.0}[self.lagrange_label]
@@ -250,7 +245,7 @@ class Simulator:
 
         perturbation = perturbation_size * np.array((np.cos(perturbation_angle), np.sin(perturbation_angle), 0))
 
-        self.sat_pos[0] = self.lagrange_point + perturbation
+        self.sat_pos[0] = self.calc_lagrange_point() + perturbation
 
     def _initialize_velocities(self, init_cm_pos: Array1D) -> None:
         # orbits are counterclockwise so
@@ -275,7 +270,7 @@ class Simulator:
         self.planet_pos[0] -= init_cm_pos
         self.sat_pos[0] -= init_cm_pos
 
-        self.lagrange_point_trans = self.lagrange_point - init_cm_pos
+        self.lagrange_point_trans = self.calc_lagrange_point() - init_cm_pos
 
     def _integrate(self) -> None:
         nb_integrate(

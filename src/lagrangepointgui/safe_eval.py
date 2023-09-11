@@ -1,6 +1,6 @@
 """Contains a function to safely evaluate input expressions."""
 from src.lagrangepointgui.presets import read_presets
-from src.lagrangepointsimulator.constants import CONSTANTS  # noqa: F401
+from src.lagrangepointsimulator.constants import CONSTANTS
 
 ALLOWED_CHARS = set("0123456789.+-*/()e")
 
@@ -26,8 +26,9 @@ def safe_eval(expr: str) -> int | float | None:
     except (NameError, SyntaxError, ZeroDivisionError) as err:
         raise ValueError(str(err)) from err
 
-    if not isinstance(res, (int, float)):
-        raise ValueError("Result is not a real number.")
+    if not isinstance(res, int | float):
+        msg = "Result is not a real number."
+        raise TypeError(msg)
 
     return res
 
@@ -39,7 +40,8 @@ def _validate_expr(expr: str, constants: dict[str, float | int]) -> None:
     cleaned_expr = _remove_constants(expr, constants)
     chars_in_expr = set(cleaned_expr)
     if not chars_in_expr.issubset(ALLOWED_CHARS):
-        raise ValueError("invalid constant or syntax in expression.")
+        msg = "invalid constant or syntax in expression."
+        raise ValueError(msg)
 
 
 def _remove_constants(expr: str, constants: dict[str, float | int]) -> str:
