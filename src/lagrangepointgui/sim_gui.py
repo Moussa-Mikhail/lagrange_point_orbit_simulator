@@ -52,6 +52,12 @@ SYSTEM_PARAMS: Params = {
 
 Input: TypeAlias = str | float | None
 
+SIMULATE = "Simulate"
+
+START_STOP = "Start/Stop"
+
+PLOT_CONSERVED = "Plot Conserved"
+
 
 class _SimUi(QMainWindow):
     def __init__(self, plotter: Plotter) -> None:
@@ -96,7 +102,7 @@ class _SimUi(QMainWindow):
         buttonsLayout = QHBoxLayout()
         self._inputsLayout.addRow(buttonsLayout)
 
-        for btnText in ("Simulate", "Start/Stop", "Plot Conserved"):
+        for btnText in (SIMULATE, START_STOP, PLOT_CONSERVED):
             self.buttons[btnText] = QPushButton(btnText)
             buttonsLayout.addWidget(self.buttons[btnText])
 
@@ -220,12 +226,13 @@ class _SimCtrl:
         self._view = view
         self._connectSignals()
         self._addReturnPressed()
+        self._calculating = False
 
     def _connectSignals(self) -> None:
         btnActions = {
-            "Simulate": self._simulate,
-            "Start/Stop": self._toggleAnimation,
-            "Plot Conserved": self._plotConservedQuantites,
+            SIMULATE: self._simulate,
+            START_STOP: self._toggleAnimation,
+            PLOT_CONSERVED: self._plotConservedQuantites,
         }
         for btnText, btn in self._view.buttons.items():
             action = btnActions[btnText]
@@ -258,6 +265,9 @@ class _SimCtrl:
         self._view.presetBox.lineEdit().returnPressed.connect(self._simulate)  # type: ignore
 
     def _simulate(self) -> None:
+        if self._calculating:
+            return
+
         try:
             paramLabelToValue = self._view.getInputs()
 
@@ -281,10 +291,12 @@ class _SimCtrl:
             return
 
         self._view.stopAnimation()
-        self._runInThread(self._model.simulate, self._view.updateOrbitPlots)
-
+        onFinishFuncs = [self._view.updateOrbitPlots]
         if self._view.autoPlotConserved.isChecked():
-            self._plotConservedQuantites()
+            onFinishFuncs.append(self._plotConservedQuantites)
+
+        self._disableButtons()
+        self._runInThread(self._model.simulate, onFinishFuncs)
 
     def _enableButtons(self) -> None:
         for btn in self._view.buttons.values():
@@ -294,27 +306,38 @@ class _SimCtrl:
         for btn in self._view.buttons.values():
             btn.setEnabled(False)
 
+    def _disableButtonsExceptStartStop(self) -> None:
+        for btnText, btn in self._view.buttons.items():
+            if btnText == START_STOP:
+                continue
+
+            btn.setEnabled(False)
+
     def _toggleAnimation(self) -> None:
         self._view.toggleAnimation()
 
     def _plotConservedQuantites(self) -> None:
-        self._runInThread(self._view.calcConservedQuantities, self._view.plotConservedQuantites)
+        self._disableButtonsExceptStartStop()
+        self._runInThread(self._view.calcConservedQuantities, [self._view.plotConservedQuantites])
 
     # noinspection PyUnresolvedReferences
-    def _runInThread(self, expensiveCalc: Callable[[], None], onFinishFunc: Callable[[], None]) -> None:
+    def _runInThread(self, expensiveCalc: Callable[[], None], onFinishFuncs: list[Callable[[], None]]) -> None:
         """Run an expensive calculation in a separate thread."""
-        self._disableButtons()
-
         runnable = Runnable(expensiveCalc)
 
         runnable.signals.finished.connect(self._enableButtons)
-        runnable.signals.finished.connect(onFinishFunc)
+        runnable.signals.finished.connect(self._setCalculatingFalse)
+        for onFinishFunc in onFinishFuncs:
+            runnable.signals.finished.connect(onFinishFunc)
 
-        if pool := QThreadPool.globalInstance():
-            pool.start(runnable)
-        else:
+        if not (pool := QThreadPool.globalInstance()):
             msg = "Unable to find thread pool."
             raise RuntimeError(msg)
+        pool.start(runnable)
+        self._calculating = True
+
+    def _setCalculatingFalse(self) -> None:
+        self._calculating = False
 
 
 def _displayErrorMessage(message: str) -> None:
