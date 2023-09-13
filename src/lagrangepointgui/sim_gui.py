@@ -75,10 +75,11 @@ class _SimUi(QMainWindow):
         inputAndOrbitsLayout = QHBoxLayout()
         mainLayout.addLayout(inputAndOrbitsLayout)
 
-        inputsLayout = QFormLayout()
-        inputAndOrbitsLayout.addLayout(inputsLayout)
-        self._addButtons(inputsLayout)
-        self._addInputFields(inputsLayout)
+        self._inputsLayout = QFormLayout()
+        inputAndOrbitsLayout.addLayout(self._inputsLayout)
+        self._addButtons()
+        self._addPresetBox()
+        self._addInputFields()
         inputAndOrbitsLayout.addWidget(self._plotter.inertial_plot)
         inputAndOrbitsLayout.addWidget(self._plotter.corotating_plot)
 
@@ -91,9 +92,9 @@ class _SimUi(QMainWindow):
 
         self.resize(mainLayout.sizeHint())
 
-    def _addButtons(self, inputsLayout: QFormLayout) -> None:
+    def _addButtons(self) -> None:
         buttonsLayout = QHBoxLayout()
-        inputsLayout.addRow(buttonsLayout)
+        self._inputsLayout.addRow(buttonsLayout)
 
         for btnText in ("Simulate", "Start/Stop", "Plot Conserved"):
             self.buttons[btnText] = QPushButton(btnText)
@@ -101,27 +102,34 @@ class _SimUi(QMainWindow):
 
         buttonsLayout.addWidget(self.autoPlotConserved)
 
-    def _addInputFields(self, inputsLayout: QFormLayout) -> None:
+    def _addPresetBox(self) -> None:
         presets, _ = readPresets()
         self.presetBox.addItems(presets)
-        inputsLayout.addRow("Presets", self.presetBox)
 
-        self._addParams("Simulation Parameters", SIMULATION_PARAMS, inputsLayout)
-        self._addParams("System Parameters", SYSTEM_PARAMS, inputsLayout)
-        self._addParams("Satellite Parameters", SATELLITE_PARAMS, inputsLayout)
-        self._addLagrangeLabel(inputsLayout)
+        field = QLineEdit()
+        field.setReadOnly(True)
 
-    def _addParams(self, paramCategory: str, params: Params, inputsLayout: QFormLayout) -> None:
+        self.presetBox.setLineEdit(field)
+
+        self._inputsLayout.addRow("Presets", self.presetBox)
+
+    def _addInputFields(self) -> None:
+        self._addParams("Simulation Parameters", SIMULATION_PARAMS)
+        self._addParams("System Parameters", SYSTEM_PARAMS)
+        self._addParams("Satellite Parameters", SATELLITE_PARAMS)
+        self._addLagrangeLabel()
+
+    def _addParams(self, paramCategory: str, params: Params) -> None:
         argLabel = QLabel(paramCategory)
         argLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        inputsLayout.addRow(argLabel)
+        self._inputsLayout.addRow(argLabel)
 
         for fieldLabel, (defaultValue, _) in params.items():
             field = QLineEdit(defaultValue)
             self.inputFields[fieldLabel] = field
-            inputsLayout.addRow(fieldLabel, field)
+            self._inputsLayout.addRow(fieldLabel, field)
 
-    def _addLagrangeLabel(self, inputsLayout: QFormLayout) -> None:
+    def _addLagrangeLabel(self) -> None:
         defaultValue = LAGRANGE_PARAM[LAGRANGE_LABEL][0]
         field = QLineEdit()
         field.setReadOnly(True)
@@ -132,7 +140,7 @@ class _SimUi(QMainWindow):
         box.setLineEdit(field)
 
         self.inputFields[LAGRANGE_LABEL] = field
-        inputsLayout.addRow(LAGRANGE_LABEL, box)
+        self._inputsLayout.addRow(LAGRANGE_LABEL, box)
 
     def updateOrbitPlots(self) -> None:
         self._plotted = True
@@ -246,6 +254,8 @@ class _SimCtrl:
     def _addReturnPressed(self) -> None:
         for field in self._view.inputFields.values():
             field.returnPressed.connect(self._simulate)  # type: ignore
+
+        self._view.presetBox.lineEdit().returnPressed.connect(self._simulate)  # type: ignore
 
     def _simulate(self) -> None:
         try:
