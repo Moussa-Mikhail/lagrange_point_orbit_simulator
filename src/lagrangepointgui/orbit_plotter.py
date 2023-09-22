@@ -163,10 +163,11 @@ class Plotter:
             "name": "Satellite",
         }
 
+        arrays_and_args = ((star_pos, star_args), (planet_pos, planet_args), (sat_pos, sat_args))
+
         arr_step = self.array_step()
-        plot.plot(star_pos[::arr_step, :2] / AU, **star_args)
-        plot.plot(planet_pos[::arr_step, :2] / AU, **planet_args)
-        plot.plot(sat_pos[::arr_step, :2] / AU, **sat_args)
+        for arr, args in arrays_and_args:
+            plot.plot(arr[::arr_step, :2] / AU, **args)
 
         anim_plot = pg.ScatterPlotItem()
 
@@ -174,9 +175,8 @@ class Plotter:
 
         # The purpose of this is to add the bodies to the plot legend
         # and plot their initial positions
-        Plotter.plot_point(anim_plot, star_pos[0], star_args)
-        Plotter.plot_point(anim_plot, planet_pos[0], planet_args)
-        Plotter.plot_point(anim_plot, sat_pos[0], sat_args)
+        for arr, args in arrays_and_args:
+            Plotter.plot_point(anim_plot, arr[0], args)
 
         plot.autoRange()
 
@@ -186,10 +186,8 @@ class Plotter:
             i = next(idx_gen)
 
             anim_plot.clear()
-
-            Plotter.plot_point(anim_plot, star_pos[i], star_args)
-            Plotter.plot_point(anim_plot, planet_pos[i], planet_args)
-            Plotter.plot_point(anim_plot, sat_pos[i], sat_args)
+            for arr, args in arrays_and_args:
+                Plotter.plot_point(anim_plot, arr[i], args)
 
         return animate_plot
 
