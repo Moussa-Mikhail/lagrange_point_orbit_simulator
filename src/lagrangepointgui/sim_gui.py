@@ -54,9 +54,9 @@ Input: TypeAlias = str | float | None
 
 SIMULATE = "Simulate"
 
-START_STOP = "Start/Stop"
+TOGGLE_ANIMATION = "Toggle Animation"
 
-PLOT_CONSERVED = "Plot Conserved"
+PLOT_CONSERVED = "Plot Conserved Quantities"
 
 
 class _SimUi(QMainWindow):
@@ -102,7 +102,7 @@ class _SimUi(QMainWindow):
         buttonsLayout = QHBoxLayout()
         self._inputsLayout.addRow(buttonsLayout)
 
-        for btnText in (SIMULATE, START_STOP, PLOT_CONSERVED):
+        for btnText in (SIMULATE, TOGGLE_ANIMATION, PLOT_CONSERVED):
             self.buttons[btnText] = QPushButton(btnText)
             buttonsLayout.addWidget(self.buttons[btnText])
 
@@ -231,7 +231,7 @@ class _SimCtrl:
     def _connectSignals(self) -> None:
         btnActions = {
             SIMULATE: self._simulate,
-            START_STOP: self._toggleAnimation,
+            TOGGLE_ANIMATION: self._toggleAnimation,
             PLOT_CONSERVED: self._plotConservedQuantites,
         }
         for btnText, btn in self._view.buttons.items():
@@ -308,7 +308,7 @@ class _SimCtrl:
 
     def _disableButtonsExceptStartStop(self) -> None:
         for btnText, btn in self._view.buttons.items():
-            if btnText == START_STOP:
+            if btnText == TOGGLE_ANIMATION:
                 continue
 
             btn.setEnabled(False)
