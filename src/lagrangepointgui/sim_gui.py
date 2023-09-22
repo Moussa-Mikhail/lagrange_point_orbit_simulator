@@ -208,7 +208,7 @@ class WorkerSignals(QObject):
     finished = pyqtSignal()
 
 
-class Runnable(QRunnable):
+class ExpensiveFuncRunner(QRunnable):
     def __init__(self, expensiveFunc: Callable[[], None]) -> None:
         super().__init__()
         self.expensiveFunc = expensiveFunc
@@ -321,9 +321,9 @@ class _SimCtrl:
         self._runInThread(self._view.calcConservedQuantities, [self._view.plotConservedQuantites])
 
     # noinspection PyUnresolvedReferences
-    def _runInThread(self, expensiveCalc: Callable[[], None], onFinishFuncs: list[Callable[[], None]]) -> None:
-        """Run an expensive calculation in a separate thread."""
-        runnable = Runnable(expensiveCalc)
+    def _runInThread(self, expensiveFunc: Callable[[], None], onFinishFuncs: list[Callable[[], None]]) -> None:
+        """Run an expensive function in a separate thread."""
+        runnable = ExpensiveFuncRunner(expensiveFunc)
 
         runnable.signals.finished.connect(self._enableButtons)
         runnable.signals.finished.connect(self._setCalculatingFalse)
