@@ -15,6 +15,8 @@ def safe_eval(expr: str) -> int | float | None:
     if not expr:
         return None
 
+    expr = expr.strip()
+
     _, user_constants = read_presets()
 
     all_constants = CONSTANTS | user_constants
