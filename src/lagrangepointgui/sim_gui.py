@@ -349,7 +349,8 @@ def _displayErrorMessage(message: str) -> None:
 
 def main() -> None:
     simApp = QApplication(sys.argv)
-    simApp.setFont(QFont("Arial", 10))
+    simApp.setFont(QFont("Arial", 13))
+    simApp.setStyle("fusion")
 
     sim = Simulator()
     plotter = Plotter(sim)
