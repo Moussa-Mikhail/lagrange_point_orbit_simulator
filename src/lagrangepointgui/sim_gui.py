@@ -306,7 +306,7 @@ class _SimCtrl:
         for btn in self._view.buttons.values():
             btn.setEnabled(False)
 
-    def _disableButtonsExceptStartStop(self) -> None:
+    def _disableButtonsExceptToggleAnimation(self) -> None:
         for btnText, btn in self._view.buttons.items():
             if btnText == TOGGLE_ANIMATION:
                 continue
@@ -317,7 +317,7 @@ class _SimCtrl:
         self._view.toggleAnimation()
 
     def _plotConservedQuantites(self) -> None:
-        self._disableButtonsExceptStartStop()
+        self._disableButtonsExceptToggleAnimation()
         self._runInThread(self._view.calcConservedQuantities, [self._view.plotConservedQuantites])
 
     # noinspection PyUnresolvedReferences
