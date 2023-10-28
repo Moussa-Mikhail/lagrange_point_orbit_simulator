@@ -1,2 +1,2 @@
 @echo off
-poetry run python -m src.lagrangepointgui.sim_gui
+python -m src.lagrangepointgui.sim_gui
