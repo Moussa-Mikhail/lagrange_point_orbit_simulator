@@ -1,4 +1,4 @@
-name: Release
+name: release
 on:
   push:
     tags:
@@ -21,7 +21,7 @@ jobs:
       -
         name: Pip Install
         run: |
-            python3 -m pip install -r requirmenets-gui.txt
+            python3 -m pip install -r requirements-gui.txt
             python3 -m pip install pyinstaller
       -
         name: Build Hydrus
