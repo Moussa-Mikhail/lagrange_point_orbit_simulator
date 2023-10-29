@@ -99,8 +99,8 @@ jobs:
         name: Build Hydrus
         run: |
           cd $GITHUB_WORKSPACE
-          build.bat
-        shell: cmd
+          ./build.sh
+        shell: bash
       -
         name: Compress App
         run: |
