@@ -132,9 +132,9 @@ jobs:
       -
         name: Rename Files
         run: |
-          mv Windows-Extract/Windows-Extract.zip      SimGui.${{ env.version_short }}-Windows.zip
-          mv Ubuntu-Extract/Ubuntu-Extract.tar.gz     SimGui.${{ env.version_short }}-Linux.tar.gz
-          mv MacOS-Extract/MacOS-Extract.7z           SimGui.${{ env.version_short }}-macOS.7z
+          mv Windows-Extract/Windows-Extract.zip      SimGui.test-Windows.zip
+          mv Ubuntu-Extract/Ubuntu-Extract.tar.gz     SimGui.test-Linux.tar.gz
+          mv MacOS-Extract/MacOS-Extract.7z           SimGui.test-macOS.7z
       -
         name: Upload Files
         uses: softprops/action-gh-release@v1
