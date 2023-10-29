@@ -1,5 +1,5 @@
-llvmlite==0.41.0 ; python_version >= "3.10" and python_version < "3.11"
-numba==0.58.0 ; python_version >= "3.10" and python_version < "3.11"
-numpy==1.25.2 ; python_version >= "3.10" and python_version < "3.11"
+llvmlite==0.41.1 ; python_version >= "3.10" and python_version < "3.11"
+numba==0.58.1 ; python_version >= "3.10" and python_version < "3.11"
+numpy==1.26.1 ; python_version >= "3.10" and python_version < "3.11"
 tomli==2.0.1 ; python_version >= "3.10" and python_version < "3.11"
 validateddescriptor @ git+https://github.com/Moussa-Mikhail/validated-descriptor.git@main ; python_version >= "3.10" and python_version < "3.11"
