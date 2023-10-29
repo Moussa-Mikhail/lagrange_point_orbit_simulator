@@ -31,14 +31,14 @@ jobs:
       -
         name: Compress App
         run: |
-          cd dist/sim_gui
+          cd dist
           tar -czvf SimGui.7z sim_gui.App
       -
         name: Upload a Build Artifact
         uses: actions/upload-artifact@v3
         with:
           name: MacOS-Extract
-          path: MacOS-Extract.7z
+          path: dist/MacOS-Extract.7z
           if-no-files-found: error
           retention-days: 2
 
@@ -74,7 +74,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Ubuntu-Extract
-          path: Ubuntu-Extract.tar.gz
+          path: dist/Ubuntu-Extract.tar.gz
           if-no-files-found: error
           retention-days: 2
 
@@ -110,7 +110,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Windows-Extract
-          path: Windows-Extract.zip
+          path: dist/Windows-Extract.zip
           if-no-files-found: error
           retention-days: 2
 
@@ -134,7 +134,7 @@ jobs:
           mkdir ubuntu windows
           mv Windows-Extract/Windows-Extract.zip      SimGui.${{ env.version_short }}-Windows.zip
           mv Ubuntu-Extract/Ubuntu-Extract.tar.gz     SimGui.Network.${{ env.version_short }}-Linux.tar.gz
-          mv MacOS-Extract/MacOS-Extract.7z           SimGui.Network.${{ env.version_short }}-macOS.dmg
+          mv MacOS-Extract/MacOS-Extract.7z           SimGui.Network.${{ env.version_short }}-macOS.7z
       -
         name: Upload Files
         uses: softprops/action-gh-release@v1
@@ -143,4 +143,4 @@ jobs:
           files: |
             Hydrus.Network.${{ env.version_short }}-Windows.zip
             Hydrus.Network.${{ env.version_short }}-Linux.tar.gz
-            Hydrus.Network.${{ env.version_short }}-macOS.dmg
+            Hydrus.Network.${{ env.version_short }}-macOS.7z
