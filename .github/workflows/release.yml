@@ -1,0 +1,146 @@
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-11
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          architecture: x64
+      -
+        name: Pip Install
+        run: |
+            python3 -m pip install -r requirmenets-gui.txt
+            python3 -m pip install pyinstaller
+      -
+        name: Build Hydrus
+        run: |
+          cd $GITHUB_WORKSPACE
+          sh ./build.sh
+          cd dist/sim_gui
+      -
+        name: Compress App
+        run: |
+          tar -czvf SimGui.7z sim_gui.App
+      -
+        name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: MacOS-Extract
+          path: MacOS-Extract.7z
+          if-no-files-found: error
+          retention-days: 2
+
+  build-ubuntu:
+    runs-on: ubuntu-20.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          architecture: x64
+      -
+        name: Pip Install
+        run: |
+            python3 -m pip install -r requirements-gui.txt
+            python3 -m pip install pyinstaller
+      -
+        name: Build Hydrus
+        run: |
+          cd $GITHUB_WORKSPACE
+          sh ./build.sh
+          cd dist
+      -
+        name: Compress App
+        run: |
+            tar -czvf Ubuntu-Extract.tar.gz sim_gui
+      -
+        name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Ubuntu-Extract
+          path: Ubuntu-Extract.tar.gz
+          if-no-files-found: error
+          retention-days: 2
+
+  build-windows:
+    runs-on: windows-2019
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          architecture: x64
+      -
+        name: Pip Install
+        run: |
+            python3 -m pip install -r requirements-gui.txt
+            python3 -m pip install pyinstaller
+      -
+        name: Build Hydrus
+        run: |
+          cd $GITHUB_WORKSPACE
+          sh ./build.sh
+          cd dist
+      -
+        name: Compress App
+        run: |
+          7z.exe a -tzip -mm=Deflate -mx=5 Windows-Extract.zip sim_gui
+      -
+        name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Windows-Extract
+          path: Windows-Extract.zip
+          if-no-files-found: error
+          retention-days: 2
+
+  create-release:
+    name: Upload to Release
+    runs-on: ubuntu-20.04
+    needs: [build-windows, build-ubuntu, build-macos]
+    steps:
+      -
+        name: Get All Artifacts
+        uses: actions/download-artifact@v3
+      -
+        name: Extract Version Metadata
+        id: meta
+        run: |
+          echo "version=${GITHUB_REF##*/}" >> $GITHUB_ENV
+          echo "version_short=${GITHUB_REF##*/v}" >> $GITHUB_ENV
+      -
+        name: Rename Files
+        run: |
+          mkdir ubuntu windows
+          mv Windows-Extract/Windows-Extract.zip      SimGui.${{ env.version_short }}-Windows.zip
+          mv Ubuntu-Extract/Ubuntu-Extract.tar.gz     SimGui.Network.${{ env.version_short }}-Linux.tar.gz
+          mv MacOS-Extract/MacOS-Extract.7z           SimGui.Network.${{ env.version_short }}-macOS.dmg
+      -
+        name: Upload Files
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            Hydrus.Network.${{ env.version_short }}-Windows.zip
+            Hydrus.Network.${{ env.version_short }}-Linux.tar.gz
+            Hydrus.Network.${{ env.version_short }}-macOS.dmg
