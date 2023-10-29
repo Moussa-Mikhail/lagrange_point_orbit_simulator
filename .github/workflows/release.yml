@@ -28,10 +28,10 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           sh ./build.sh
-          cd dist/sim_gui
       -
         name: Compress App
         run: |
+          cd dist/sim_gui
           tar -czvf SimGui.7z sim_gui.App
       -
         name: Upload a Build Artifact
@@ -64,10 +64,10 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           sh ./build.sh
-          cd dist
       -
         name: Compress App
         run: |
+            cd dist
             tar -czvf Ubuntu-Extract.tar.gz sim_gui
       -
         name: Upload a Build Artifact
@@ -100,10 +100,10 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           sh ./build.sh
-          cd dist
       -
         name: Compress App
         run: |
+          cd dist
           7z.exe a -tzip -mm=Deflate -mx=5 Windows-Extract.zip sim_gui
       -
         name: Upload a Build Artifact
