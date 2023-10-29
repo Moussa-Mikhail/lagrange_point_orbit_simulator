@@ -99,7 +99,8 @@ jobs:
         name: Build Hydrus
         run: |
           cd $GITHUB_WORKSPACE
-          Start-Process -FilePath "./build.bat" -Wait
+          build.bat
+        shell: cmd
       -
         name: Compress App
         run: |
