@@ -1,5 +1,5 @@
 name: update-requirements
-on: [ push ]
+on: push
 jobs:
   update-requirements:
     runs-on: ubuntu-latest
