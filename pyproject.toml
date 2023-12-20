@@ -14,7 +14,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.11"
+python = ">=3.10,<3.12"
 validateddescriptor = {git = "https://github.com/Moussa-Mikhail/validated-descriptor.git", rev = "main"}
 numpy = ">=1.23.4"
 numba = ">=0.56.3"
