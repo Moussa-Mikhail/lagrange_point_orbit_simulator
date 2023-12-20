@@ -1,15 +1,11 @@
 # pylint: disable=missing-docstring
 """Reads user defined presets and constants for usage in GUI."""
-from typing import TypeAlias
-
-try:
-    import tomllib as tomli  # type: ignore
-except ModuleNotFoundError:
-    import tomli
-
 import os
 import sys
 from pathlib import Path
+from typing import TypeAlias
+
+import tomllib
 
 dir_path = Path(os.path.realpath(__file__)).parent
 
@@ -38,7 +34,7 @@ def read_presets() -> tuple[ParamPresets, Constants]:
 def _read_preset(file_path: Path) -> tuple[ParamPresets, Constants]:
     try:
         with Path.open(file_path, "rb") as file:
-            presets = tomli.load(file)
+            presets = tomllib.load(file)
     except FileNotFoundError:
         return {}, {}
 

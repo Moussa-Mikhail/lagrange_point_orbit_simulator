@@ -19,12 +19,11 @@ validateddescriptor = {git = "https://github.com/Moussa-Mikhail/validated-descri
 numpy = ">=1.23.4"
 numba = ">=0.56.3"
 
-tomli = { version = ">=2.0.1", python = "<3.11", optional = true }
 pyqt6 = { version = ">=6.4.0", optional = true }
 pyqtgraph = { version = ">=0.13.1", optional = true }
 
 [tool.poetry.extras]
-gui = ["pyqt6", "pyqtgraph", "tomli"]
+gui = ["pyqt6", "pyqtgraph"]
 
 [tool.poetry.group.dev.dependencies]
 mypy = ">=0.991"
