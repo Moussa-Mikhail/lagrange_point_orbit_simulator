@@ -29,7 +29,7 @@ LAGRANGE_LABEL = "Lagrange label"
 
 Params: TypeAlias = dict[str, tuple[str, str]]
 
-# parameter label in gui: (default value, attribute name in Simulator
+# parameter label in gui: (default value, attribute name in Simulator)
 SIMULATION_PARAMS: Params = {
     "number of years": ("10.0", "num_years"),
     "time step (hours)": ("1.0", "time_step"),
@@ -59,6 +59,7 @@ TOGGLE_ANIMATION = "Toggle Animation"
 PLOT_CONSERVED = "Plot Conserved Quantities"
 
 
+# noinspection PyPep8Naming
 class _SimUi(QMainWindow):
     def __init__(self, plotter: Plotter) -> None:
         super().__init__()
@@ -165,7 +166,7 @@ class _SimUi(QMainWindow):
     def calcConservedQuantities(self) -> None:
         self._plotter.get_conserved_quantities()
 
-    def plotConservedQuantites(self) -> None:
+    def plotConservedQuantities(self) -> None:
         if not self._plotted:
             _displayErrorMessage("No data to plot.")
             return
@@ -232,7 +233,7 @@ class _SimCtrl:
         btnActions = {
             SIMULATE: self._simulate,
             TOGGLE_ANIMATION: self._toggleAnimation,
-            PLOT_CONSERVED: self._plotConservedQuantites,
+            PLOT_CONSERVED: self._plotConservedQuantities,
         }
         for btnText, btn in self._view.buttons.items():
             action = btnActions[btnText]
@@ -293,7 +294,7 @@ class _SimCtrl:
         self._view.stopAnimation()
         onFinishFuncs = [self._view.updateOrbitPlots]
         if self._view.autoPlotConserved.isChecked():
-            onFinishFuncs.append(self._plotConservedQuantites)
+            onFinishFuncs.append(self._plotConservedQuantities)
 
         self._disableButtons()
         self._runInThread(self._model.simulate, onFinishFuncs)
@@ -316,9 +317,9 @@ class _SimCtrl:
     def _toggleAnimation(self) -> None:
         self._view.toggleAnimation()
 
-    def _plotConservedQuantites(self) -> None:
+    def _plotConservedQuantities(self) -> None:
         self._disableButtonsExceptToggleAnimation()
-        self._runInThread(self._view.calcConservedQuantities, [self._view.plotConservedQuantites])
+        self._runInThread(self._view.calcConservedQuantities, [self._view.plotConservedQuantities])
 
     # noinspection PyUnresolvedReferences
     def _runInThread(self, expensiveFunc: Callable[[], None], onFinishFuncs: list[Callable[[], None]]) -> None:

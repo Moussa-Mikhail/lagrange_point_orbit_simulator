@@ -134,7 +134,6 @@ class Plotter:
         """Plotting logic common to both inertial and corotating plots.
         Returns a function which is called by the timer to animate the plot.
         """
-        # TODO: Refactor this to avoid duplication of code
 
         plot.clear()
         plot.disableAutoRange()
@@ -186,6 +185,7 @@ class Plotter:
             i = next(idx_gen)
 
             anim_plot.clear()
+            # noinspection PyShadowingNames
             for arr, args in arrays_and_args:
                 Plotter.plot_point(anim_plot, arr[i], args)
 
@@ -305,7 +305,7 @@ class Plotter:
             normalized_angular_momentum: Array2D = total_angular_momentum / total_angular_momentum[0] - 1
 
         # X and Y components of the angular momentum are always 0.
-        # The above division results in Not a Number values for the normalized X and Y components.
+        # The above division results in NaN values for the normalized X and Y components.
         # For our purposes a normalized value of 0 makes more sense.
         normalized_angular_momentum = np.nan_to_num(normalized_angular_momentum, nan=0.0)
 
