@@ -5,6 +5,6 @@ from typing import TypeAlias
 from numpy import double
 from numpy.typing import NDArray
 
-Array1D: TypeAlias = NDArray[double]  # pylint: disable=invalid-name
+Array1D: TypeAlias = NDArray[double]
 
-Array2D: TypeAlias = NDArray[double]  # pylint: disable=invalid-name
+Array2D: TypeAlias = NDArray[double]
