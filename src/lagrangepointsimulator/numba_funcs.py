@@ -7,12 +7,12 @@ from src.lagrangepointsimulator.constants import G
 from src.lagrangepointsimulator.sim_types import Array1D, Array2D
 
 
-@njit(cache=True)
+@njit()
 def inverse_norm_cubed(vector: Array1D) -> float:
     return sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]) ** -3
 
 
-@njit(cache=True)
+@njit()
 def calc_acceleration(
     g_star: float,
     g_planet: float,
@@ -49,7 +49,6 @@ def calc_acceleration(
         sat_accel[j] = sat_star_coeff * sat_to_star[j] + sat_planet_coeff * sat_to_planet[j]
 
 
-# noinspection PyTypeChecker
 @njit(cache=True)
 def integrate(
     time_step: float,
