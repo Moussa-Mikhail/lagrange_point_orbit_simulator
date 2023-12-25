@@ -1,10 +1,11 @@
 """This module contains the Simulator class
-which holds parameters defining a satellites orbit near a Lagrange point and simulates
+which takes parameters defining a satellites orbit near a Lagrange point and simulates
 that orbit.
-It assumes that both the star and planet are undergoing uniform circular motion.
+It ensures that both the star and planet are undergoing uniform circular motion.
 """
 
 from math import ceil, sqrt
+from typing import TypeVar, cast
 
 import numpy as np
 from numpy.linalg import norm
@@ -22,6 +23,7 @@ def array_of_norms(arr_2d: Array2D) -> Array1D:
 
 
 def unit_vector(angle: float) -> Array1D:
+    """Takes an angle in radians and returns the corresponding unit vector"""
     return np.array([np.cos(angle), np.sin(angle), 0])
 
 
@@ -31,7 +33,6 @@ def calc_period_from_semi_major_axis(semi_major_axis: float, star_mass: float, p
     return sqrt(period_squared)
 
 
-# pylint: disable=too-many-instance-attributes
 class Simulator:
     """This class holds parameters defining a satellites orbit and simulates it.
     Once an instance of the class has been created it can be used by calling the simulate method.
@@ -123,7 +124,7 @@ class Simulator:
 
         self.lagrange_point_trans: Array1D = np.empty(3, dtype=np.double)
 
-        self.star_pos: Array2D = np.empty((0, 3), dtype=np.double)
+        self.star_pos: Array2D = cast(Array2D, np.empty((0, 3), dtype=np.double))
         self.star_vel: Array2D = np.empty_like(self.star_pos)
         self.planet_pos: Array2D = np.empty_like(self.star_pos)
         self.planet_vel: Array2D = np.empty_like(self.star_pos)
@@ -148,10 +149,6 @@ class Simulator:
 
     def time_points_in_years(self) -> Array1D:
         return self.time_points() / YEARS
-
-    @property
-    def lagrange_point(self) -> Array1D:
-        return self.calc_lagrange_point()
 
     def calc_lagrange_point(self) -> Array1D:
         planet_distance_meters = self.planet_distance * AU
@@ -218,9 +215,8 @@ class Simulator:
 
         self._initialize_positions()
 
-        # we set up conditions so that the star and planet have circular orbits
-        # about the center of mass
-        # velocities have to be defined relative to the CM
+        # we set up conditions so that the star and planet have circular orbits about the center of mass
+        # so velocities have to be defined relative to the CM
         init_cm_pos = self.calc_center_of_mass(self.star_pos[0], self.planet_pos[0], self.sat_pos[0])
 
         self._initialize_velocities(init_cm_pos)
@@ -239,7 +235,7 @@ class Simulator:
 
         self.planet_pos[0] = np.array((self.planet_distance * AU, 0, 0))
 
-        # Perturbation of satellite's position #
+        # Perturbation of satellite's position away from the lagrange point
         perturbation_size = self.perturbation_size * AU
         perturbation_angle = np.radians(self.actual_perturbation_angle)
 
@@ -247,9 +243,9 @@ class Simulator:
 
         self.sat_pos[0] = self.calc_lagrange_point() + perturbation
 
+    # noinspection PyUnreachableCode
     def _initialize_velocities(self, init_cm_pos: Array1D) -> None:
-        # orbits are counterclockwise so
-        # angular velocity is in the positive z direction
+        # orbits are counterclockwise so angular velocity is in the positive z direction
         angular_vel = np.array((0, 0, self.angular_speed), dtype=np.double)
 
         # for a circular orbit velocity = cross_product(angular velocity, position)
@@ -286,12 +282,14 @@ class Simulator:
             self.sat_vel,
         )
 
+    A = TypeVar("A", Array1D, Array2D)
+
     def calc_center_of_mass(
         self,
-        star_pos_or_vel: Array1D | Array2D,
-        planet_pos_or_vel: Array1D | Array2D,
-        sat_pos_or_vel: Array1D | Array2D,
-    ) -> Array1D | Array2D:
+        star_pos_or_vel: A,
+        planet_pos_or_vel: A,
+        sat_pos_or_vel: A,
+    ) -> A:
         """Can be used to calculate either the position or velocity of the center of mass.
         The input arrays can be either 1D or 2D. If 2D, the first dimension is the time
         """
@@ -312,36 +310,41 @@ class Simulator:
         return total_momentum, total_angular_momentum, total_energy
 
     def calc_total_linear_momentum(self) -> Array2D:
-        return self.star_mass * self.star_vel + self.planet_mass * self.planet_vel + self.SAT_MASS * self.sat_vel
+        total_momentum = (
+            self.star_mass * self.star_vel + self.planet_mass * self.planet_vel + self.SAT_MASS * self.sat_vel
+        )
+        return cast(Array2D, total_momentum)
 
+    # noinspection PyUnreachableCode,PyUnusedLocal
     def calc_total_angular_momentum(self) -> Array2D:
-        angular_momentum_star: Array2D = np.cross(self.star_pos, self.star_mass * self.star_vel)
+        star_angular_momentum = np.cross(self.star_pos, self.star_mass * self.star_vel)
 
-        angular_momentum_planet = np.cross(self.planet_pos, self.planet_mass * self.planet_vel)
+        planet_angular_momentum = np.cross(self.planet_pos, self.planet_mass * self.planet_vel)
 
-        angular_momentum_sat = np.cross(self.sat_pos, self.SAT_MASS * self.sat_vel)
+        sat_angular_momentum = np.cross(self.sat_pos, self.SAT_MASS * self.sat_vel)
 
-        return angular_momentum_star + angular_momentum_planet + angular_momentum_sat
+        total_angular_momentum = star_angular_momentum + planet_angular_momentum + sat_angular_momentum
+        return cast(Array2D, total_angular_momentum)
 
     def calc_total_energy(self) -> Array1D:
-        d_planet_to_star = array_of_norms(self.star_pos - self.planet_pos)
-        d_planet_to_sat = array_of_norms(self.sat_pos - self.planet_pos)
-        d_star_to_sat = array_of_norms(self.sat_pos - self.star_pos)
+        planet_to_star_distance = array_of_norms(self.star_pos - self.planet_pos)
+        planet_to_sat_distance = array_of_norms(self.sat_pos - self.planet_pos)
+        star_to_sat_distance = array_of_norms(self.sat_pos - self.star_pos)
 
         potential_energy = (
-            -G * self.star_mass * self.planet_mass / d_planet_to_star
-            + -G * self.SAT_MASS * self.planet_mass / d_planet_to_sat
-            + -G * self.SAT_MASS * self.star_mass / d_star_to_sat
+            -G * self.star_mass * self.planet_mass / planet_to_star_distance
+            + -G * self.SAT_MASS * self.planet_mass / planet_to_sat_distance
+            + -G * self.SAT_MASS * self.star_mass / star_to_sat_distance
         )
 
-        mag_star_vel = array_of_norms(self.star_vel)
-        mag_planet_vel = array_of_norms(self.planet_vel)
-        mag_sat_vel = array_of_norms(self.sat_vel)
+        star_vel_magnitude = array_of_norms(self.star_vel)
+        planet_vel_magnitude = array_of_norms(self.planet_vel)
+        sat_vel_magnitude = array_of_norms(self.sat_vel)
 
         kinetic_energy = (
-            0.5 * self.star_mass * mag_star_vel**2
-            + 0.5 * self.planet_mass * mag_planet_vel**2
-            + 0.5 * self.SAT_MASS * mag_sat_vel**2
+            0.5 * self.star_mass * star_vel_magnitude**2
+            + 0.5 * self.planet_mass * planet_vel_magnitude**2
+            + 0.5 * self.SAT_MASS * sat_vel_magnitude**2
         )
 
         return potential_energy + kinetic_energy
