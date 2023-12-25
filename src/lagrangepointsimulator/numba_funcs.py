@@ -49,6 +49,7 @@ def calc_acceleration(
         sat_accel[j] = sat_star_coeff * sat_to_star[j] + sat_planet_coeff * sat_to_planet[j]
 
 
+# noinspection PyTypeChecker
 @njit(cache=True)
 def integrate(
     time_step: float,
@@ -116,23 +117,23 @@ def integrate(
 
 
 @njit(parallel=True, cache=True)
-def transform_to_corotating(pos_trans: Array2D, times: Array1D, angular_speed: float) -> Array2D:
+def transform_to_corotating(position: Array2D, times: Array1D, angular_speed: float) -> Array2D:
     """Transforms pos_trans to a frame of reference that rotates at a rate of angular_speed counter-clockwise.
-    pos_trans is an array of positions measured relative to the center of rotation.
+    pos_trans is assumed to be an array of positions measured relative to the center of rotation.
     """
 
-    # we do this by linearly transforming each position vector by
-    # the inverse of the basis transform
+    # w is the angular speed, t is the time
+    # we transform pos_trans by linearly transforming each position vector by the inverse of the basis transform
     # the coordinate transform is unit(x) -> R(w*t)*unit(x), unit(y) -> R(w*t)*unit(y)
     # where R(w*t) is the rotation matrix with angle w*t about the z axis
     # the inverse is R(-w*t)
     # at each time t we apply the matrix R(-w*t) to the position vector
 
-    num_steps = pos_trans.shape[0]
+    num_steps = position.shape[0]
 
-    pos_corotating = np.empty(dtype=pos_trans.dtype, shape=(num_steps, 2))
+    pos_corotating = np.empty(dtype=position.dtype, shape=(num_steps, 2))
 
-    for i in prange(pos_trans.shape[0]):
+    for i in prange(num_steps):
         time: float = times[i]
 
         angle = -angular_speed * time
@@ -140,10 +141,10 @@ def transform_to_corotating(pos_trans: Array2D, times: Array1D, angular_speed: f
         cos: float = np.cos(angle)
         sin: float = np.sin(angle)
 
-        x, y = pos_trans[i, :2]
+        x, y = position[i, :2]
 
         pos_corotating[i, 0] = cos * x - sin * y
 
         pos_corotating[i, 1] = sin * x + cos * y
 
-    return pos_corotating
+    return pos_corotating  # type: ignore
