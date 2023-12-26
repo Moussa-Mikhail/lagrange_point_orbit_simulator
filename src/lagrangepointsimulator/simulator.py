@@ -291,7 +291,7 @@ class Simulator:
         sat_pos_or_vel: A,
     ) -> A:
         """Can be used to calculate either the position or velocity of the center of mass.
-        The input arrays can be either 1D or 2D. If 2D, the first dimension is the time
+        The input arrays can be either 1D or 2D. If 2D, the first dimension should be time
         """
 
         return (
@@ -331,20 +331,20 @@ class Simulator:
         planet_to_sat_distance = array_of_norms(self.sat_pos - self.planet_pos)
         star_to_sat_distance = array_of_norms(self.sat_pos - self.star_pos)
 
-        potential_energy = (
-            -G * self.star_mass * self.planet_mass / planet_to_star_distance
-            + -G * self.SAT_MASS * self.planet_mass / planet_to_sat_distance
-            + -G * self.SAT_MASS * self.star_mass / star_to_sat_distance
+        potential_energy = -G * (
+            self.star_mass * self.planet_mass / planet_to_star_distance
+            + self.SAT_MASS * self.planet_mass / planet_to_sat_distance
+            + self.SAT_MASS * self.star_mass / star_to_sat_distance
         )
 
         star_vel_magnitude = array_of_norms(self.star_vel)
         planet_vel_magnitude = array_of_norms(self.planet_vel)
         sat_vel_magnitude = array_of_norms(self.sat_vel)
 
-        kinetic_energy = (
-            0.5 * self.star_mass * star_vel_magnitude**2
-            + 0.5 * self.planet_mass * planet_vel_magnitude**2
-            + 0.5 * self.SAT_MASS * sat_vel_magnitude**2
+        kinetic_energy = 0.5 * (
+            self.star_mass * star_vel_magnitude**2
+            + self.planet_mass * planet_vel_magnitude**2
+            + self.SAT_MASS * sat_vel_magnitude**2
         )
 
         return potential_energy + kinetic_energy
