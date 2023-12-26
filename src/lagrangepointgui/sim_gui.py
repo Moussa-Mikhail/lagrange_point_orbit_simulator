@@ -229,6 +229,7 @@ class _SimCtrl:
         self._addReturnPressed()
         self._calculating = False
 
+    # noinspection PyUnresolvedReferences
     def _connectSignals(self) -> None:
         btnActions = {
             SIMULATE: self._simulate,
@@ -237,9 +238,9 @@ class _SimCtrl:
         }
         for btnText, btn in self._view.buttons.items():
             action = btnActions[btnText]
-            btn.clicked.connect(action)  # type: ignore
+            btn.clicked.connect(action)
 
-        self._view.presetBox.activated.connect(self._applySelectedPreset)  # type: ignore
+        self._view.presetBox.activated.connect(self._applySelectedPreset)
 
     def _applySelectedPreset(self) -> None:
         presetName = self._view.presetBox.currentText()
@@ -261,7 +262,8 @@ class _SimCtrl:
 
     def _addReturnPressed(self) -> None:
         for field in self._view.inputFields.values():
-            field.returnPressed.connect(self._simulate)  # type: ignore
+            # noinspection PyUnresolvedReferences
+            field.returnPressed.connect(self._simulate)
 
         self._view.presetBox.lineEdit().returnPressed.connect(self._simulate)  # type: ignore
 

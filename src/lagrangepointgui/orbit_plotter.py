@@ -7,7 +7,7 @@ from math import ceil
 from typing import TypeAlias, cast
 
 import numpy as np
-import pyqtgraph as pg  # type: ignore[import]
+import pyqtgraph as pg  # type: ignore[import-untyped]
 from numpy.linalg import norm
 from PyQt6.QtCore import QTimer
 
@@ -85,15 +85,16 @@ class Plotter:
     def stop_animation(self) -> None:
         self.timer.stop()
 
+    # noinspection PyUnresolvedReferences
     def plot_orbit_inertial_and_corotating(self) -> None:
         animate_inertial = self.plot_inertial_orbit()
         animate_corotating = self.plot_corotating_orbit()
 
         with suppress(TypeError):
-            self.timer.timeout.disconnect()  # type: ignore
+            self.timer.timeout.disconnect()
 
-        self.timer.timeout.connect(animate_inertial)  # type: ignore
-        self.timer.timeout.connect(animate_corotating)  # type: ignore
+        self.timer.timeout.connect(animate_inertial)
+        self.timer.timeout.connect(animate_corotating)
 
     def plot_index_generator(self) -> Generator[int, None, None]:
         """This generator yields the index of the next point to plot."""
