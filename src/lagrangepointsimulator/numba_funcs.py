@@ -130,7 +130,7 @@ def transform_to_corotating(position: Array2D, times: Array1D, angular_speed: fl
 
     num_steps = position.shape[0]
 
-    pos_corotating = np.empty(dtype=position.dtype, shape=(num_steps, 2))
+    corotating_position = np.empty(dtype=position.dtype, shape=(num_steps, 2))
 
     for i in prange(num_steps):
         time: float = times[i]
@@ -142,8 +142,8 @@ def transform_to_corotating(position: Array2D, times: Array1D, angular_speed: fl
 
         x, y = position[i, :2]
 
-        pos_corotating[i, 0] = cos * x - sin * y
+        corotating_position[i, 0] = cos * x - sin * y
 
-        pos_corotating[i, 1] = sin * x + cos * y
+        corotating_position[i, 1] = sin * x + cos * y
 
-    return pos_corotating  # type: ignore
+    return corotating_position
