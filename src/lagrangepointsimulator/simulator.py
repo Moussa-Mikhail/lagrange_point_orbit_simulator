@@ -310,10 +310,7 @@ class Simulator:
         return total_momentum, total_angular_momentum, total_energy
 
     def calc_total_linear_momentum(self) -> Array2D:
-        total_momentum = (
-            self.star_mass * self.star_vel + self.planet_mass * self.planet_vel + self.SAT_MASS * self.sat_vel
-        )
-        return cast(Array2D, total_momentum)
+        return self.star_mass * self.star_vel + self.planet_mass * self.planet_vel + self.SAT_MASS * self.sat_vel
 
     # noinspection PyUnreachableCode,PyUnusedLocal
     def calc_total_angular_momentum(self) -> Array2D:
@@ -323,8 +320,7 @@ class Simulator:
 
         sat_angular_momentum = np.cross(self.sat_pos, self.SAT_MASS * self.sat_vel)
 
-        total_angular_momentum = star_angular_momentum + planet_angular_momentum + sat_angular_momentum
-        return cast(Array2D, total_angular_momentum)
+        return star_angular_momentum + planet_angular_momentum + sat_angular_momentum  # type: ignore[return-value]
 
     def calc_total_energy(self) -> Array1D:
         planet_to_star_distance = array_of_norms(self.star_pos - self.planet_pos)
