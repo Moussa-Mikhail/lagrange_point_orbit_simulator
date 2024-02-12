@@ -30,7 +30,7 @@ mypy = ">=0.991"
 black = ">=22.12.0"
 ruff = ">=0.0.272"
 sourcery = ">=1.8.0"
-refurb = "^1.25.0"
+refurb = ">=1.25.0"
 
 [tool.poetry.group.build.dependencies]
 pyinstaller = ">=5.11.0"
@@ -45,8 +45,6 @@ line-length = 120
 
 [tool.ruff.lint]
 select = ["ALL"]
-
-#ignore = ["ANN101", "D", "PGH003", "FBT003", "TD002", "TD003", "FIX002", "PLR0913", "T201", "S307", "S307", "COM812"]
 
 ignore = ["ANN101", "D100", "D102", "D101", "D103", "D104", "D107", "D203", "D205", "D213", "PLR0913", "T201", "COM812", "ISC001"]
 
