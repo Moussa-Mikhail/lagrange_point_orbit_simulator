@@ -175,7 +175,8 @@ class _SimUi(QMainWindow):
 
     def getInputs(self) -> dict[str, Input]:
         """Get the parameters from the input fields. Returns a dict of parameter label to value.
-        Raises a ValueError if any of the numerical fields can't be evaluated."""
+        Raises a ValueError if any of the numerical fields can't be evaluated.
+        """
         inputs: dict[str, Input] = {}
         for fieldLabel, field in self.inputFields.items():
             fieldText = field.text()
@@ -265,7 +266,7 @@ class _SimCtrl:
             # noinspection PyUnresolvedReferences
             field.returnPressed.connect(self._simulate)
 
-        self._view.presetBox.lineEdit().returnPressed.connect(self._simulate)  # type: ignore
+        self._view.presetBox.lineEdit().returnPressed.connect(self._simulate)  # type: ignore[arg-type, union-attr]
 
     def _simulate(self) -> None:
         if self._calculating:

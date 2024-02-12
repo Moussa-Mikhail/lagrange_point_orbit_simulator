@@ -1,10 +1,9 @@
 """Reads user defined presets and constants for usage in GUI."""
 import os
 import sys
+import tomllib
 from pathlib import Path
 from typing import TypeAlias
-
-import tomllib
 
 dir_path = Path(os.path.realpath(__file__)).parent
 

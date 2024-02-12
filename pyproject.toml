@@ -40,16 +40,18 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-select = ["ALL"]
-
-ignore = ["ANN101", "D", "PGH003", "FBT003", "TD002", "TD003", "FIX002", "PLR0913", "T201", "S307", "PGH001", "COM812"]
-
+target-version = "py311"
 line-length = 120
 
-target-version = "py310"
+[tool.ruff.lint]
+select = ["ALL"]
 
-# Ignore `E402` (import violations) in all `__init__.py` files.
-[tool.ruff.per-file-ignores]
+#ignore = ["ANN101", "D", "PGH003", "FBT003", "TD002", "TD003", "FIX002", "PLR0913", "T201", "S307", "S307", "COM812"]
+
+ignore = ["ANN101", "D100", "D102", "D101", "D103", "D104", "D107", "D203", "D205", "D213", "PLR0913", "T201"]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore `E402` (import violations) and `F401` (Module imported but unused) in all `__init__.py` files.
 "__init__.py" = ["E402", "F401"]
 
 # Don't autofix unused variables

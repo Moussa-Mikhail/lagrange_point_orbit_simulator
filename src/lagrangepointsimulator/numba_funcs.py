@@ -1,7 +1,7 @@
 from math import sqrt
 
 import numpy as np
-from numba import njit, prange  # type: ignore
+from numba import njit, prange  # type: ignore[import-untyped]
 
 from src.lagrangepointsimulator.constants import G
 from src.lagrangepointsimulator.sim_types import Array1D, Array2D
@@ -117,10 +117,9 @@ def integrate(
 
 @njit(parallel=True, cache=True)
 def transform_to_corotating(position: Array2D, times: Array1D, angular_speed: float) -> Array2D:
-    """Transforms pos_trans to a frame of reference that rotates at a rate of angular_speed counter-clockwise.
+    """Transform pos_trans to a frame of reference that rotates at a rate of angular_speed counter-clockwise.
     pos_trans is assumed to be an array of positions measured relative to the center of rotation.
     """
-
     # w is the angular speed, t is the time
     # we transform pos_trans by linearly transforming each position vector by the inverse of the basis transform
     # the coordinate transform is unit(x) -> R(w*t)*unit(x), unit(y) -> R(w*t)*unit(y)

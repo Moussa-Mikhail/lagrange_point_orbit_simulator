@@ -1,5 +1,3 @@
-"""Holds descriptor factory functions"""
-
 from validateddescriptor import ValidatedDescriptor, value_check_factory
 
 is_positive = value_check_factory(lambda x: x > 0, "positive")

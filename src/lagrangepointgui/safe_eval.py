@@ -1,4 +1,5 @@
 """Contains a function to safely evaluate input expressions."""
+
 from src.lagrangepointgui.presets import read_presets
 from src.lagrangepointsimulator.constants import CONSTANTS
 
@@ -6,12 +7,11 @@ ALLOWED_CHARS = set("0123456789.+-*/()e")
 
 
 def safe_eval(expr: str) -> int | float | None:
-    """safe eval function used on expressions that contain developer and user defined constants.
+    """Safe eval function used on expressions that contain developer and user defined constants.
     Returns the result of the expression as a float or int. If the expression is empty, returns None.
     Raises a ValueError if the expression contains anything other than
     the constants, digits, the usual arithmetic operators, parens, or scientific notation.
     """
-
     if not expr:
         return None
 
@@ -24,7 +24,7 @@ def safe_eval(expr: str) -> int | float | None:
     _validate_expr(expr, all_constants)
 
     try:
-        res = eval(expr, all_constants)
+        res = eval(expr, all_constants)  # noqa: S307
     except (NameError, SyntaxError, ZeroDivisionError) as err:
         raise ValueError(str(err)) from err
 
@@ -36,7 +36,7 @@ def safe_eval(expr: str) -> int | float | None:
 
 
 def _validate_expr(expr: str, constants: dict[str, float | int]) -> None:
-    """Ensures that the expression only contains constants, digits,
+    """Ensure that the expression only contains constants, digits,
     the usual arithmetic operators, parens, or scientific notation.
     """
     cleaned_expr = _remove_constants(expr, constants)
@@ -47,8 +47,7 @@ def _validate_expr(expr: str, constants: dict[str, float | int]) -> None:
 
 
 def _remove_constants(expr: str, constants: dict[str, float | int]) -> str:
-    """remove constants in the expression"""
-
+    """Remove constants in the expression."""
     for constant_name in constants:
         expr = expr.replace(constant_name, "")
 

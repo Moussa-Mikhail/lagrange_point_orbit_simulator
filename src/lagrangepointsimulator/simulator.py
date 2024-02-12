@@ -1,9 +1,3 @@
-"""This module contains the Simulator class
-which takes parameters defining a satellites orbit near a Lagrange point and simulates
-that orbit.
-It ensures that both the star and planet are undergoing uniform circular motion.
-"""
-
 from math import ceil, sqrt
 from typing import TypeVar, cast
 
@@ -18,12 +12,12 @@ from src.lagrangepointsimulator.sim_types import Array1D, Array2D
 
 
 def array_of_norms(arr_2d: Array2D) -> Array1D:
-    """Returns an array of the norm of each element of the input array"""
+    """Return an array of the norm of each element of the input array."""
     return norm(arr_2d, axis=1)
 
 
 def unit_vector(angle: float) -> Array1D:
-    """Takes an angle in radians and returns the corresponding unit vector"""
+    """Take an angle in radians and return the corresponding unit vector."""
     return np.array([np.cos(angle), np.sin(angle), 0])
 
 
@@ -34,7 +28,8 @@ def calc_period_from_semi_major_axis(semi_major_axis: float, star_mass: float, p
 
 
 class Simulator:
-    """This class holds parameters defining a satellites orbit and simulates it.
+    """Class which holds parameters defining a satellites orbit and simulates it.
+
     Once an instance of the class has been created it can be used by calling the simulate method.
     The constructor takes the following parameters:
 
@@ -133,7 +128,7 @@ class Simulator:
 
     @property
     def sim_time(self) -> float:
-        """Time to simulate in seconds"""
+        """Time to simulate in seconds."""
         return self.num_years * YEARS
 
     @property
@@ -290,10 +285,9 @@ class Simulator:
         planet_pos_or_vel: A,
         sat_pos_or_vel: A,
     ) -> A:
-        """Can be used to calculate either the position or velocity of the center of mass.
-        The input arrays can be either 1D or 2D. If 2D, the first dimension should be time
+        """Can be used to calculate either the position or velocity of the center of mass. The input arrays can be
+        either 1D or 2D.
         """
-
         return (
             self.star_mass * star_pos_or_vel + self.planet_mass * planet_pos_or_vel + self.SAT_MASS * sat_pos_or_vel
         ) / (self.star_mass + self.planet_mass + self.SAT_MASS)

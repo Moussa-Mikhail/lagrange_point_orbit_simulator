@@ -1,4 +1,4 @@
-"""This script measures how long a simulation takes to run."""
+"""Scripts which measures how long a simulation takes to run."""
 
 from timeit import timeit
 
@@ -16,7 +16,7 @@ def simulate_without_reallocation() -> None:
             setup=SETUP,
             number=NUM_SAMPLES,
         )
-        / NUM_SAMPLES
+        / NUM_SAMPLES,
     )
 
 
@@ -27,7 +27,7 @@ def simulate_with_reallocation() -> None:
             setup=SETUP,
             number=NUM_SAMPLES,
         )
-        / NUM_SAMPLES
+        / NUM_SAMPLES,
     )
 
 

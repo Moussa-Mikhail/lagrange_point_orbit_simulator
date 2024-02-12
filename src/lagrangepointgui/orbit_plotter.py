@@ -1,6 +1,7 @@
-"""Contains the Plotter class which is responsible for plotting
-the orbits of the system simulated by an instance of the Simulator class.
+"""Contains the Plotter class which is responsible for plotting the orbits of the system simulated by an instance of
+the Simulator class.
 """
+
 from collections.abc import Callable, Generator
 from contextlib import suppress
 from math import ceil
@@ -42,7 +43,7 @@ def _plot_components(plot: pg.PlotWidget, arr: Array2D, times: Array1D) -> None:
 
 
 def _create_conserved_plot(quantity_name: str) -> pg.PlotWidget:
-    """Initializes the plot axes and title for the conserved quantities plots."""
+    """Initialize the plot axes and title for the conserved quantities plots."""
     plot = pg.PlotWidget(title=f"Relative Change in {quantity_name} vs Time")
 
     plot.setLabel("bottom", "Time", units="years")
@@ -97,7 +98,7 @@ class Plotter:
         self.timer.timeout.connect(animate_corotating)
 
     def plot_index_generator(self) -> Generator[int, None, None]:
-        """This generator yields the index of the next point to plot."""
+        """Create a generator which yields the index of the next point to plot."""
         time_step_default = 1 * HOURS
 
         # maximum rate of plot update is too slow
@@ -134,8 +135,7 @@ class Plotter:
     ) -> AnimatePlotFunc:
         """Plotting logic common to both inertial and corotating plots.
         Returns a function which is called by the timer to animate the plot.
-        """
-
+        """  # noqa: D401
         plot.clear()
         plot.disableAutoRange()
 
@@ -194,7 +194,7 @@ class Plotter:
 
     @staticmethod
     def plot_point(scatter_plot: pg.ScatterPlotItem, pos: Array1D, args: PlotArgs) -> None:
-        """Plots pos on scatter_plot.
+        """Plot pos on scatter_plot.
         pos can be any subscript-able list with length >= 2. Only the first 2 elements are plotted.
         """
         scatter_plot.addPoints(
@@ -206,7 +206,7 @@ class Plotter:
         return self.plot_orbit(self.inertial_plot, self.sim.star_pos, self.sim.planet_pos, self.sim.sat_pos)
 
     def plot_corotating_orbit(self) -> AnimatePlotFunc:
-        """Plots the orbits of the system simulated in the corotating frame."""
+        """Plot the orbits of the system simulated in the corotating frame."""
         star_pos_corotating = self.sim.transform_to_corotating(self.sim.star_pos)
         planet_pos_corotating = self.sim.transform_to_corotating(self.sim.planet_pos)
         sat_pos_corotating = self.sim.transform_to_corotating(self.sim.sat_pos)
@@ -244,7 +244,7 @@ class Plotter:
         legend.addItem(plot_data_item, self.sim.lagrange_label)
 
     def plot_conserved_quantities(self) -> None:
-        """Plots the relative change in the conserved quantities:
+        """Plot the relative change in the conserved quantities:
         linear and angular momenta, and energy.
         """
         # slice the arrays so that we only plot at most 10**5 points.
