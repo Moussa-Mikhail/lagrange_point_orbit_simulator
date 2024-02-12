@@ -1,4 +1,5 @@
 """Reads user defined presets and constants for usage in GUI."""
+
 import os
 import sys
 import tomllib

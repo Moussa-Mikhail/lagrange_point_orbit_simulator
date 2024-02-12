@@ -48,7 +48,7 @@ select = ["ALL"]
 
 #ignore = ["ANN101", "D", "PGH003", "FBT003", "TD002", "TD003", "FIX002", "PLR0913", "T201", "S307", "S307", "COM812"]
 
-ignore = ["ANN101", "D100", "D102", "D101", "D103", "D104", "D107", "D203", "D205", "D213", "PLR0913", "T201"]
+ignore = ["ANN101", "D100", "D102", "D101", "D103", "D104", "D107", "D203", "D205", "D213", "PLR0913", "T201", "COM812", "ISC001"]
 
 [tool.ruff.lint.per-file-ignores]
 # Ignore `E402` (import violations) and `F401` (Module imported but unused) in all `__init__.py` files.
