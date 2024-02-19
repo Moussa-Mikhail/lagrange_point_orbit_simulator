@@ -58,6 +58,8 @@ TOGGLE_ANIMATION = "Toggle Animation"
 
 PLOT_CONSERVED = "Plot Conserved Quantities"
 
+TOGGLE_CONSERVED = "Toggle Conserved Quantity Plots"
+
 
 # noinspection PyPep8Naming
 class _SimUi(QMainWindow):
@@ -73,31 +75,42 @@ class _SimUi(QMainWindow):
 
         self.setWindowTitle("Orbits near Lagrange Points")
 
-        centralWidget = QWidget(self)
-        self.setCentralWidget(centralWidget)
+        self._centralWidget = QWidget(self)
+        self.setCentralWidget(self._centralWidget)
 
-        mainLayout = QVBoxLayout()
-        centralWidget.setLayout(mainLayout)
+        self._mainLayout = QVBoxLayout()
+        self._centralWidget.setLayout(self._mainLayout)
 
         inputAndOrbitsLayout = QHBoxLayout()
-        mainLayout.addLayout(inputAndOrbitsLayout)
+        self._mainLayout.addLayout(inputAndOrbitsLayout)
+
+        self._inputsAndConservedButtonLayout = QVBoxLayout()
+        inputAndOrbitsLayout.addLayout(self._inputsAndConservedButtonLayout)
 
         self._inputsLayout = QFormLayout()
-        inputAndOrbitsLayout.addLayout(self._inputsLayout)
+        self._inputsAndConservedButtonLayout.addLayout(self._inputsLayout)
+
         self._addButtons()
         self._addPresetBox()
         self._addInputFields()
         inputAndOrbitsLayout.addWidget(self._plotter.inertial_plot)
         inputAndOrbitsLayout.addWidget(self._plotter.corotating_plot)
 
+        self._addToggleConservedPlotsButton()
+
+        self._conservedPlotsWidget = QWidget(self)
         conservedPlotsLayout = QHBoxLayout()
-        mainLayout.addLayout(conservedPlotsLayout)
+        self._conservedPlotsWidget.setLayout(conservedPlotsLayout)
+        self._mainLayout.addWidget(self._conservedPlotsWidget)
 
         conservedPlotsLayout.addWidget(self._plotter.linear_momentum_plot)
         conservedPlotsLayout.addWidget(self._plotter.angular_momentum_plot)
         conservedPlotsLayout.addWidget(self._plotter.energy_plot)
 
-        self.resize(mainLayout.sizeHint())
+        self._hideConservedPlots()
+        self._conservedPlotsIsVisible = False
+
+        self.resize(self._mainLayout.sizeHint())
 
     def _addButtons(self) -> None:
         buttonsLayout = QHBoxLayout()
@@ -124,7 +137,17 @@ class _SimUi(QMainWindow):
         self._addParams("Simulation Parameters", SIMULATION_PARAMS)
         self._addParams("System Parameters", SYSTEM_PARAMS)
         self._addParams("Satellite Parameters", SATELLITE_PARAMS)
+
         self._addLagrangeLabel()
+
+    def _addToggleConservedPlotsButton(self) -> None:
+        conservedPlotsButton = QPushButton(TOGGLE_CONSERVED)
+        conservedPlotsButton.setFixedSize(conservedPlotsButton.sizeHint())
+        conservedPlotsButton.setContentsMargins(100, 100, 100, 100)
+
+        self._inputsAndConservedButtonLayout.addWidget(conservedPlotsButton)
+
+        self.buttons[TOGGLE_CONSERVED] = conservedPlotsButton
 
     def _addParams(self, paramCategory: str, params: Params) -> None:
         argLabel = QLabel(paramCategory)
@@ -172,6 +195,23 @@ class _SimUi(QMainWindow):
             return
 
         self._plotter.plot_conserved_quantities()
+        self._showConservedPlots()
+
+    def _showConservedPlots(self) -> None:
+        self._conservedPlotsWidget.show()
+        self.resize(self._mainLayout.sizeHint())
+        self._conservedPlotsIsVisible = True
+
+    def _hideConservedPlots(self) -> None:
+        self._conservedPlotsWidget.hide()
+        self.resize(self._mainLayout.sizeHint())
+        self._conservedPlotsIsVisible = False
+
+    def toggleConservationPlots(self) -> None:
+        if self._conservedPlotsIsVisible:
+            self._hideConservedPlots()
+        else:
+            self._showConservedPlots()
 
     def getInputs(self) -> dict[str, Input]:
         """Get the parameters from the input fields. Returns a dict of parameter label to value.
@@ -234,8 +274,9 @@ class _SimCtrl:
     def _connectSignals(self) -> None:
         btnActions = {
             SIMULATE: self._simulate,
-            TOGGLE_ANIMATION: self._toggleAnimation,
+            TOGGLE_ANIMATION: self._view.toggleAnimation,
             PLOT_CONSERVED: self._plotConservedQuantities,
+            TOGGLE_CONSERVED: self._view.toggleConservationPlots,
         }
         for btnText, btn in self._view.buttons.items():
             action = btnActions[btnText]
@@ -316,9 +357,6 @@ class _SimCtrl:
                 continue
 
             btn.setEnabled(False)
-
-    def _toggleAnimation(self) -> None:
-        self._view.toggleAnimation()
 
     def _plotConservedQuantities(self) -> None:
         self._disableButtonsExceptToggleAnimation()
