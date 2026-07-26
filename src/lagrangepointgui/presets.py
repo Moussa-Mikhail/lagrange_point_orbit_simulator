@@ -40,4 +40,17 @@ def _read_preset(file_path: Path) -> tuple[ParamPresets, Constants]:
     params = presets.get("presets", {})
     constants = presets.get("constants", {})
 
+    _check_constant_names(constants)
+
     return params, constants
+
+def _check_constant_names(constants: dict[str, float | int]) -> None:
+    names = sorted(constants, key=len)
+
+    for i, maybe_substring in enumerate(names):
+
+        for maybe_superstring in names[i+1:]:
+
+            if maybe_substring in maybe_superstring:
+                raise ValueError(f'Constant name "{maybe_substring}" is a substring of "{maybe_superstring}". '
+                                 'Please rename one of them to avoid ambiguous parsing.')
