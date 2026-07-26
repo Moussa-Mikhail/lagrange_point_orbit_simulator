@@ -51,3 +51,7 @@ build = [
 
 [tool.uv]
 default-groups = "all"
+
+[tool.ruff]
+lint.ignore = ['EXE002']
+line-length = 120
