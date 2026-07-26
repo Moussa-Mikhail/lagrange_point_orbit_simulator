@@ -1,12 +1,16 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
 # About
 
-Python code used to simulate satellite orbits near Lagrange points. It is meant for the L4/L5 points but any of the 5 points can be used. The initial position and velocity of the satellite can be specified by the user. Additionally, the masses of the star, planet, and the distance between them can also be specified.
+Python code used to simulate satellite orbits near Lagrange points. It is meant for the L4/L5 points but any of the 5
+points can be used. The initial position and velocity of the satellite can be specified by the user. Additionally, the
+masses of the star, planet, and the distance between them can also be specified.
 
 ## Installation of source code
 
-Download the repository.
-If you use Pip open your command line in the repository directory and enter "pip install -r requirements.txt". This will install all the packages this code depends on. If you use Poetry then a .lock file is provided.
+Download the repository: On GitHub click the green button that says "<>Code" then "Download ZIP". Unzip the file. If you
+use Pip open your command line in the repository directory and enter "pip install -r requirements.txt". This will
+install all the packages this code depends on. If you use Poetry or uv then a .lock file is provided.
 
 ## Usage
 
@@ -55,8 +59,8 @@ The constants "SUN_MASS", "EARTH_MASS", and others maybe import from the constan
 planet_distance: positive float.
 Distance between the planet and the star in AU. The default is 1.0.
 
-The time to simulate will take longer than usual on the first call to the simulate method.
+The time to simulate will be slow on the first call to the simulate method and much faster afterwards.
  ```
 
-This is the docstring of the Simulator class which can be seen at any time by using "help(Simulator)" in Python.
-The attributes of an instance can be changed after creation.
+This is the docstring of the Simulator class which can be seen at any time by using "help (Simulator)" in Python. The
+attributes of an instance can be changed after creation.
