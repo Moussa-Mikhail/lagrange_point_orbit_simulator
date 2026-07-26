@@ -23,7 +23,7 @@ jobs:
           python3 -m pip install -r requirements-gui.txt
           python3 -m pip install pyinstaller
       -
-        name: Build Hydrus
+        name: Build Simulator
         run: |
           cd $GITHUB_WORKSPACE
           sh ./build.sh
@@ -59,7 +59,7 @@ jobs:
           python3 -m pip install -r requirements-gui.txt
           python3 -m pip install pyinstaller
       -
-        name: Build Hydrus
+        name: Build Simulator
         run: |
           cd $GITHUB_WORKSPACE
           sh ./build.sh
@@ -95,7 +95,7 @@ jobs:
           python3 -m pip install -r requirements-gui.txt
           python3 -m pip install pyinstaller
       -
-        name: Build Hydrus
+        name: Build Simulator
         run: |
           cd $GITHUB_WORKSPACE
           ./build.sh
