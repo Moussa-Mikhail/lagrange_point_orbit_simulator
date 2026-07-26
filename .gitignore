@@ -140,3 +140,7 @@ user_presets.toml
 
 # Pycharm
 .idea/
+
+/src.zip
+/pyproject.toml.bak
+.aider*

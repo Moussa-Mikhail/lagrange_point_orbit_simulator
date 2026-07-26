@@ -1,66 +1,53 @@
-[tool.poetry]
-name = "lagrangepointsimulator"
+[project]
+name = "lagrange-point-orbit-simulator"
 version = "0.1.0"
 description = "Simulates orbits near Lagrange Points"
-authors = ["Moussa Mikhail <moussamikhail56@gmail.com>"]
-license = "GPL3"
 readme = "README.md"
-repository = "https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator"
-keywords = ["lagrange point", "orbit", "simulation", "physics", "gui", "astronomy"]
-classifiers = ["Topic :: Scientific/Engineering :: Physics", "Topic :: Scientific/Engineering :: Visualization", "Topic :: Scientific/Engineering :: Astronomy"]
-packages = [
-    { include = "src/lagrangepointsimulator" },
-    { include = "src/lagrangepointgui"}
+requires-python = ">=3.13"
+license = "GPL-3.0-onlys"
+
+authors = [
+    { name = "Moussa Mikhail", email = "moussamikhail56@gmail.com" },
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.10,<3.12"
-validateddescriptor = {git = "https://github.com/Moussa-Mikhail/validated-descriptor.git", rev = "main"}
-numpy = ">=1.23.4"
-numba = ">=0.56.3"
+keywords = ["lagrange point", "orbit", "simulation", "physics", "gui", "astronomy"]
 
-pyqt6 = { version = ">=6.4.0", optional = true }
-pyqtgraph = { version = ">=0.13.1", optional = true }
+classifiers = [
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
 
-[tool.poetry.extras]
-gui = ["pyqt6", "pyqtgraph"]
+dependencies = [
+    "numba>=0.64.0",
+    "numpy>=2.4.2",
+    "validateddescriptor",
+]
 
-[tool.poetry.group.dev.dependencies]
-mypy = ">=0.991"
-black = ">=22.12.0"
-ruff = ">=0.0.272"
-sourcery = ">=1.8.0"
-refurb = ">=1.25.0"
+[project.urls]
+Repository = "https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator"
 
-[tool.poetry.group.build.dependencies]
-pyinstaller = ">=5.11.0"
+[project.optional-dependencies]
+gui = [
+    "pyqt6>=6.10.2",
+    "pyqtgraph>=0.14.0",
+]
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.uv.sources]
+validateddescriptor = { git = "https://github.com/Moussa-Mikhail/validated-descriptor.git" }
 
-[tool.ruff]
-target-version = "py311"
-line-length = 120
+[dependency-groups]
+dev = [
+    "refurb>=2.3.0",
+    "ruff>=0.15.5",
+    "sourcery>=1.43.0",
+    "ty>=0.0.21",
+    "lagrange-point-orbit-simulator[gui]",
+]
 
-[tool.ruff.lint]
-select = ["ALL"]
+build = [
+    "pyinstaller>=5.11.0",
+]
 
-ignore = ["ANN101", "D100", "D102", "D101", "D103", "D104", "D107", "D203", "D205", "D213", "PLR0913", "T201", "COM812", "ISC001"]
-
-[tool.ruff.lint.per-file-ignores]
-# Ignore `E402` (import violations) and `F401` (Module imported but unused) in all `__init__.py` files.
-"__init__.py" = ["E402", "F401"]
-
-# Don't autofix unused variables
-unfixable = ["F841"]
-
-[tool.mypy]
-disallow_untyped_defs = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_unreachable = true
-exclude = ["dist"]
-
-[tool.black]
-line-length = 120
+[tool.uv]
+default-groups = "all"
