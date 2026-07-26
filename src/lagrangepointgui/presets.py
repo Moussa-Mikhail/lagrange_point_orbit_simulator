@@ -4,7 +4,6 @@ import os
 import sys
 import tomllib
 from pathlib import Path
-from typing import TypeAlias
 
 dir_path = Path(os.path.realpath(__file__)).parent
 
@@ -16,11 +15,11 @@ if getattr(sys, "frozen", False):
 default_presets_path = dir_path / "default_presets.toml"
 user_presets_path = dir_path / "user_presets.toml"
 
-Expr: TypeAlias = float | int | str
-Bases: TypeAlias = list[str]
+type Expr = float | int | str
+type Bases = list[str]
 
-ParamPresets: TypeAlias = dict[str, dict[str, Expr | Bases]]
-Constants: TypeAlias = dict[str, float | int]
+type ParamPresets = dict[str, dict[str, Expr | Bases]]
+type Constants = dict[str, float | int]
 
 
 def read_presets() -> tuple[ParamPresets, Constants]:
@@ -44,13 +43,14 @@ def _read_preset(file_path: Path) -> tuple[ParamPresets, Constants]:
 
     return params, constants
 
+
 def _check_constant_names(constants: dict[str, float | int]) -> None:
     names = sorted(constants, key=len)
 
     for i, maybe_substring in enumerate(names):
-
-        for maybe_superstring in names[i+1:]:
-
+        for maybe_superstring in names[i + 1 :]:
             if maybe_substring in maybe_superstring:
-                raise ValueError(f'Constant name "{maybe_substring}" is a substring of "{maybe_superstring}". '
-                                 'Please rename one of them to avoid ambiguous parsing.')
+                raise ValueError(
+                    f'Constant name "{maybe_substring}" is a substring of "{maybe_superstring}". '
+                    "Please rename one of them to avoid ambiguous parsing."
+                )

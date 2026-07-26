@@ -5,7 +5,6 @@ the Simulator class.
 from collections.abc import Callable, Generator
 from contextlib import suppress
 from math import ceil
-from typing import TypeAlias, cast
 
 import numpy as np
 import pyqtgraph as pg  # type: ignore[import-untyped]
@@ -16,9 +15,9 @@ from src.lagrangepointsimulator import Simulator
 from src.lagrangepointsimulator.constants import AU, HOURS, YEARS
 from src.lagrangepointsimulator.sim_types import Array1D, Array2D
 
-PlotArgs: TypeAlias = dict[str, str | int]
+type PlotArgs = dict[str, str | int]
 
-AnimatePlotFunc: TypeAlias = Callable[[], None]
+type AnimatePlotFunc = Callable[[], None]
 
 
 def _create_orbit_plot(title: str) -> pg.PlotWidget:
@@ -97,7 +96,7 @@ class Plotter:
         self.timer.timeout.connect(animate_inertial)
         self.timer.timeout.connect(animate_corotating)
 
-    def plot_index_generator(self) -> Generator[int, None, None]:
+    def plot_index_generator(self) -> Generator[int]:
         """Create a generator which yields the index of the next point to plot."""
         time_step_default = 1 * HOURS
 
@@ -135,7 +134,7 @@ class Plotter:
     ) -> AnimatePlotFunc:
         """Plotting logic common to both inertial and corotating plots.
         Returns a function which is called by the timer to animate the plot.
-        """  # noqa: D401
+        """
         plot.clear()
         plot.disableAutoRange()
 
@@ -163,7 +162,11 @@ class Plotter:
             "name": "Satellite",
         }
 
-        arrays_and_args = ((star_pos, star_args), (planet_pos, planet_args), (sat_pos, sat_args))
+        arrays_and_args = (
+            (star_pos, star_args),
+            (planet_pos, planet_args),
+            (sat_pos, sat_args),
+        )
 
         arr_step = self.array_step()
         for arr, args in arrays_and_args:
@@ -291,7 +294,7 @@ class Plotter:
         # to avoid this we normalize the total linear momentum
         # by the initial linear momentum of the planet.
 
-        init_planet_momentum = cast(float, (norm(self.sim.planet_mass * self.sim.planet_vel[0])))
+        init_planet_momentum = norm(self.sim.planet_mass * self.sim.planet_vel[0])
         normalized_linear_momentum: Array2D = total_momentum / init_planet_momentum
 
         _plot_components(self.linear_momentum_plot, normalized_linear_momentum, times_in_years)

@@ -1,13 +1,22 @@
 from math import ceil, sqrt
-from typing import TypeVar, cast
+from typing import TypeVar
 
 import numpy as np
 from numpy.linalg import norm
 
 from src.lagrangepointsimulator import descriptors
-from src.lagrangepointsimulator.constants import AU, EARTH_MASS, HOURS, SUN_MASS, YEARS, G
+from src.lagrangepointsimulator.constants import (
+    AU,
+    EARTH_MASS,
+    HOURS,
+    SUN_MASS,
+    YEARS,
+    G,
+)
 from src.lagrangepointsimulator.numba_funcs import integrate as nb_integrate
-from src.lagrangepointsimulator.numba_funcs import transform_to_corotating as nb_transform_to_corotating
+from src.lagrangepointsimulator.numba_funcs import (
+    transform_to_corotating as nb_transform_to_corotating,
+)
 from src.lagrangepointsimulator.sim_types import Array1D, Array2D
 
 
@@ -68,7 +77,7 @@ class Simulator:
     planet_mass: positive float. Mass of the planet in kilograms.
     The default is the mass of the Earth.
 
-    The constants "SUN_MASS", "EARTH_MASS", and others maybe import from the constants module.
+    The constants "SUN_MASS", "EARTH_MASS", and others may be imported from the constants module.
 
     planet_distance: positive float.
     Distance between the planet and the star in AU. The default is 1.0.
@@ -119,7 +128,7 @@ class Simulator:
 
         self.lagrange_point_trans: Array1D = np.empty(3, dtype=np.double)
 
-        self.star_pos: Array2D = cast(Array2D, np.empty((0, 3), dtype=np.double))
+        self.star_pos: Array2D = np.empty((0, 3), dtype=np.double)
         self.star_vel: Array2D = np.empty_like(self.star_pos)
         self.planet_pos: Array2D = np.empty_like(self.star_pos)
         self.planet_vel: Array2D = np.empty_like(self.star_pos)
