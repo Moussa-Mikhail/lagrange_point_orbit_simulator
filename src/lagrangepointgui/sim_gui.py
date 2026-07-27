@@ -1,7 +1,6 @@
-# ruff: noqa: N802 N803 N806 N812
 import sys
 from collections.abc import Callable
-from typing import TypeAlias, cast
+from typing import cast
 
 from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal
 from PyQt6.QtGui import QFont
@@ -27,7 +26,8 @@ from src.lagrangepointsimulator import Simulator
 
 LAGRANGE_LABEL = "Lagrange label"
 
-Params: TypeAlias = dict[str, tuple[str, str]]
+type Params = dict[str, tuple[str, str]]
+"""GUI label to default value and attribute name"""
 
 # parameter label in gui: (default value, attribute name in Simulator)
 SIMULATION_PARAMS: Params = {
@@ -50,7 +50,7 @@ SYSTEM_PARAMS: Params = {
     "planet distance": ("1.0", "planet_distance"),
 }
 
-Input: TypeAlias = str | float | None
+type Input = str | float | None
 
 SIMULATE = "Simulate"
 
@@ -70,7 +70,7 @@ class _SimUi(QMainWindow):
         self._plotted = False
         self.inputFields: dict[str, QLineEdit] = {}
         self.presetBox = QComboBox()
-        self.buttons: dict[str, QPushButton] = {}
+        self.textToButton: dict[str, QPushButton] = {}
         self.autoPlotConserved = QCheckBox("Auto Plot Conserved")
 
         self.setWindowTitle("Orbits near Lagrange Points")
@@ -90,7 +90,7 @@ class _SimUi(QMainWindow):
         self._inputsLayout = QFormLayout()
         self._inputsAndConservedButtonLayout.addLayout(self._inputsLayout)
 
-        self._addButtons()
+        self._addMainButtons()
         self._addPresetBox()
         self._addInputFields()
         inputAndOrbitsLayout.addWidget(self._plotter.inertial_plot)
@@ -108,17 +108,14 @@ class _SimUi(QMainWindow):
         conservedPlotsLayout.addWidget(self._plotter.energy_plot)
 
         self._hideConservedPlots()
-        self._conservedPlotsIsVisible = False
 
-        self.resize(self._mainLayout.sizeHint())
-
-    def _addButtons(self) -> None:
+    def _addMainButtons(self) -> None:
         buttonsLayout = QHBoxLayout()
         self._inputsLayout.addRow(buttonsLayout)
 
         for btnText in (SIMULATE, TOGGLE_ANIMATION, PLOT_CONSERVED):
-            self.buttons[btnText] = QPushButton(btnText)
-            buttonsLayout.addWidget(self.buttons[btnText])
+            self.textToButton[btnText] = QPushButton(btnText)
+            buttonsLayout.addWidget(self.textToButton[btnText])
 
         buttonsLayout.addWidget(self.autoPlotConserved)
 
@@ -147,7 +144,7 @@ class _SimUi(QMainWindow):
 
         self._inputsAndConservedButtonLayout.addWidget(conservedPlotsButton)
 
-        self.buttons[TOGGLE_CONSERVED] = conservedPlotsButton
+        self.textToButton[TOGGLE_CONSERVED] = conservedPlotsButton
 
     def _addParams(self, paramCategory: str, params: Params) -> None:
         argLabel = QLabel(paramCategory)
@@ -272,15 +269,16 @@ class _SimCtrl:
 
     # noinspection PyUnresolvedReferences
     def _connectSignals(self) -> None:
-        btnActions = {
+        buttonTextToAction = {
             SIMULATE: self._simulate,
             TOGGLE_ANIMATION: self._view.toggleAnimation,
             PLOT_CONSERVED: self._plotConservedQuantities,
             TOGGLE_CONSERVED: self._view.toggleConservationPlots,
         }
-        for btnText, btn in self._view.buttons.items():
-            action = btnActions[btnText]
-            btn.clicked.connect(action)
+
+        for buttonText, action in buttonTextToAction.items():
+            button = self._view.textToButton[buttonText]
+            button.clicked.connect(action)
 
         self._view.presetBox.activated.connect(self._applySelectedPreset)
 
@@ -304,10 +302,11 @@ class _SimCtrl:
 
     def _addReturnPressed(self) -> None:
         for field in self._view.inputFields.values():
-            # noinspection PyUnresolvedReferences
             field.returnPressed.connect(self._simulate)
 
-        self._view.presetBox.lineEdit().returnPressed.connect(self._simulate)  # type: ignore[arg-type, union-attr]
+        lineEdit = self._view.presetBox.lineEdit()
+        assert lineEdit
+        lineEdit.returnPressed.connect(self._simulate)
 
     def _simulate(self) -> None:
         if self._calculating:
@@ -336,7 +335,7 @@ class _SimCtrl:
             return
 
         self._view.stopAnimation()
-        onFinishFuncs = [self._view.updateOrbitPlots]
+        onFinishFuncs: list[Callable[[], None]] = [self._view.updateOrbitPlots]
         if self._view.autoPlotConserved.isChecked():
             onFinishFuncs.append(self._plotConservedQuantities)
 
@@ -344,15 +343,15 @@ class _SimCtrl:
         self._runInThread(self._model.simulate, onFinishFuncs)
 
     def _enableButtons(self) -> None:
-        for btn in self._view.buttons.values():
+        for btn in self._view.textToButton.values():
             btn.setEnabled(True)
 
     def _disableButtons(self) -> None:
-        for btn in self._view.buttons.values():
+        for btn in self._view.textToButton.values():
             btn.setEnabled(False)
 
     def _disableButtonsExceptToggleAnimation(self) -> None:
-        for btnText, btn in self._view.buttons.items():
+        for btnText, btn in self._view.textToButton.items():
             if btnText == TOGGLE_ANIMATION:
                 continue
 
@@ -375,6 +374,7 @@ class _SimCtrl:
         if not (pool := QThreadPool.globalInstance()):
             msg = "Unable to find thread pool."
             raise RuntimeError(msg)
+
         pool.start(runnable)
         self._calculating = True
 
