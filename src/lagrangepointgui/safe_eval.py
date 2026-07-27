@@ -1,5 +1,7 @@
 """Contains a function to safely evaluate input expressions."""
 
+from collections.abc import Iterable
+
 from src.lagrangepointgui.presets import read_presets
 from src.lagrangepointsimulator.constants import CONSTANTS
 
@@ -24,7 +26,7 @@ def safe_eval(expr: str) -> int | float | None:
     _validate_expr(expr, all_constants)
 
     try:
-        res = eval(expr, all_constants)  # noqa: S307
+        res = eval(expr, all_constants)
     except (NameError, SyntaxError, ZeroDivisionError) as err:
         raise ValueError(str(err)) from err
 
@@ -39,16 +41,18 @@ def _validate_expr(expr: str, constants: dict[str, float | int]) -> None:
     """Ensure that the expression only contains constants, digits,
     the usual arithmetic operators, parens, or scientific notation.
     """
-    cleaned_expr = _remove_constants(expr, constants)
+    cleaned_expr = _remove_constants(expr, constants.keys())
     chars_in_expr = set(cleaned_expr)
     if not chars_in_expr.issubset(ALLOWED_CHARS):
         msg = "invalid constant or syntax in expression."
         raise ValueError(msg)
 
 
-def _remove_constants(expr: str, constants: dict[str, float | int]) -> str:
+def _remove_constants(expr: str, constant_names: Iterable[str]) -> str:
     """Remove constants in the expression."""
-    for constant_name in constants:
-        expr = expr.replace(constant_name, "")
+    # Remove longer constant names first to avoid removing substrings of longer ones
+    constant_names = sorted(constant_names, key=len, reverse=True)
+    for name in constant_names:
+        expr = expr.replace(name, "")
 
     return expr
