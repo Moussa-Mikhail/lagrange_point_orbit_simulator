@@ -31,8 +31,8 @@ type Params = dict[str, tuple[str, str]]
 
 # parameter label in gui: (default value, attribute name in Simulator)
 SIMULATION_PARAMS: Params = {
-    "number of years": ("10.0", "num_years"),
-    "time step (hours)": ("1.0", "time_step"),
+    "simulation time": ("10.0", "num_years"),
+    "time step": ("1.0", "time_step"),
 }
 
 SATELLITE_PARAMS: Params = {
@@ -62,6 +62,28 @@ TOGGLE_CONSERVED = "Toggle Conserved Quantity Plots"
 
 
 # noinspection PyPep8Naming
+def _addUnits(paramName: str) -> str:
+    if paramName.endswith("mass"):
+        return paramName + " (kg)"
+
+    if paramName.endswith("angle"):
+        return paramName + " (deg)"
+
+    if paramName == "simulation time":
+        return paramName + " (years)"
+
+    if paramName == "time step":
+        return paramName + " (hours)"
+
+    if paramName in ("perturbation size", "planet distance"):
+        return paramName + " (AU)"
+
+    if paramName == "initial speed":
+        return paramName + " (x planet speed)"
+
+    return paramName
+
+
 class _SimUi(QMainWindow):
     def __init__(self, plotter: Plotter) -> None:
         super().__init__()
@@ -137,6 +159,17 @@ class _SimUi(QMainWindow):
 
         self._addLagrangeLabel()
 
+    def _addParams(self, paramCategory: str, params: Params) -> None:
+        argLabel = QLabel(paramCategory)
+        argLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._inputsLayout.addRow(argLabel)
+
+        for paramName, (defaultValue, _) in params.items():
+            fieldLabel = _addUnits(paramName)
+            field = QLineEdit(defaultValue)
+            self.inputFields[paramName] = field
+            self._inputsLayout.addRow(fieldLabel, field)
+
     def _addToggleConservedPlotsButton(self) -> None:
         conservedPlotsButton = QPushButton(TOGGLE_CONSERVED)
         conservedPlotsButton.setFixedSize(conservedPlotsButton.sizeHint())
@@ -145,16 +178,6 @@ class _SimUi(QMainWindow):
         self._inputsAndConservedButtonLayout.addWidget(conservedPlotsButton)
 
         self.textToButton[TOGGLE_CONSERVED] = conservedPlotsButton
-
-    def _addParams(self, paramCategory: str, params: Params) -> None:
-        argLabel = QLabel(paramCategory)
-        argLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._inputsLayout.addRow(argLabel)
-
-        for fieldLabel, (defaultValue, _) in params.items():
-            field = QLineEdit(defaultValue)
-            self.inputFields[fieldLabel] = field
-            self._inputsLayout.addRow(fieldLabel, field)
 
     def _addLagrangeLabel(self) -> None:
         defaultValue = LAGRANGE_PARAM[LAGRANGE_LABEL][0]
