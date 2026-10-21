@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "lagrange-point-orbit-simulator"
 version = "0.1.0"
@@ -32,6 +36,9 @@ gui = [
     "pyqt6>=6.10.2",
     "pyqtgraph>=0.14.0",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lagrangepointsimulator", "src/lagrangepointgui"]
 
 [tool.uv.sources]
 validateddescriptor = { git = "https://github.com/Moussa-Mikhail/validated-descriptor.git" }
