@@ -1,0 +1,190 @@
+"""Python side of the web UI. Runs inside Pyodide in a Web Worker.
+
+The parameter table and the plot preparation mirror src/lagrangepointgui/sim_gui.py and orbit_plotter.py, which can't
+be imported here because they depend on Qt.
+"""
+
+import sys
+import types
+from importlib.util import find_spec
+from math import ceil
+
+import numpy as np
+from js import Object
+from numpy.linalg import norm
+from pyodide.ffi import to_js
+
+from lagrangepointsimulator import Simulator
+from lagrangepointsimulator.constants import AU, HOURS, YEARS
+
+
+def _import_gui_helpers() -> None:
+    # lagrangepointgui/__init__.py imports Qt. Register the package without running it so that the Qt-free
+    # presets and safe_eval submodules can still be imported.
+    spec = find_spec("lagrangepointgui")
+    assert spec
+    package = types.ModuleType("lagrangepointgui")
+    package.__path__ = list(spec.submodule_search_locations or [])
+    sys.modules["lagrangepointgui"] = package
+
+
+_import_gui_helpers()
+
+from lagrangepointgui.presets import read_presets
+from lagrangepointgui.safe_eval import safe_eval
+
+LAGRANGE_LABEL = "Lagrange label"
+
+# group: (parameter label, default value, attribute name in Simulator, unit)
+GROUPS = {
+    "Simulation Parameters": [
+        ("simulation time", "10.0", "num_years", "years"),
+        ("time step", "1.0", "time_step", "hours"),
+    ],
+    "System Parameters": [
+        ("star mass", "sun_mass", "star_mass", "kg"),
+        ("planet mass", "earth_mass", "planet_mass", "kg"),
+        ("planet distance", "1.0", "planet_distance", "AU"),
+    ],
+    "Satellite Parameters": [
+        ("perturbation size", "0.0", "perturbation_size", "AU"),
+        ("perturbation angle", "", "perturbation_angle", "deg"),
+        ("initial speed", "1.0", "speed", "x planet speed"),
+        ("initial velocity angle", "", "vel_angle", "deg"),
+    ],
+}
+
+LAGRANGE_LABELS = [f"L{i}" for i in range(1, 6)]
+DEFAULT_LAGRANGE_LABEL = "L4"
+
+LABEL_TO_ATTRIBUTE = {label: attr for params in GROUPS.values() for label, _, attr, _ in params}
+LABEL_TO_ATTRIBUTE[LAGRANGE_LABEL] = "lagrange_label"
+
+MAX_POINTS = 10**5
+
+_sim = Simulator()
+_simulated = False
+
+
+def _to_js(obj):
+    return to_js(obj, dict_converter=Object.fromEntries)
+
+
+def get_spec():
+    presets, _ = read_presets()
+    # field text as the desktop GUI shows it, e.g. "1.0" and not 1
+    presets = {
+        name: {label: value if label == "bases" else str(value) for label, value in preset.items()}
+        for name, preset in presets.items()
+    }
+    return _to_js(
+        {
+            "groups": {
+                name: [{"label": label, "default": default, "unit": unit} for label, default, _, unit in params]
+                for name, params in GROUPS.items()
+            },
+            "lagrangeLabel": LAGRANGE_LABEL,
+            "lagrangeLabels": LAGRANGE_LABELS,
+            "defaultLagrangeLabel": DEFAULT_LAGRANGE_LABEL,
+            "presets": presets,
+        }
+    )
+
+
+def _array_step() -> int:
+    # no need to plot all points, see Plotter.array_step
+    return int((_sim.num_steps + 1) / MAX_POINTS) or 1
+
+
+def _animation_rate() -> int:
+    # see Plotter.plot_index_generator
+    return ceil(100 / 3 * HOURS / abs(_sim.time_step_in_seconds) * _sim.orbital_period / YEARS)
+
+
+def _xy(arr, step: int):
+    # separate 1D arrays so they arrive in JS as plain typed arrays
+    return {
+        "x": np.ascontiguousarray(arr[::step, 0] / AU),
+        "y": np.ascontiguousarray(arr[::step, 1] / AU),
+    }
+
+
+def simulate(inputs):
+    """Run a simulation. inputs maps parameter labels to the text of the fields."""
+    global _simulated
+
+    inputs = inputs.to_py()
+
+    values = {}
+    for label, text in inputs.items():
+        if label == LAGRANGE_LABEL:
+            values[label] = text
+            continue
+
+        try:
+            values[label] = safe_eval(text)
+        except (ValueError, TypeError) as e:
+            return _to_js({"error": f"Invalid expression in field '{label}'.\n{e}"})
+
+    try:
+        for label, value in values.items():
+            setattr(_sim, LABEL_TO_ATTRIBUTE[label], value)
+    except (TypeError, ValueError) as e:
+        msg = str(e)
+        # replace attribute names with parameter labels
+        for label, attribute in LABEL_TO_ATTRIBUTE.items():
+            msg = msg.replace(attribute, label)
+
+        return _to_js({"error": msg})
+
+    _sim.simulate()
+    _simulated = True
+
+    step = _array_step()
+    bodies = (_sim.star_pos, _sim.planet_pos, _sim.sat_pos)
+
+    return _to_js(
+        {
+            "inertial": [_xy(arr, step) for arr in bodies],
+            "corotating": [_xy(_sim.transform_to_corotating(arr), step) for arr in bodies],
+            "lagrangePoint": [float(v) for v in _sim.lagrange_point_trans[:2] / AU],
+            "lagrangeLabel": _sim.lagrange_label,
+            "step": step,
+            "numSteps": _sim.num_steps,
+            "animationRate": _animation_rate(),
+        }
+    )
+
+
+def conserved():
+    """Relative change in the conserved quantities of the last simulation, see Plotter."""
+    if not _simulated:
+        return _to_js({"error": "No data to plot."})
+
+    total_momentum, total_angular_momentum, total_energy = _sim.calc_conserved_quantities()
+
+    step = _array_step()
+    times = np.ascontiguousarray(_sim.time_points_in_years()[::step])
+
+    # The total linear momentum is initially approx. 0, so it's normalized by the planet's initial momentum.
+    init_planet_momentum = norm(_sim.planet_mass * _sim.planet_vel[0])
+    linear = total_momentum[::step] / init_planet_momentum
+
+    # The x and y components of the angular momentum are always 0, so the division gives NaN there.
+    with np.errstate(invalid="ignore"):
+        angular = total_angular_momentum[::step] / total_angular_momentum[0] - 1
+    angular = np.nan_to_num(angular, nan=0.0)
+
+    energy = total_energy[::step] / total_energy[0] - 1
+
+    def components(arr):
+        return [np.ascontiguousarray(arr[:, i]) for i in range(3)]
+
+    return _to_js(
+        {
+            "times": times,
+            "linearMomentum": components(linear),
+            "angularMomentum": components(angular),
+            "energy": np.ascontiguousarray(energy),
+        }
+    )

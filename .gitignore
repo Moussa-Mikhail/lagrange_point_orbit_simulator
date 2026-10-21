@@ -144,3 +144,4 @@ user_presets.toml
 /src.zip
 /pyproject.toml.bak
 .aider*
+!web/index.html

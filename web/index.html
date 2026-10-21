@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orbits near Lagrange Points</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"
+          integrity="sha384-cCVCZkAjYNxaYKbM8lsArLznDF/SvMFr1jcZrvOpSTCa0W40ZAdLzHCEulnUa5i7"
+          crossorigin="anonymous"></script>
+  <script src="app.js" type="module"></script>
+</head>
+<body>
+  <main id="layout">
+    <section id="controls">
+      <div id="buttons">
+        <div id="action-buttons">
+          <button id="simulate" disabled>Simulate</button>
+          <button id="toggle-animation" disabled>Toggle Animation</button>
+          <button id="plot-conserved" disabled>Plot Conserved Quantities</button>
+        </div>
+        <label><input type="checkbox" id="auto-plot-conserved"> Auto Plot Conserved</label>
+      </div>
+      <form id="inputs" autocomplete="off"></form>
+      <button id="toggle-conserved" disabled>Toggle Conserved Quantity Plots</button>
+      <p id="status" role="status">Starting…</p>
+    </section>
+    <section id="orbits">
+      <div class="plot">
+        <div id="inertial-plot" class="fill"></div>
+        <canvas id="inertial-overlay" class="overlay"></canvas>
+      </div>
+      <div class="plot">
+        <div id="corotating-plot" class="fill"></div>
+        <canvas id="corotating-overlay" class="overlay"></canvas>
+      </div>
+    </section>
+    <section id="conserved" hidden>
+      <div id="linear-momentum-plot" class="plot"></div>
+      <div id="angular-momentum-plot" class="plot"></div>
+      <div id="energy-plot" class="plot"></div>
+    </section>
+  </main>
+  <dialog id="error">
+    <p id="error-message"></p>
+    <form method="dialog"><button>OK</button></form>
+  </dialog>
+</body>
+</html>
