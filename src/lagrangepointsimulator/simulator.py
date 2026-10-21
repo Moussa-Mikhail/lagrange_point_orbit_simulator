@@ -4,8 +4,8 @@ from typing import TypeVar
 import numpy as np
 from numpy.linalg import norm
 
-from src.lagrangepointsimulator import descriptors
-from src.lagrangepointsimulator.constants import (
+from lagrangepointsimulator import descriptors
+from lagrangepointsimulator.constants import (
     AU,
     EARTH_MASS,
     HOURS,
@@ -13,11 +13,11 @@ from src.lagrangepointsimulator.constants import (
     YEARS,
     G,
 )
-from src.lagrangepointsimulator.numba_funcs import integrate as nb_integrate
-from src.lagrangepointsimulator.numba_funcs import (
+from lagrangepointsimulator.numba_funcs import integrate as nb_integrate
+from lagrangepointsimulator.numba_funcs import (
     transform_to_corotating as nb_transform_to_corotating,
 )
-from src.lagrangepointsimulator.sim_types import Array1D, Array2D
+from lagrangepointsimulator.sim_types import Array1D, Array2D
 
 
 def array_of_norms(arr_2d: Array2D) -> Array1D:

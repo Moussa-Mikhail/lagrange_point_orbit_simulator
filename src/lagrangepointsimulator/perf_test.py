@@ -2,7 +2,7 @@
 
 from timeit import timeit
 
-SETUP = "from src.lagrangepointsimulator.simulator import Simulator; sim = Simulator(num_years=400); sim.simulate()"
+SETUP = "from lagrangepointsimulator.simulator import Simulator; sim = Simulator(num_years=400); sim.simulate()"
 
 NUM_SAMPLES = 3000
 

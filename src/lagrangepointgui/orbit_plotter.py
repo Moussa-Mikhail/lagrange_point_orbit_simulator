@@ -11,9 +11,9 @@ import pyqtgraph as pg  # type: ignore[import-untyped]
 from numpy.linalg import norm
 from PyQt6.QtCore import QTimer
 
-from src.lagrangepointsimulator import Simulator
-from src.lagrangepointsimulator.constants import AU, HOURS, YEARS
-from src.lagrangepointsimulator.sim_types import Array1D, Array2D
+from lagrangepointsimulator import Simulator
+from lagrangepointsimulator.constants import AU, HOURS, YEARS
+from lagrangepointsimulator.sim_types import Array1D, Array2D
 
 type PlotArgs = dict[str, str | int]
 

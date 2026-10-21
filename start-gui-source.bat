@@ -1,2 +1,3 @@
 @echo off
-python3 -m src.lagrangepointgui.sim_gui
+set PYTHONPATH=src
+python3 -m lagrangepointgui.sim_gui

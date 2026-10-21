@@ -1,1 +1,1 @@
-from src.lagrangepointgui.orbit_plotter import Plotter as Plotter
+from lagrangepointgui.orbit_plotter import Plotter as Plotter
