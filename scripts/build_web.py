@@ -28,7 +28,7 @@ def pinned_validateddescriptor() -> tuple[str, str]:
         msg = "validateddescriptor pin not found in requirements.txt"
         raise RuntimeError(msg)
 
-    return match.group(1), match.group(2)
+    return match[1], match[2]
 
 
 def main() -> None:

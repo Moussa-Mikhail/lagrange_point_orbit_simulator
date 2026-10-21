@@ -64,22 +64,22 @@ TOGGLE_CONSERVED = "Toggle Conserved Quantity Plots"
 # noinspection PyPep8Naming
 def _addUnits(paramName: str) -> str:
     if paramName.endswith("mass"):
-        return paramName + " (kg)"
+        return f"{paramName} (kg)"
 
     if paramName.endswith("angle"):
-        return paramName + " (deg)"
+        return f"{paramName} (deg)"
 
     if paramName == "simulation time":
-        return paramName + " (years)"
+        return f"{paramName} (years)"
 
     if paramName == "time step":
-        return paramName + " (hours)"
+        return f"{paramName} (hours)"
 
-    if paramName in ("perturbation size", "planet distance"):
-        return paramName + " (AU)"
+    if paramName in {"perturbation size", "planet distance"}:
+        return f"{paramName} (AU)"
 
     if paramName == "initial speed":
-        return paramName + " (x planet speed)"
+        return f"{paramName} (x planet speed)"
 
     return paramName
 
