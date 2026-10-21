@@ -4,7 +4,11 @@
 ast-serialize==0.6.0
     # via mypy
 colorama==0.4.6
-    # via pyqtgraph
+    # via
+    #   pyqtgraph
+    #   pytest
+iniconfig==2.3.1
+    # via pytest
 librt==0.13.0 ; platform_python_implementation != 'PyPy'
     # via mypy
 llvmlite==0.48.0
@@ -20,8 +24,14 @@ numpy==2.4.6
     #   lagrange-point-orbit-simulator
     #   numba
     #   pyqtgraph
+packaging==26.2
+    # via pytest
 pathspec==1.1.1
     # via mypy
+pluggy==1.7.0
+    # via pytest
+pygments==2.21.0
+    # via pytest
 pyqt6==6.11.0
     # via lagrange-point-orbit-simulator
 pyqt6-qt6==6.11.1
@@ -30,6 +40,7 @@ pyqt6-sip==13.11.1
     # via pyqt6
 pyqtgraph==0.14.0
     # via lagrange-point-orbit-simulator
+pytest==9.1.1
 refurb==2.3.1
 ruff==0.16.0
 sourcery==1.44.0

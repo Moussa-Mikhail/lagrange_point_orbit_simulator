@@ -217,6 +217,10 @@ class Simulator:
         if len(self.star_pos) != self.num_steps + 1:
             self._allocate_arrays()
 
+        self._set_initial_conditions()
+
+    def _set_initial_conditions(self) -> None:
+        # Fills in the first row of each array. The arrays only need to have a single row for this.
         self._initialize_positions()
 
         # we set up conditions so that the star and planet have circular orbits about the center of mass

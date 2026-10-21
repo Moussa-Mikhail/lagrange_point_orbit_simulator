@@ -4,7 +4,7 @@
 
 const PYODIDE_VERSION = "0.29.5";
 
-importScripts(`https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/pyodide.js`);
+importScripts(`https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/pyodide.js`, "integrator.js");
 
 let bridge;
 
@@ -34,7 +34,8 @@ async function init() {
   pyodide.runPython(new TextDecoder().decode(await fetchBuffer("py/bridge.py")));
   bridge = {
     get_spec: pyodide.globals.get("get_spec"),
-    simulate: pyodide.globals.get("simulate"),
+    prepare: pyodide.globals.get("prepare"),
+    finish: pyodide.globals.get("finish"),
     conserved: pyodide.globals.get("conserved"),
   };
 
@@ -52,7 +53,13 @@ function collectBuffers(value, buffers = []) {
 
 const handlers = {
   init,
-  simulate: (inputs) => bridge.simulate(inputs),
+  // Python validates the inputs and sets up the first row, JS integrates, and Python prepares the plot data.
+  simulate: (inputs) => {
+    const setup = bridge.prepare(inputs);
+    if (setup.error) return setup;
+    const rows = integrate(setup.timeStep, setup.numSteps, setup.gStar, setup.gPlanet, setup.state, setup.step);
+    return bridge.finish(rows);
+  },
   conserved: () => bridge.conserved(),
 };
 

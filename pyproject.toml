@@ -47,12 +47,17 @@ packages = ["src/lagrangepointsimulator", "src/lagrangepointgui"]
 validateddescriptor = { git = "https://github.com/Moussa-Mikhail/validated-descriptor.git" }
 
 [dependency-groups]
+test = [
+    "pytest>=8.0",
+]
+
 dev = [
     "refurb>=2.3.0",
     "ruff>=0.15.5",
     "sourcery>=1.43.0",
     "ty>=0.0.21",
     "lagrange-point-orbit-simulator[gui,numba]",
+    {include-group = "test"},
 ]
 
 build = [
@@ -61,6 +66,10 @@ build = [
 
 [tool.uv]
 default-groups = "all"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
 
 [tool.ruff]
 lint.ignore = ['EXE002']
