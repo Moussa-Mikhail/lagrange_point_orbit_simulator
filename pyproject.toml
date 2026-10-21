@@ -23,7 +23,6 @@ classifiers = [
 ]
 
 dependencies = [
-    "numba>=0.64.0",
     "numpy>=2.4.2",
     "validateddescriptor",
 ]
@@ -32,7 +31,11 @@ dependencies = [
 Repository = "https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator"
 
 [project.optional-dependencies]
+numba = [
+    "numba>=0.64.0",
+]
 gui = [
+    "numba>=0.64.0",
     "pyqt6>=6.10.2",
     "pyqtgraph>=0.14.0",
 ]
@@ -49,7 +52,7 @@ dev = [
     "ruff>=0.15.5",
     "sourcery>=1.43.0",
     "ty>=0.0.21",
-    "lagrange-point-orbit-simulator[gui]",
+    "lagrange-point-orbit-simulator[gui,numba]",
 ]
 
 build = [

@@ -1,52 +1,85 @@
 from math import sqrt
 
 import numpy as np
-from numba import njit, prange  # type: ignore[import-untyped]
 
 from lagrangepointsimulator.constants import G
-from lagrangepointsimulator.sim_types import Array1D, Array2D
+from lagrangepointsimulator.sim_types import Array1D, Array2D, Vec3
+
+try:
+    from numba import njit, prange  # type: ignore[import-untyped]
+
+    HAS_NUMBA = True
+except ImportError:
+    HAS_NUMBA = False
+
+    # Numba is optional. Without it the functions below run as plain Python.
+    prange = range  # ty:ignore[invalid-assignment]
+
+    def njit(*args, **_kwargs):
+        """No-op stand-in for numba.njit. Usable as @njit and as @njit(...) with any options."""
+        if len(args) == 1 and callable(args[0]):
+            return args[0]
+
+        return lambda func: func
 
 
-@njit()
-def inverse_norm_cubed(vector: Array1D) -> float:
+@njit(inline="always")
+def _sub(a: Vec3, b: Vec3) -> Vec3:
+    return (a[0] - b[0], a[1] - b[1], a[2] - b[2])
+
+
+@njit(inline="always")
+def _advance(pos: Vec3, vel: Vec3, time: float) -> Vec3:
+    return (pos[0] + vel[0] * time, pos[1] + vel[1] * time, pos[2] + vel[2] * time)
+
+
+@njit(inline="always")
+def inverse_norm_cubed(vector: Vec3) -> float:
     return sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]) ** -3
 
 
-@njit()
+@njit(inline="always")
 def calc_acceleration(
     g_star: float,
     g_planet: float,
-    star_pos: Array1D,
-    planet_pos: Array1D,
-    sat_pos: Array1D,
-    star_accel: Array1D,
-    planet_accel: Array1D,
-    sat_accel: Array1D,
-    planet_to_star: Array1D,
-    sat_to_star: Array1D,
-    sat_to_planet: Array1D,
-) -> None:
-    for j in range(3):
-        planet_to_star[j] = star_pos[j] - planet_pos[j]
-        sat_to_star[j] = star_pos[j] - sat_pos[j]
-        sat_to_planet[j] = planet_pos[j] - sat_pos[j]
+    star_pos: Vec3,
+    planet_pos: Vec3,
+    sat_pos: Vec3,
+) -> tuple[Vec3, Vec3, Vec3]:
+    """Return the accelerations of the star, planet and satellite."""
+    planet_to_star = _sub(star_pos, planet_pos)
+    sat_to_star = _sub(star_pos, sat_pos)
+    sat_to_planet = _sub(planet_pos, sat_pos)
 
     d_planet_to_star_inverse_cubed = inverse_norm_cubed(planet_to_star)
     d_sat_to_star_inverse_cubed = inverse_norm_cubed(sat_to_star)
     d_sat_to_planet_inverse_cubed = inverse_norm_cubed(sat_to_planet)
 
-    star_planet_coeff = g_planet * d_planet_to_star_inverse_cubed
+    star_planet_coeff = -g_planet * d_planet_to_star_inverse_cubed
     planet_star_coeff = g_star * d_planet_to_star_inverse_cubed
     sat_star_coeff = g_star * d_sat_to_star_inverse_cubed
     sat_planet_coeff = g_planet * d_sat_to_planet_inverse_cubed
 
-    for j in range(3):
-        star_accel[j] = -star_planet_coeff * planet_to_star[j]
+    star_accel = (
+        star_planet_coeff * planet_to_star[0],
+        star_planet_coeff * planet_to_star[1],
+        star_planet_coeff * planet_to_star[2],
+    )
 
-        # note the lack of negative signs in the following lines
-        planet_accel[j] = planet_star_coeff * planet_to_star[j]
+    # note the lack of negative signs in the following lines
+    planet_accel = (
+        planet_star_coeff * planet_to_star[0],
+        planet_star_coeff * planet_to_star[1],
+        planet_star_coeff * planet_to_star[2],
+    )
 
-        sat_accel[j] = sat_star_coeff * sat_to_star[j] + sat_planet_coeff * sat_to_planet[j]
+    sat_accel = (
+        sat_star_coeff * sat_to_star[0] + sat_planet_coeff * sat_to_planet[0],
+        sat_star_coeff * sat_to_star[1] + sat_planet_coeff * sat_to_planet[1],
+        sat_star_coeff * sat_to_star[2] + sat_planet_coeff * sat_to_planet[2],
+    )
+
+    return star_accel, planet_accel, sat_accel
 
 
 @njit(cache=True)
@@ -62,57 +95,41 @@ def integrate(
     sat_pos: Array2D,
     sat_vel: Array2D,
 ) -> None:
-    star_accel = np.empty(3, dtype=np.double)
-    planet_accel = np.empty_like(star_accel)
-    sat_accel = np.empty_like(star_accel)
-
-    star_intermediate_pos = np.empty_like(star_accel)
-    planet_intermediate_pos = np.empty_like(star_accel)
-    sat_intermediate_pos = np.empty_like(star_accel)
-
-    planet_to_star = np.empty_like(star_accel)
-    sat_to_star = np.empty_like(star_accel)
-    sat_to_planet = np.empty_like(star_accel)
-
     half_time_step = 0.5 * time_step
 
     g_star = G * star_mass
     g_planet = G * planet_mass
 
+    # The state is carried in tuples so the loop doesn't read back from the arrays.
+    star_p: Vec3 = (star_pos[0, 0], star_pos[0, 1], star_pos[0, 2])
+    star_v: Vec3 = (star_vel[0, 0], star_vel[0, 1], star_vel[0, 2])
+    planet_p: Vec3 = (planet_pos[0, 0], planet_pos[0, 1], planet_pos[0, 2])
+    planet_v: Vec3 = (planet_vel[0, 0], planet_vel[0, 1], planet_vel[0, 2])
+    sat_p: Vec3 = (sat_pos[0, 0], sat_pos[0, 1], sat_pos[0, 2])
+    sat_v: Vec3 = (sat_vel[0, 0], sat_vel[0, 1], sat_vel[0, 2])
+
     for k in range(1, num_steps + 1):
-        for j in range(3):
-            star_intermediate_pos[j] = star_pos[k - 1, j] + star_vel[k - 1, j] * half_time_step
+        star_p = _advance(star_p, star_v, half_time_step)
+        planet_p = _advance(planet_p, planet_v, half_time_step)
+        sat_p = _advance(sat_p, sat_v, half_time_step)
 
-            planet_intermediate_pos[j] = planet_pos[k - 1, j] + planet_vel[k - 1, j] * half_time_step
+        star_accel, planet_accel, sat_accel = calc_acceleration(g_star, g_planet, star_p, planet_p, sat_p)
 
-            sat_intermediate_pos[j] = sat_pos[k - 1, j] + sat_vel[k - 1, j] * half_time_step
+        star_v = _advance(star_v, star_accel, time_step)
+        planet_v = _advance(planet_v, planet_accel, time_step)
+        sat_v = _advance(sat_v, sat_accel, time_step)
 
-        calc_acceleration(
-            g_star,
-            g_planet,
-            star_intermediate_pos,
-            planet_intermediate_pos,
-            sat_intermediate_pos,
-            star_accel,
-            planet_accel,
-            sat_accel,
-            planet_to_star,
-            sat_to_star,
-            sat_to_planet,
-        )
+        star_p = _advance(star_p, star_v, half_time_step)
+        planet_p = _advance(planet_p, planet_v, half_time_step)
+        sat_p = _advance(sat_p, sat_v, half_time_step)
 
         for j in range(3):
-            star_vel[k, j] = star_vel[k - 1, j] + star_accel[j] * time_step
-
-            planet_vel[k, j] = planet_vel[k - 1, j] + planet_accel[j] * time_step
-
-            sat_vel[k, j] = sat_vel[k - 1, j] + sat_accel[j] * time_step
-
-            star_pos[k, j] = star_intermediate_pos[j] + star_vel[k, j] * half_time_step
-
-            planet_pos[k, j] = planet_intermediate_pos[j] + planet_vel[k, j] * half_time_step
-
-            sat_pos[k, j] = sat_intermediate_pos[j] + sat_vel[k, j] * half_time_step
+            star_pos[k, j] = star_p[j]
+            star_vel[k, j] = star_v[j]
+            planet_pos[k, j] = planet_p[j]
+            planet_vel[k, j] = planet_v[j]
+            sat_pos[k, j] = sat_p[j]
+            sat_vel[k, j] = sat_v[j]
 
 
 @njit(parallel=True, cache=True)
@@ -147,3 +164,23 @@ def transform_to_corotating(position: Array2D, times: Array1D, angular_speed: fl
         corotating_position[i, 1] = sin * x + cos * y
 
     return corotating_position
+
+
+def _transform_to_corotating_numpy(position: Array2D, times: Array1D, angular_speed: float) -> Array2D:
+    """Vectorized transform_to_corotating, used when Numba isn't installed since a Python loop is slow."""
+    angle = -angular_speed * times
+    cos = np.cos(angle)
+    sin = np.sin(angle)
+
+    x = position[:, 0]
+    y = position[:, 1]
+
+    corotating_position = np.empty(dtype=position.dtype, shape=(position.shape[0], 2))
+    corotating_position[:, 0] = cos * x - sin * y
+    corotating_position[:, 1] = sin * x + cos * y
+
+    return corotating_position
+
+
+if not HAS_NUMBA:
+    transform_to_corotating = _transform_to_corotating_numpy

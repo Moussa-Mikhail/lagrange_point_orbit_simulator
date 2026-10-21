@@ -71,15 +71,18 @@ version = "0.1.0"
 source = { editable = "." }
 default-groups = "all"
 dependencies = [
-    { name = "numba" },
     { name = "numpy" },
     { name = "validateddescriptor" },
 ]
 
 [package.optional-dependencies]
 gui = [
+    { name = "numba" },
     { name = "pyqt6" },
     { name = "pyqtgraph" },
+]
+numba = [
+    { name = "numba" },
 ]
 
 [package.dev-dependencies]
@@ -87,7 +90,7 @@ build = [
     { name = "pyinstaller" },
 ]
 dev = [
-    { name = "lagrange-point-orbit-simulator", extra = ["gui"] },
+    { name = "lagrange-point-orbit-simulator", extra = ["gui", "numba"] },
     { name = "refurb" },
     { name = "ruff" },
     { name = "sourcery" },
@@ -96,18 +99,19 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "numba", specifier = ">=0.64.0" },
+    { name = "numba", marker = "extra == 'gui'", specifier = ">=0.64.0" },
+    { name = "numba", marker = "extra == 'numba'", specifier = ">=0.64.0" },
     { name = "numpy", specifier = ">=2.4.2" },
     { name = "pyqt6", marker = "extra == 'gui'", specifier = ">=6.10.2" },
     { name = "pyqtgraph", marker = "extra == 'gui'", specifier = ">=0.14.0" },
     { name = "validateddescriptor", git = "https://github.com/Moussa-Mikhail/validated-descriptor.git" },
 ]
-provides-extras = ["gui"]
+provides-extras = ["numba", "gui"]
 
 [package.metadata.requires-dev]
 build = [{ name = "pyinstaller", specifier = ">=5.11.0" }]
 dev = [
-    { name = "lagrange-point-orbit-simulator", extras = ["gui"] },
+    { name = "lagrange-point-orbit-simulator", extras = ["gui", "numba"] },
     { name = "refurb", specifier = ">=2.3.0" },
     { name = "ruff", specifier = ">=0.15.5" },
     { name = "sourcery", specifier = ">=1.43.0" },
