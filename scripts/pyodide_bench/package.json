@@ -1,0 +1,8 @@
+{
+  "name": "pyodide-bench",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "pyodide": "0.29.5"
+  }
+}
