@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Simulates orbits near Lagrange Points"
 readme = "README.md"
 requires-python = ">=3.13"
-license = "GPL-3.0-onlys"
+license = "GPL-3.0-only"
 
 authors = [
     { name = "Moussa Mikhail", email = "moussamikhail56@gmail.com" },
