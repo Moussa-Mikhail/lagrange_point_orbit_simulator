@@ -13,15 +13,18 @@ from PyQt6.QtWidgets import (
     QErrorMessage,
     QFormLayout,
     QHBoxLayout,
+    QInputDialog,
     QLabel,
     QLineEdit,
     QMainWindow,
+    QMessageBox,
     QPushButton,
     QVBoxLayout,
     QWidget,
 )
 
 from lagrangepointgui.orbit_plotter import Plotter
+from lagrangepointgui.preset_dialogs import PresetFileDialog
 from lagrangepointinputs.parameters import (
     DEFAULT_LAGRANGE_LABEL,
     LABEL_TO_ATTRIBUTE,
@@ -32,11 +35,18 @@ from lagrangepointinputs.parameters import (
 )
 from lagrangepointinputs.presets import read_presets as readPresets
 from lagrangepointinputs.safe_eval import safe_eval as safeEval
+from lagrangepointinputs.user_presets import PresetError, delete_preset, save_preset, user_preset_names
 from lagrangepointsimulator import Simulator
 
 type Input = str | float | None
 
 SIMULATE = "Simulate"
+
+SAVE_PRESET = "Save…"
+
+DELETE_PRESET = "Delete"
+
+EDIT_PRESETS = "Edit…"
 
 TOGGLE_ANIMATION = "Toggle Animation"
 
@@ -54,6 +64,7 @@ class _SimUi(QMainWindow):
         self.inputFields: dict[str, QLineEdit] = {}
         self.presetBox = QComboBox()
         self.textToButton: dict[str, QPushButton] = {}
+        self.textToPresetButton: dict[str, QPushButton] = {}
         self.autoPlotConserved = QCheckBox("Auto Plot Conserved")
 
         self.setWindowTitle("Orbits near Lagrange Points")
@@ -103,15 +114,39 @@ class _SimUi(QMainWindow):
         buttonsLayout.addWidget(self.autoPlotConserved)
 
     def _addPresetBox(self) -> None:
-        presets, _ = readPresets()
-        self.presetBox.addItems(presets)
-
         field = QLineEdit()
         field.setReadOnly(True)
 
         self.presetBox.setLineEdit(field)
+        self.refreshPresets()
 
         self._inputsLayout.addRow("Presets", self.presetBox)
+
+        presetButtonsLayout = QHBoxLayout()
+        for btnText in (SAVE_PRESET, DELETE_PRESET, EDIT_PRESETS):
+            self.textToPresetButton[btnText] = QPushButton(btnText)
+            presetButtonsLayout.addWidget(self.textToPresetButton[btnText])
+
+        self._inputsLayout.addRow(presetButtonsLayout)
+        self.updateDeleteButton()
+
+    def refreshPresets(self, selected: str | None = None) -> None:
+        """Reload the list of presets, keeping the current one selected unless selected is given."""
+        selected = selected or self.presetBox.currentText()
+
+        presets, _ = readPresets()
+        self.presetBox.clear()
+        self.presetBox.addItems(presets)
+        if selected in presets:
+            self.presetBox.setCurrentText(selected)
+
+    def updateDeleteButton(self) -> None:
+        """Only the user's own presets can be deleted."""
+        self.textToPresetButton[DELETE_PRESET].setEnabled(self.presetBox.currentText() in user_preset_names())
+
+    def getInputTexts(self) -> dict[str, str]:
+        """The text of every input field as it is written, e.g. to store it as a preset."""
+        return {label: field.text() for label, field in self.inputFields.items()}
 
     def _addInputFields(self) -> None:
         for paramCategory, params in PARAMETER_GROUPS.items():
@@ -256,6 +291,16 @@ class _SimCtrl:
             button.clicked.connect(action)
 
         self._view.presetBox.activated.connect(self._applySelectedPreset)
+        self._view.presetBox.currentTextChanged.connect(self._view.updateDeleteButton)
+
+        presetButtonTextToAction = {
+            SAVE_PRESET: self._savePreset,
+            DELETE_PRESET: self._deletePreset,
+            EDIT_PRESETS: self._editPresets,
+        }
+
+        for buttonText, action in presetButtonTextToAction.items():
+            self._view.textToPresetButton[buttonText].clicked.connect(action)
 
     def _applySelectedPreset(self) -> None:
         presetName = self._view.presetBox.currentText()
@@ -274,6 +319,54 @@ class _SimCtrl:
 
             field = self._view.inputFields[paramLabel]
             field.setText(str(value))
+
+    def _savePreset(self) -> None:
+        current = self._view.presetBox.currentText()
+        name, accepted = QInputDialog.getText(
+            self._view,
+            "Save preset",
+            "Save the values in the fields as the preset:",
+            text=current if current in user_preset_names() else "",
+        )
+        name = name.strip()
+        if not accepted or not name:
+            return
+
+        if name in readPresets()[0]:
+            kind = "one of your presets" if name in user_preset_names() else "a built-in preset"
+            question = f"'{name}' is {kind}. Replace it?"
+            if QMessageBox.question(self._view, "Replace preset", question) != QMessageBox.StandardButton.Yes:
+                return
+
+        try:
+            save_preset(name, self._view.getInputTexts())
+        except PresetError as e:
+            _displayErrorMessage(str(e))
+            return
+
+        self._view.refreshPresets(name)
+
+    def _deletePreset(self) -> None:
+        name = self._view.presetBox.currentText()
+        if (
+            QMessageBox.question(self._view, "Delete preset", f"Delete the preset '{name}'?")
+            != QMessageBox.StandardButton.Yes
+        ):
+            return
+
+        try:
+            delete_preset(name)
+        except PresetError as e:
+            _displayErrorMessage(str(e))
+            return
+
+        self._view.refreshPresets()
+        self._view.updateDeleteButton()
+
+    def _editPresets(self) -> None:
+        if PresetFileDialog(self._view).exec():
+            self._view.refreshPresets()
+            self._view.updateDeleteButton()
 
     def _addReturnPressed(self) -> None:
         for field in self._view.inputFields.values():
