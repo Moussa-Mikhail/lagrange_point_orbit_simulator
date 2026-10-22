@@ -39,14 +39,14 @@ type Constants = dict[str, float | int]
 
 
 def read_presets() -> tuple[ParamPresets, Constants]:
-    default_params, default_consts = _read_preset(default_presets_path)
-    legacy_params, legacy_consts = _read_preset(legacy_user_presets_path)
-    user_params, user_consts = _read_preset(user_presets_path)
+    default_params, default_consts = read_preset_file(default_presets_path)
+    legacy_params, legacy_consts = read_preset_file(legacy_user_presets_path)
+    user_params, user_consts = read_preset_file(user_presets_path)
 
     return default_params | legacy_params | user_params, default_consts | legacy_consts | user_consts
 
 
-def _read_preset(file_path: Path) -> tuple[ParamPresets, Constants]:
+def read_preset_file(file_path: Path) -> tuple[ParamPresets, Constants]:
     try:
         modified_time = file_path.stat().st_mtime_ns
     except FileNotFoundError:
@@ -79,3 +79,10 @@ def _check_constant_names(constants: dict[str, float | int]) -> None:
                     f'Constant name "{maybe_substring}" is a substring of "{maybe_superstring}". '
                     "Please rename one of them to avoid ambiguous parsing."
                 )
+
+
+def clear_cache() -> None:
+    """Forget the files read so far, e.g. after writing one. The cache is keyed on the modification time, which can be
+    too coarse to tell two quick writes apart.
+    """
+    _read_preset_cached.cache_clear()
