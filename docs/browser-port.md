@@ -16,5 +16,5 @@ A static site that runs the simulator entirely in the browser, hosted on GitHub 
 - **Everything is pinned.** Pyodide is pinned to an exact version and only uses packages from that release. Every other asset comes from the repo or a pinned, versioned CDN URL (Plotly carries an integrity hash).
 
 ## Known limits
-- The browser test (`tests/e2e`) loads the built site in Chromium and checks that simulations, presets, the conserved plots and error reporting work. It doesn't check how the plots look, and it needs network access because the page loads Pyodide and Plotly from their CDNs.
+- The browser test (`tests/e2e`) loads the built site in Chromium and checks that simulations, presets (including saving, editing, exporting and importing them), the conserved plots and error reporting work. It doesn't check how the plots look, and it needs network access because the page loads Pyodide and Plotly from their CDNs.
 - Long runs aren't streamed to the UI and can't be cancelled.

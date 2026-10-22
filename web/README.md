@@ -11,5 +11,8 @@ python -m http.server -d build/site     # then open http://localhost:8000
 - `worker.js`: loads Pyodide (pinned to 0.29.5 from jsdelivr) and the wheels, and answers requests from `app.js`.
 - `integrator.js`: the integrator in JavaScript, about 100x faster than Pyodide running the Python one. The Python
   version in `src/lagrangepointsimulator/numba_funcs.py` is the reference, so keep the two in step.
+- User presets: the text of the user's presets file is kept in `localStorage`. The file itself lives in Pyodide's
+  in-memory file system, where the shared `lagrangepointinputs.user_presets` validates and writes it, and `app.js` sends
+  the stored text back at startup.
 - `py/bridge.py`: the Python the worker runs. It mirrors the parameters of `sim_gui.py` and the data preparation of
   `orbit_plotter.py`, which can't be imported there because they need Qt.

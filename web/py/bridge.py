@@ -11,6 +11,7 @@ from js import Object
 from numpy.linalg import norm
 from pyodide.ffi import to_js
 
+from lagrangepointinputs import user_presets
 from lagrangepointinputs.parameters import (
     DEFAULT_LAGRANGE_LABEL,
     LABEL_TO_ATTRIBUTE,
@@ -34,13 +35,17 @@ def _to_js(obj):
     return to_js(obj, dict_converter=Object.fromEntries)
 
 
-def get_spec():
+def _presets_spec():
     presets, _ = read_presets()
     # field text as the desktop GUI shows it, e.g. "1.0" and not 1
     presets = {
         name: {label: value if label == "bases" else str(value) for label, value in preset.items()}
         for name, preset in presets.items()
     }
+    return {"presets": presets, "userPresets": user_presets.user_preset_names()}
+
+
+def get_spec():
     return _to_js(
         {
             "groups": {
@@ -50,9 +55,39 @@ def get_spec():
             "lagrangeLabel": LAGRANGE_LABEL,
             "lagrangeLabels": list(LAGRANGE_LABELS),
             "defaultLagrangeLabel": DEFAULT_LAGRANGE_LABEL,
-            "presets": presets,
+            **_presets_spec(),
         }
     )
+
+
+# The user's presets file lives in Pyodide's in-memory file system, so it is gone when the page closes. app.js keeps
+# the text in localStorage and sends it back through set_user_text at startup. Each function that changes the presets
+# returns the new text for it to store, or {"error": message}.
+
+
+def _presets_changed(change):
+    try:
+        change()
+    except user_presets.PresetError as e:
+        return _to_js({"error": str(e)})
+
+    return _to_js({"text": user_presets.read_text(), **_presets_spec()})
+
+
+def get_user_text():
+    return user_presets.read_text() or user_presets.EXAMPLE_TEXT
+
+
+def set_user_text(text):
+    return _presets_changed(lambda: user_presets.save_text(text))
+
+
+def save_preset(name, values):
+    return _presets_changed(lambda: user_presets.save_preset(name, values.to_py()))
+
+
+def delete_preset(name):
+    return _presets_changed(lambda: user_presets.delete_preset(name))
 
 
 def _array_step() -> int:

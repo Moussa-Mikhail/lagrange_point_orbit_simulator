@@ -66,14 +66,24 @@ sim.calc_conserved_quantities()
 ## Presets
 
 The GUI and the web page offer presets of the system and satellite parameters. The defaults are in
-`src/lagrangepointinputs/default_presets.toml`, which also explains the format. To add your own presets and
-constants, create `user_presets.toml` in your user config directory:
+`src/lagrangepointinputs/default_presets.toml`, which also explains the format.
+
+You can make your own in the app. **Save…** stores the current values of the fields under a name, **Delete** removes
+one of your presets, and **Edit…** opens the text of your presets file, where you can also define constants and build on
+other presets with `bases`. Built-in presets can't be deleted, but saving one under the same name replaces it until you
+delete your version. Saving from the form rewrites the file, so comments in it are lost. Edit the text to keep them.
+
+On the desktop the presets are in `user_presets.toml` in your user config directory, which you can also edit by hand:
 
 | System  | Directory                                              |
 | ------- | ------------------------------------------------------ |
 | Linux   | `~/.config/lagrange-point-orbit-simulator/`            |
 | macOS   | `~/Library/Application Support/lagrange-point-orbit-simulator/` |
 | Windows | `%APPDATA%\lagrange-point-orbit-simulator\`            |
+
+On the web page they are kept in the browser, so they are per browser and are lost if its site data is cleared.
+**Export** and **Import…** copy them to and from a file in the same format, which moves them between browsers or to the
+desktop app.
 
 Edits are picked up without restarting the app.
 

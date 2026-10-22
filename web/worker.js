@@ -37,6 +37,10 @@ async function init() {
     prepare: pyodide.globals.get("prepare"),
     finish: pyodide.globals.get("finish"),
     conserved: pyodide.globals.get("conserved"),
+    get_user_text: pyodide.globals.get("get_user_text"),
+    set_user_text: pyodide.globals.get("set_user_text"),
+    save_preset: pyodide.globals.get("save_preset"),
+    delete_preset: pyodide.globals.get("delete_preset"),
   };
 
   return bridge.get_spec();
@@ -61,6 +65,11 @@ const handlers = {
     return bridge.finish(rows);
   },
   conserved: () => bridge.conserved(),
+  // the user's presets, see bridge.py
+  getPresetsText: () => bridge.get_user_text(),
+  setPresetsText: (text) => bridge.set_user_text(text),
+  savePreset: ({ name, values }) => bridge.save_preset(name, values),
+  deletePreset: (name) => bridge.delete_preset(name),
 };
 
 self.onmessage = async ({ data: { id, type, payload } }) => {

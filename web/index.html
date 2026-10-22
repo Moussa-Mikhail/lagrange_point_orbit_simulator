@@ -42,6 +42,27 @@
       <div id="energy-plot" class="plot"></div>
     </section>
   </main>
+  <dialog id="save-preset">
+    <form method="dialog">
+      <p>Save the values in the fields as the preset:</p>
+      <input type="text" id="preset-name" required autocomplete="off">
+      <div class="dialog-buttons">
+        <button value="save">Save</button>
+        <button value="cancel" formnovalidate>Cancel</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog id="edit-presets">
+    <p>Your presets and constants, in the format of
+      <a href="https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator/blob/main/src/lagrangepointinputs/default_presets.toml">default_presets.toml</a>.
+      They are kept in this browser.</p>
+    <textarea id="presets-text" rows="18" spellcheck="false"></textarea>
+    <p id="presets-error" class="error" role="alert"></p>
+    <div class="dialog-buttons">
+      <button type="button" id="presets-cancel">Cancel</button>
+      <button type="button" id="presets-save">Save</button>
+    </div>
+  </dialog>
   <dialog id="error">
     <p id="error-message"></p>
     <form method="dialog"><button>OK</button></form>

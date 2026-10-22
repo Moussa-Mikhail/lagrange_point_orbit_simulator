@@ -75,6 +75,13 @@ select option { color: var(--text); background-color: var(--panel); }
 dialog { color: var(--text); background: var(--panel); border: 1px solid var(--border); border-radius: 6px; max-width: 480px; }
 dialog::backdrop { background: rgba(0, 0, 0, 0.6); }
 #error-message { white-space: pre-wrap; }
+#edit-presets { width: min(720px, 94vw); max-width: none; }
+#presets-text { width: 100%; font: 13px/1.4 ui-monospace, monospace; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 3px; }
+.error { color: #e5604d; white-space: pre-wrap; min-height: 1.4em; margin: 6px 0; }
+.dialog-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
+/* Save comes first in the markup so that Enter in the name field saves */
+#save-preset .dialog-buttons { flex-direction: row-reverse; justify-content: flex-start; }
+#preset-buttons { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
 
 @media (max-width: 480px) {
   #action-buttons button { padding: 5px 6px; font-size: 13px; }

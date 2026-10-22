@@ -39,6 +39,10 @@ const ANIMATION_INTERVAL_MS = 33; // 30 fps
 let spec;
 const inputFields = {};
 let presetSelect;
+const presetButtons = {};
+
+// The text of the user's presets file is kept here. The worker's file system doesn't outlast the page.
+const PRESETS_STORAGE_KEY = "userPresets";
 
 let plotted = false;
 let calculating = false;
@@ -65,9 +69,12 @@ function buildForm() {
   const presetLabel = document.createElement("label");
   presetLabel.textContent = "Presets";
   presetSelect = document.createElement("select");
-  for (const name of Object.keys(spec.presets)) presetSelect.add(new Option(name));
-  presetSelect.addEventListener("change", () => applyPreset(presetSelect.value));
-  form.append(presetLabel, presetSelect);
+  presetSelect.addEventListener("change", () => {
+    applyPreset(presetSelect.value);
+    updateDeleteButton();
+  });
+  form.append(presetLabel, presetSelect, buildPresetButtons());
+  refreshPresets();
 
   for (const [groupName, params] of Object.entries(spec.groups)) {
     const heading = document.createElement("h2");
@@ -101,12 +108,143 @@ function buildForm() {
     simulate();
   });
   form.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
+    // not on the buttons, where Enter has to press them
+    if (event.key === "Enter" && event.target.tagName !== "BUTTON") {
       event.preventDefault();
       simulate();
     }
   });
 }
+
+function buildPresetButtons() {
+  const row = document.createElement("div");
+  row.id = "preset-buttons";
+
+  const actions = {
+    save: ["Save as…", savePreset],
+    delete: ["Delete", deletePreset],
+    edit: ["Edit…", editPresets],
+    export: ["Export", exportPresets],
+    import: ["Import…", () => importInput.click()],
+  };
+  for (const [key, [text, action]] of Object.entries(actions)) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = text;
+    button.addEventListener("click", action);
+    presetButtons[key] = button;
+    row.append(button);
+  }
+
+  const importInput = document.createElement("input");
+  importInput.type = "file";
+  importInput.id = "import-presets";
+  importInput.accept = ".toml,text/plain";
+  importInput.hidden = true;
+  importInput.addEventListener("change", async () => {
+    const [file] = importInput.files;
+    importInput.value = "";
+    if (file) await importPresets(await file.text(), file.name);
+  });
+  row.append(importInput);
+
+  return row;
+}
+
+// Reload the list of presets, keeping the current one selected unless selected is given.
+function refreshPresets(selected = presetSelect.value) {
+  presetSelect.replaceChildren(...Object.keys(spec.presets).map((name) => new Option(name)));
+  if (selected in spec.presets) presetSelect.value = selected;
+  updateDeleteButton();
+}
+
+// Only the user's own presets can be deleted.
+function updateDeleteButton() {
+  presetButtons.delete.disabled = !spec.userPresets.includes(presetSelect.value);
+}
+
+// result is what the worker returns after the presets changed: {error} or {text, presets, userPresets}
+function adoptPresets(result) {
+  spec.presets = result.presets;
+  spec.userPresets = result.userPresets;
+  try {
+    localStorage.setItem(PRESETS_STORAGE_KEY, result.text);
+  } catch {
+    // storage can be blocked, the presets then last until the page closes
+  }
+}
+
+async function changePresets(task, selected) {
+  const result = await task().catch((error) => ({ error: error.message }));
+  if (result.error) {
+    showError(result.error);
+    return false;
+  }
+  adoptPresets(result);
+  if (presetSelect) refreshPresets(selected);
+  return true;
+}
+
+async function savePreset() {
+  const input = $("preset-name");
+  input.value = spec.userPresets.includes(presetSelect.value) ? presetSelect.value : "";
+  const dialog = $("save-preset");
+  dialog.returnValue = "";
+  dialog.showModal();
+  input.select();
+
+  await new Promise((resolve) => dialog.addEventListener("close", resolve, { once: true }));
+  const name = input.value.trim();
+  if (dialog.returnValue !== "save" || !name) return;
+
+  if (name in spec.presets) {
+    const kind = spec.userPresets.includes(name) ? "one of your presets" : "a built-in preset";
+    if (!confirm(`'${name}' is ${kind}. Replace it?`)) return;
+  }
+
+  const values = Object.fromEntries(Object.entries(inputFields).map(([label, field]) => [label, field.value]));
+  await changePresets(() => request("savePreset", { name, values }), name);
+}
+
+async function deletePreset() {
+  const name = presetSelect.value;
+  if (!confirm(`Delete the preset '${name}'?`)) return;
+  await changePresets(() => request("deletePreset", name));
+}
+
+async function editPresets() {
+  $("presets-text").value = await request("getPresetsText");
+  $("presets-error").textContent = "";
+  $("edit-presets").showModal();
+}
+
+async function savePresetsText() {
+  const result = await request("setPresetsText", $("presets-text").value).catch((error) => ({ error: error.message }));
+  if (result.error) {
+    $("presets-error").textContent = result.error;
+    return;
+  }
+  adoptPresets(result);
+  refreshPresets();
+  $("edit-presets").close();
+}
+
+async function exportPresets() {
+  const text = await request("getPresetsText");
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+  link.download = "user_presets.toml";
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+async function importPresets(text, fileName) {
+  if (!confirm(`Replace your presets with the contents of ${fileName}?`)) return;
+  await changePresets(() => request("setPresetsText", text));
+}
+
+$("presets-save").addEventListener("click", savePresetsText);
+$("presets-cancel").addEventListener("click", () => $("edit-presets").close());
 
 function applyPreset(name) {
   const preset = spec.presets[name];
@@ -380,6 +518,19 @@ BUTTONS.toggleConserved.addEventListener("click", toggleConservedPlots);
 
 try {
   spec = await request("init");
+
+  let stored = null;
+  try {
+    stored = localStorage.getItem(PRESETS_STORAGE_KEY);
+  } catch {
+    // storage can be blocked
+  }
+  if (stored) {
+    const loaded = await request("setPresetsText", stored);
+    if (loaded.error) showError(`Your saved presets could not be loaded.\n${loaded.error}`);
+    else adoptPresets(loaded);
+  }
+
   buildForm();
   setButtons(true);
   setStatus("Ready");

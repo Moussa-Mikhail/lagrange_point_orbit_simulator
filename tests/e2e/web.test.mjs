@@ -111,3 +111,90 @@ test("an invalid expression is reported without breaking the page", async () => 
   await simulate();
   assert.equal(await errorMessage(), null);
 });
+
+// User presets
+
+const presetNames = () => page.$$eval("#inputs select:first-of-type option", (options) => options.map((o) => o.value));
+
+async function reload() {
+  await page.reload();
+  await page.waitForFunction(() => !document.getElementById("simulate").disabled);
+}
+
+async function savePresetAs(name) {
+  await page.click("text=Save as…");
+  await page.fill("#preset-name", name);
+  await page.keyboard.press("Enter");
+  await page.waitForFunction((name) => [...document.querySelectorAll("#inputs select:first-of-type option")].some((o) => o.value === name), name);
+}
+
+async function deletePreset(name) {
+  await page.selectOption("#inputs select:first-of-type", name);
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.click("text=Delete");
+  await page.waitForFunction((name) => ![...document.querySelectorAll("#inputs select:first-of-type option")].some((o) => o.value === name), name);
+}
+
+test("a saved preset applies, survives a reload and can be deleted", async () => {
+  await page.selectOption("#inputs select:first-of-type", "Default");
+  assert.equal(await page.isDisabled("text=Delete"), true, "built-in presets can't be deleted");
+
+  await page.fill("#field-star-mass", "sun_mass/3");
+  await page.fill("#field-initial-speed", "0.95");
+  await savePresetAs("Mine");
+  assert.equal(await page.inputValue("#inputs select:first-of-type"), "Mine");
+  assert.equal(await page.isDisabled("text=Delete"), false);
+
+  await reload();
+  assert.ok((await presetNames()).includes("Mine"));
+  await page.selectOption("#inputs select:first-of-type", "Default");
+  assert.equal(await page.inputValue("#field-star-mass"), "sun_mass");
+  await page.selectOption("#inputs select:first-of-type", "Mine");
+  assert.equal(await page.inputValue("#field-star-mass"), "sun_mass/3");
+  assert.equal(await page.inputValue("#field-initial-speed"), "0.95");
+
+  await simulate();
+  assert.equal(await errorMessage(), null);
+
+  await deletePreset("Mine");
+  await reload();
+  assert.ok(!(await presetNames()).includes("Mine"));
+});
+
+test("the presets can be edited as text, and invalid text is refused", async () => {
+  await page.click("text=Edit…");
+  await page.fill("#presets-text", '[presets]\n"Typed" = { bases = ["Nope"] }\n');
+  await page.click("#presets-save");
+  await page.waitForFunction(() => document.getElementById("presets-error").textContent);
+  assert.match(await page.textContent("#presets-error"), /unknown base 'Nope'/);
+  assert.equal(await page.isVisible("#edit-presets"), true);
+
+  await page.fill("#presets-text", '[constants]\nmy_mass = 3.0e30\n[presets]\n"Typed" = { bases = ["Default"], "star mass" = "my_mass" }\n');
+  await page.click("#presets-save");
+  await page.waitForSelector("#edit-presets", { state: "hidden" });
+
+  await page.selectOption("#inputs select:first-of-type", "Typed");
+  assert.equal(await page.inputValue("#field-star-mass"), "my_mass");
+  await simulate();
+  assert.equal(await errorMessage(), null, "the constant from the edited text can be used");
+
+  await deletePreset("Typed");
+});
+
+test("the presets can be exported and imported", async () => {
+  await page.fill("#field-star-mass", "2*sun_mass");
+  await savePresetAs("Exported");
+
+  const [download] = await Promise.all([page.waitForEvent("download"), page.click("#preset-buttons >> text=Export")]);
+  assert.equal(download.suggestedFilename(), "user_presets.toml");
+  const text = await readFile(await download.path(), "utf8");
+  assert.match(text, /"Exported"/);
+
+  await deletePreset("Exported");
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.setInputFiles("#import-presets", { name: "user_presets.toml", mimeType: "text/plain", buffer: Buffer.from(text) });
+  await page.waitForFunction(() => [...document.querySelectorAll("#inputs select:first-of-type option")].some((o) => o.value === "Exported"));
+
+  await deletePreset("Exported");
+});
