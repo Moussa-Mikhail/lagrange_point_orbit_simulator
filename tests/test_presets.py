@@ -115,11 +115,76 @@ def test_a_preset_that_is_a_base_cannot_be_deleted(user_file: Path) -> None:
         user_presets.delete_preset("A")
 
 
-def test_the_serialized_file_parses_back_identically() -> None:
-    params = {'Odd "name" \\ é': {"bases": ["Default"], "star mass": "1e30", "initial speed": 0.5}}
-    constants = {"my_const": 1.5, "other_const": 3}
+COMMENTED = """\
+# my presets
+[constants]
+my_mass = 2.0  # kg, roughly
 
-    assert user_presets.parse(user_presets.serialize(params, constants)) == (params, constants)
+[presets]
+# the first one
+"A" = { "star mass" = "1" }
+"B" = { bases = ["A"], "initial speed" = 0.5 }
+# trailing comment
+
+[other_notes]
+"""
+
+
+def test_saving_keeps_comments_and_replaces_only_its_own_line(user_file: Path) -> None:
+    user_file.write_text(COMMENTED.replace("\n[other_notes]\n", ""))
+
+    user_presets.save_preset("A", {"star mass": "2"})
+    user_presets.save_preset("C", {"star mass": "3"})
+
+    lines = user_file.read_text().splitlines()
+    assert lines[:6] == COMMENTED.splitlines()[:6]
+    assert lines[6] == '"A" = { "star mass" = "2" }'
+    assert lines[7] == '"B" = { bases = ["A"], "initial speed" = 0.5 }'
+    assert lines[8] == '"C" = { "star mass" = "3" }'
+    assert lines[9:] == ["# trailing comment"]
+    assert user_presets.user_preset_names() == ["A", "B", "C"]
+
+
+def test_a_new_section_is_added_when_there_is_none(user_file: Path) -> None:
+    user_file.write_text("# just constants\n[constants]\nmy_mass = 2.0\n")
+
+    user_presets.save_preset("A", {"star mass": "my_mass"})
+
+    assert (
+        user_file.read_text()
+        == '# just constants\n[constants]\nmy_mass = 2.0\n\n[presets]\n"A" = { "star mass" = "my_mass" }\n'
+    )
+
+
+def test_deleting_keeps_comments(user_file: Path) -> None:
+    user_file.write_text(COMMENTED.replace("\n[other_notes]\n", ""))
+
+    user_presets.delete_preset("B")
+
+    assert user_file.read_text() == COMMENTED.replace("\n[other_notes]\n", "").replace(
+        '"B" = { bases = ["A"], "initial speed" = 0.5 }\n', ""
+    )
+
+
+def test_unusual_names_roundtrip(user_file: Path) -> None:
+    name = 'Odd "name" \\ é'
+    user_presets.save_preset(name, {"star mass": "1"})
+    user_presets.save_preset(name, {"star mass": "2"})
+
+    assert user_presets.user_preset_names() == [name]
+    assert presets.read_presets()[0][name] == {"star mass": "2"}
+
+
+def test_a_preset_defined_as_a_table_is_not_changed_behind_the_users_back(user_file: Path) -> None:
+    text = '[presets."T"]\n"star mass" = "1"\n'
+    user_file.write_text(text)
+
+    with pytest.raises(user_presets.PresetError, match="Use Edit"):
+        user_presets.save_preset("T", {"star mass": "2"})
+    with pytest.raises(user_presets.PresetError, match="Use Edit"):
+        user_presets.delete_preset("T")
+
+    assert user_file.read_text() == text
 
 
 def test_the_example_text_is_valid() -> None:

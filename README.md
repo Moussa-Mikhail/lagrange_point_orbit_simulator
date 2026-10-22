@@ -71,7 +71,7 @@ The GUI and the web page offer presets of the system and satellite parameters. T
 You can make your own in the app. **Save…** stores the current values of the fields under a name, **Delete** removes
 one of your presets, and **Edit…** opens the text of your presets file, where you can also define constants and build on
 other presets with `bases`. Built-in presets can't be deleted, but saving one under the same name replaces it until you
-delete your version. Saving from the form rewrites the file, so comments in it are lost. Edit the text to keep them.
+delete your version.
 
 On the desktop the presets are in `user_presets.toml` in your user config directory, which you can also edit by hand:
 

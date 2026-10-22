@@ -1,7 +1,7 @@
 """Validates, writes and edits the user's presets file, for the GUI and the web UI.
 
-The file is user_presets.toml in the user config directory, see presets.py. Presets that are saved from the form
-rewrite the file in a fixed layout, so comments in it are lost. Editing the text keeps whatever is written.
+The file is user_presets.toml in the user config directory, see presets.py. Saving or deleting a preset changes only
+its own line, so the rest of the file, including comments, is kept.
 """
 
 import json
@@ -62,48 +62,99 @@ def save_text(text: str) -> None:
 
 
 def save_preset(name: str, values: dict[str, str]) -> None:
-    """Store values, which map parameter labels to field text, as the user preset name."""
+    """Store values, which map parameter labels to field text, as the user preset name.
+
+    An existing line for the preset is replaced, otherwise the preset is added after the others.
+    """
     name = name.strip()
     if not name:
         msg = "The preset needs a name."
         raise PresetError(msg)
 
-    params, constants = parse(read_text())
-    params[name] = {**values}
-    save_text(serialize(params, constants))
+    text = read_text()
+    existing = parse(text)[0]
+    line = _preset_line(name, {**values})
+
+    lines = text.splitlines()
+    index = _find_preset_line(lines, name)
+    if index is not None:
+        lines[index] = line
+    elif name in existing:
+        raise PresetError(_NOT_EDITABLE.format(name=name))
+    else:
+        _insert_preset_line(lines, line)
+
+    save_text("\n".join(lines) + "\n")
 
 
 def delete_preset(name: str) -> None:
     """Remove the user preset name. A default preset it overrode shows again."""
-    params, constants = parse(read_text())
+    text = read_text()
+    params = parse(text)[0]
     if name not in params:
         msg = f"'{name}' is not one of your presets."
         raise PresetError(msg)
 
-    del params[name]
     overrides_default = name in presets.read_preset_file(presets.default_presets_path)[0]
-    users = [other for other, preset in params.items() if name in _bases(preset)]
+    users = [other for other, preset in params.items() if other != name and name in _bases(preset)]
     if users and not overrides_default:
         msg = f"'{name}' can't be deleted because it is a base of {', '.join(f"'{u}'" for u in users)}."
         raise PresetError(msg)
 
-    save_text(serialize(params, constants))
+    lines = text.splitlines()
+    index = _find_preset_line(lines, name)
+    if index is None:
+        raise PresetError(_NOT_EDITABLE.format(name=name))
+
+    del lines[index]
+    save_text("\n".join(lines) + "\n")
 
 
-def serialize(params: presets.ParamPresets, constants: presets.Constants) -> str:
-    lines = ["# Written by the app. Comments are not kept when presets are saved from the form.", ""]
+_NOT_EDITABLE = "'{name}' isn't written as a single line under [presets], so the app can't change it. Use Edit instead."
+_SECTION = re.compile(r"\s*\[\s*(?P<name>[^\]]*?)\s*\]\s*(#.*)?")
+_PRESET_KEY = re.compile(r"""\s*(?P<key>"(?:[^"\\]|\\.)*"|'[^']*'|[A-Za-z0-9_-]+)\s*=\s*\{""")
 
-    if constants:
-        lines.append("[constants]")
-        lines.extend(f"{name} = {value!r}" for name, value in constants.items())
+
+def _preset_lines(lines: list[str]) -> list[tuple[int, str]]:
+    """The (index, name) of each line of the form "name" = { ... } in the [presets] section."""
+    found = []
+    section = ""
+    for index, line in enumerate(lines):
+        if match := _SECTION.fullmatch(line):
+            section = match["name"]
+        elif section == "presets" and (match := _PRESET_KEY.match(line)):
+            try:
+                (name,) = tomllib.loads(f"{match['key']} = 0")
+            except tomllib.TOMLDecodeError:
+                continue
+            found.append((index, name))
+
+    return found
+
+
+def _find_preset_line(lines: list[str], name: str) -> int | None:
+    return next((index for index, found in _preset_lines(lines) if found == name), None)
+
+
+def _insert_preset_line(lines: list[str], line: str) -> None:
+    """Add line after the last preset in the [presets] section, or in a new section at the end."""
+    if found := _preset_lines(lines):
+        lines.insert(found[-1][0] + 1, line)
+        return
+
+    for index, text in enumerate(lines):
+        if (match := _SECTION.fullmatch(text)) and match["name"] == "presets":
+            lines.insert(index + 1, line)
+            return
+
+    if lines and lines[-1].strip():
         lines.append("")
+    lines.extend(["[presets]", line])
 
-    lines.append("[presets]")
-    for name, preset in params.items():
-        fields = ", ".join(f"{_quote(label)} = {_toml_value(value)}" for label, value in _bases_first(preset))
-        lines.append(f"{_quote(name)} = {{ {fields} }}")
 
-    return "\n".join(lines) + "\n"
+def _preset_line(name: str, preset: dict) -> str:
+    fields = ", ".join(f"{_quote(label)} = {_toml_value(value)}" for label, value in _bases_first(preset))
+    return f"{_quote(name)} = {{ {fields} }}"
 
 
 def parse(text: str) -> tuple[presets.ParamPresets, presets.Constants]:
