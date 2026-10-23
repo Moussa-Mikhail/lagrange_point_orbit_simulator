@@ -1,7 +1,9 @@
 import sys
+import traceback
 from collections.abc import Callable
 from typing import cast
 
+import numpy as np
 from PyQt6.QtCore import QObject, QRunnable, Qt, QThreadPool, pyqtSignal
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
@@ -412,7 +414,30 @@ def _displayErrorMessage(message: str) -> None:
     errorMsg.exec()
 
 
+def _selfTest(view: _SimUi) -> None:
+    """Check that the app has what it needs to work. Used to smoke test packaged builds."""
+    if view.presetBox.count() == 0:
+        msg = "no presets were loaded"
+        raise RuntimeError(msg)
+
+    sim = Simulator()
+    for attribute, value in _translateInputs(view.getInputs()).items():
+        setattr(sim, attribute, value)
+
+    sim.num_years = 0.1
+    sim.simulate()
+
+    if not np.isfinite(sim.sat_pos).all():
+        msg = "simulation produced non-finite positions"
+        raise RuntimeError(msg)
+
+
 def main() -> None:
+    # The flag is for builds without a console, so the result is only reported through the exit code.
+    selfTesting = "--self-test" in sys.argv
+    if selfTesting:
+        sys.argv.remove("--self-test")
+
     simApp = QApplication(sys.argv)
     simApp.setFont(QFont("Arial", 13))
     simApp.setStyle("fusion")
@@ -420,6 +445,16 @@ def main() -> None:
     sim = Simulator()
     plotter = Plotter(sim)
     view = _SimUi(plotter)
+
+    if selfTesting:
+        try:
+            _selfTest(view)
+        except Exception:  # noqa: BLE001
+            traceback.print_exc()
+            sys.exit(1)
+
+        sys.exit(0)
+
     view.show()
 
     _ = _SimCtrl(sim, view)
