@@ -115,7 +115,7 @@ The linters, type check and tests also run in CI on every push and pull request,
 let the hook) after changing `pyproject.toml` or `uv.lock`.
 
 To build the desktop app locally run `./build.sh` (`build.bat` on Windows). The result is in `dist/sim_gui`, and
-`dist/sim_gui/sim_gui --self-test` checks the build. A release is made by pushing a tag like `v0.1.1`.
+`dist/sim_gui/sim_gui --self-test` checks the build. Releases are made with `scripts/release.py`, see [docs/RELEASING.md](docs/RELEASING.md).
 
 Layout:
 

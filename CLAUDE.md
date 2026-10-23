@@ -21,6 +21,7 @@ Python three-body / Lagrange-point simulator.
 - The desktop app must keep working. Changes to the core must be backward compatible.
 - Prefer FOSS dependencies. Report the license of any new dependency.
 - Do not add dependencies or change the packaging without saying so.
+- Versions and releases: see docs/RELEASING.md. Never move or delete a published tag.
 
 ## Working style
 - If these instructions conflict with what you find in the repo, stop and ask instead of guessing.
