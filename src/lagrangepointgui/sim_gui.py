@@ -22,35 +22,17 @@ from PyQt6.QtWidgets import (
 )
 
 from lagrangepointgui.orbit_plotter import Plotter
+from lagrangepointinputs.parameters import (
+    DEFAULT_LAGRANGE_LABEL,
+    LABEL_TO_ATTRIBUTE,
+    LAGRANGE_LABEL,
+    LAGRANGE_LABELS,
+    PARAMETER_GROUPS,
+    Parameter,
+)
+from lagrangepointinputs.presets import read_presets as readPresets
+from lagrangepointinputs.safe_eval import safe_eval as safeEval
 from lagrangepointsimulator import Simulator
-from lagrangepointsimulator.presets import read_presets as readPresets
-from lagrangepointsimulator.safe_eval import safe_eval as safeEval
-
-LAGRANGE_LABEL = "Lagrange label"
-
-type Params = dict[str, tuple[str, str]]
-"""GUI label to default value and attribute name"""
-
-# parameter label in gui: (default value, attribute name in Simulator)
-SIMULATION_PARAMS: Params = {
-    "simulation time": ("10.0", "num_years"),
-    "time step": ("1.0", "time_step"),
-}
-
-SATELLITE_PARAMS: Params = {
-    "perturbation size": ("0.0", "perturbation_size"),
-    "perturbation angle": ("", "perturbation_angle"),
-    "initial speed": ("1.0", "speed"),
-    "initial velocity angle": ("", "vel_angle"),
-}
-
-LAGRANGE_PARAM: Params = {LAGRANGE_LABEL: ("L4", "lagrange_label")}
-
-SYSTEM_PARAMS: Params = {
-    "star mass": ("sun_mass", "star_mass"),
-    "planet mass": ("earth_mass", "planet_mass"),
-    "planet distance": ("1.0", "planet_distance"),
-}
 
 type Input = str | float | None
 
@@ -61,29 +43,6 @@ TOGGLE_ANIMATION = "Toggle Animation"
 PLOT_CONSERVED = "Plot Conserved Quantities"
 
 TOGGLE_CONSERVED = "Toggle Conserved Quantity Plots"
-
-
-# noinspection PyPep8Naming
-def _addUnits(paramName: str) -> str:
-    if paramName.endswith("mass"):
-        return f"{paramName} (kg)"
-
-    if paramName.endswith("angle"):
-        return f"{paramName} (deg)"
-
-    if paramName == "simulation time":
-        return f"{paramName} (years)"
-
-    if paramName == "time step":
-        return f"{paramName} (hours)"
-
-    if paramName in {"perturbation size", "planet distance"}:
-        return f"{paramName} (AU)"
-
-    if paramName == "initial speed":
-        return f"{paramName} (x planet speed)"
-
-    return paramName
 
 
 class _SimUi(QMainWindow):
@@ -155,22 +114,20 @@ class _SimUi(QMainWindow):
         self._inputsLayout.addRow("Presets", self.presetBox)
 
     def _addInputFields(self) -> None:
-        self._addParams("Simulation Parameters", SIMULATION_PARAMS)
-        self._addParams("System Parameters", SYSTEM_PARAMS)
-        self._addParams("Satellite Parameters", SATELLITE_PARAMS)
+        for paramCategory, params in PARAMETER_GROUPS.items():
+            self._addParams(paramCategory, params)
 
         self._addLagrangeLabel()
 
-    def _addParams(self, paramCategory: str, params: Params) -> None:
+    def _addParams(self, paramCategory: str, params: tuple[Parameter, ...]) -> None:
         argLabel = QLabel(paramCategory)
         argLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._inputsLayout.addRow(argLabel)
 
-        for paramName, (defaultValue, _) in params.items():
-            fieldLabel = _addUnits(paramName)
-            field = QLineEdit(defaultValue)
-            self.inputFields[paramName] = field
-            self._inputsLayout.addRow(fieldLabel, field)
+        for param in params:
+            field = QLineEdit(param.default)
+            self.inputFields[param.label] = field
+            self._inputsLayout.addRow(param.display_label, field)
 
     def _addToggleConservedPlotsButton(self) -> None:
         conservedPlotsButton = QPushButton(TOGGLE_CONSERVED)
@@ -182,13 +139,12 @@ class _SimUi(QMainWindow):
         self.textToButton[TOGGLE_CONSERVED] = conservedPlotsButton
 
     def _addLagrangeLabel(self) -> None:
-        defaultValue = LAGRANGE_PARAM[LAGRANGE_LABEL][0]
         field = QLineEdit()
         field.setReadOnly(True)
 
         box = QComboBox()
-        box.addItems([f"L{i}" for i in range(1, 6)])
-        box.setCurrentText(defaultValue)
+        box.addItems(LAGRANGE_LABELS)
+        box.setCurrentText(DEFAULT_LAGRANGE_LABEL)
         box.setLineEdit(field)
 
         self.inputFields[LAGRANGE_LABEL] = field
@@ -258,14 +214,8 @@ class _SimUi(QMainWindow):
         return inputs
 
 
-ALL_PARAMS = SIMULATION_PARAMS | SATELLITE_PARAMS | LAGRANGE_PARAM | SYSTEM_PARAMS
-
-# used to translate param labels used in gui to attribute names in simulator class
-PARAM_LABEL_TO_ATTRIBUTE_NAME = {paramLabel: attribute for paramLabel, (_, attribute) in ALL_PARAMS.items()}
-
-
 def _translateInputs(inputs: dict[str, Input]) -> dict[str, Input]:
-    return {PARAM_LABEL_TO_ATTRIBUTE_NAME[label]: v for label, v in inputs.items()}
+    return {LABEL_TO_ATTRIBUTE[label]: v for label, v in inputs.items()}
 
 
 class WorkerSignals(QObject):
@@ -353,7 +303,7 @@ class _SimCtrl:
         except (TypeError, ValueError) as e:
             msg = str(e)
             # replace attribute names with parameter labels
-            for paramLabel, attributeName in PARAM_LABEL_TO_ATTRIBUTE_NAME.items():
+            for paramLabel, attributeName in LABEL_TO_ATTRIBUTE.items():
                 msg = msg.replace(attributeName, paramLabel)
 
             _displayErrorMessage(msg)

@@ -1,7 +1,7 @@
 import pytest
 
+from lagrangepointinputs.safe_eval import safe_eval
 from lagrangepointsimulator.constants import SUN_MASS
-from lagrangepointsimulator.safe_eval import safe_eval
 
 
 @pytest.mark.parametrize(

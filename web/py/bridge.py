@@ -11,38 +11,18 @@ from js import Object
 from numpy.linalg import norm
 from pyodide.ffi import to_js
 
+from lagrangepointinputs.parameters import (
+    DEFAULT_LAGRANGE_LABEL,
+    LABEL_TO_ATTRIBUTE,
+    LAGRANGE_LABEL,
+    LAGRANGE_LABELS,
+    PARAMETER_GROUPS,
+)
+from lagrangepointinputs.presets import read_presets
+from lagrangepointinputs.safe_eval import safe_eval
 from lagrangepointsimulator import Simulator
 from lagrangepointsimulator.constants import AU, HOURS, YEARS, G
 from lagrangepointsimulator.numba_funcs import transform_to_corotating
-from lagrangepointsimulator.presets import read_presets
-from lagrangepointsimulator.safe_eval import safe_eval
-
-LAGRANGE_LABEL = "Lagrange label"
-
-# group: (parameter label, default value, attribute name in Simulator, unit)
-GROUPS = {
-    "Simulation Parameters": [
-        ("simulation time", "10.0", "num_years", "years"),
-        ("time step", "1.0", "time_step", "hours"),
-    ],
-    "System Parameters": [
-        ("star mass", "sun_mass", "star_mass", "kg"),
-        ("planet mass", "earth_mass", "planet_mass", "kg"),
-        ("planet distance", "1.0", "planet_distance", "AU"),
-    ],
-    "Satellite Parameters": [
-        ("perturbation size", "0.0", "perturbation_size", "AU"),
-        ("perturbation angle", "", "perturbation_angle", "deg"),
-        ("initial speed", "1.0", "speed", "x planet speed"),
-        ("initial velocity angle", "", "vel_angle", "deg"),
-    ],
-}
-
-LAGRANGE_LABELS = [f"L{i}" for i in range(1, 6)]
-DEFAULT_LAGRANGE_LABEL = "L4"
-
-LABEL_TO_ATTRIBUTE = {label: attr for params in GROUPS.values() for label, _, attr, _ in params}
-LABEL_TO_ATTRIBUTE[LAGRANGE_LABEL] = "lagrange_label"
 
 MAX_POINTS = 10**5
 
@@ -64,11 +44,11 @@ def get_spec():
     return _to_js(
         {
             "groups": {
-                name: [{"label": label, "default": default, "unit": unit} for label, default, _, unit in params]
-                for name, params in GROUPS.items()
+                name: [{"label": p.label, "default": p.default, "unit": p.unit} for p in params]
+                for name, params in PARAMETER_GROUPS.items()
             },
             "lagrangeLabel": LAGRANGE_LABEL,
-            "lagrangeLabels": LAGRANGE_LABELS,
+            "lagrangeLabels": list(LAGRANGE_LABELS),
             "defaultLagrangeLabel": DEFAULT_LAGRANGE_LABEL,
             "presets": presets,
         }

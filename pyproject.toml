@@ -41,7 +41,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/lagrangepointsimulator", "src/lagrangepointgui"]
+packages = ["src/lagrangepointsimulator", "src/lagrangepointinputs", "src/lagrangepointgui"]
 
 [tool.uv.sources]
 validateddescriptor = { git = "https://github.com/Moussa-Mikhail/validated-descriptor.git" }

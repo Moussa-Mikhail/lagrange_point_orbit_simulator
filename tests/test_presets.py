@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from lagrangepointsimulator import presets
-from lagrangepointsimulator.safe_eval import safe_eval
+from lagrangepointinputs import presets
+from lagrangepointinputs.safe_eval import safe_eval
 
 
 @pytest.fixture
