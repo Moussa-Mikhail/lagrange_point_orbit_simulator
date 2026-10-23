@@ -20,10 +20,29 @@ type PlotArgs = dict[str, str | int]
 type AnimatePlotFunc = Callable[[], None]
 
 
+# pyqtgraph's default grey, (150, 150, 150), is dim on the black background
+TEXT_COLOR = "#b3b3b3"
+LEGEND_TEXT_COLOR = "#cccccc"
+
+
+def _style_text(plot: pg.PlotWidget, title: str) -> None:
+    """Brighten the title and the text of the axes. Call it after the axes are labelled."""
+    plot.setTitle(title, color=TEXT_COLOR)
+    for side in ("bottom", "left"):
+        axis = plot.getAxis(side)
+        axis.setTextPen(TEXT_COLOR)
+        # the label keeps the colour it was given, so give it again
+        axis.setLabel(axis.labelText, units=axis.labelUnits, unitPrefix=axis.labelUnitPrefix, color=TEXT_COLOR)
+
+
 def _create_orbit_plot(title: str) -> pg.PlotWidget:
     plot = pg.PlotWidget(title=title)
     plot.setLabel("bottom", "x", units="AU")
     plot.setLabel("left", "y", units="AU")
+    # no "mAU": a difference of 1 on x and on y should be the same length, and read the same
+    for side in ("bottom", "left"):
+        plot.getAxis(side).enableAutoSIPrefix(False)
+    _style_text(plot, title)
 
     return plot
 
@@ -35,19 +54,37 @@ COMPONENT_TO_PLOT_ARGS: dict[str, tuple[int, str]] = {
 }
 
 
+# A 1 px line is too thin to see in a legend, and the blue one is too dark
+LEGEND_SWATCH_WIDTH = 4
+
+
+def _add_legend_entry(legend: pg.LegendItem, name: str, color: str) -> None:
+    legend.addItem(pg.PlotDataItem(pen=pg.mkPen(color, width=LEGEND_SWATCH_WIDTH)), name)
+
+
+def _add_body_legend_entry(legend: pg.LegendItem, name: str, color: str) -> None:
+    """A dot like the one that marks the body in the plot."""
+    legend.addItem(pg.ScatterPlotItem(symbol="o", size=10, pen=color, brush=color), name)
+
+
 def _plot_components(plot: pg.PlotWidget, arr: Array2D, times: Array1D) -> None:
+    legend: pg.LegendItem = plot.addLegend(labelTextColor=LEGEND_TEXT_COLOR)
+    legend.clear()
     for component, (idx, pen) in COMPONENT_TO_PLOT_ARGS.items():
         arr_component = arr[:, idx]
-        plot.plot(times, arr_component, name=component, pen=pen)
+        plot.plot(times, arr_component, pen=pen)
+        _add_legend_entry(legend, component, pen)
 
 
 def _create_conserved_plot(quantity_name: str) -> pg.PlotWidget:
     """Initialize the plot axes and title for the conserved quantities plots."""
-    plot = pg.PlotWidget(title=f"Relative Change in {quantity_name} vs Time")
+    title = f"Relative Change in {quantity_name} vs Time"
+    plot = pg.PlotWidget(title=title)
 
     plot.setLabel("bottom", "Time", units="years")
     plot.setLabel("left", f"Relative Change in {quantity_name}")
-    plot.addLegend()
+    _style_text(plot, title)
+    plot.addLegend(labelTextColor=LEGEND_TEXT_COLOR)
 
     return plot
 
@@ -138,7 +175,7 @@ class Plotter:
         plot.clear()
         plot.disableAutoRange()
 
-        legend: pg.LegendItem = plot.addLegend()
+        legend: pg.LegendItem = plot.addLegend(labelTextColor=LEGEND_TEXT_COLOR)
         legend.clear()
 
         star_args: PlotArgs = {
@@ -170,7 +207,8 @@ class Plotter:
 
         arr_step = self.array_step()
         for arr, args in arrays_and_args:
-            plot.plot(arr[::arr_step, :2] / AU, **args)
+            plot.plot(arr[::arr_step, :2] / AU, **{key: value for key, value in args.items() if key != "name"})
+            _add_body_legend_entry(legend, str(args["name"]), str(args["pen"]))
 
         anim_plot = pg.ScatterPlotItem()
 
@@ -240,11 +278,9 @@ class Plotter:
             name="Lagrange Point",
         )
 
-        plot_data_item = pg.PlotDataItem(pen="w")
-
         legend: pg.LegendItem = self.corotating_plot.addLegend()
 
-        legend.addItem(plot_data_item, self.sim.lagrange_label)
+        _add_body_legend_entry(legend, self.sim.lagrange_label, "w")
 
     def plot_conserved_quantities(self) -> None:
         """Plot the relative change in the conserved quantities:
@@ -316,4 +352,4 @@ class Plotter:
         _plot_components(self.angular_momentum_plot, normalized_angular_momentum, times_in_years)
 
     def plot_relative_change_in_energy(self, total_energy: Array1D, times_in_years: Array1D) -> None:
-        self.energy_plot.plot(times_in_years, total_energy / total_energy[0] - 1)
+        self.energy_plot.plot(times_in_years, total_energy / total_energy[0] - 1, pen="w")
