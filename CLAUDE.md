@@ -3,9 +3,10 @@
 Python three-body / Lagrange-point simulator.
 
 ## Layout
-- `lagrangepointsimulator`: core physics and integration. Must not import Qt, `lagrangepointinputs` or `lagrangepointgui`.
+- `lagrangepointsimulator`: core physics and integration. Must not import Qt, `lagrangepointinputs`, `lagrangepointapi` or the GUI packages.
 - `lagrangepointinputs`: presets and the safe expression evaluator for user input. Depends on the core, must not import Qt or `lagrangepointgui`.
-- `lagrangepointgui`: Qt desktop GUI. Depends on the core and `lagrangepointinputs`, never the reverse.
+- `lagrangepointapi`: what the web page needs as plain data (form spec, simulation, plot data, presets). Depends on the core and `lagrangepointinputs`, must not import Qt.
+- `lagrangepointgui`: Qt Widgets desktop GUI. Depends on the core and `lagrangepointinputs`, never the reverse.
 
 ## Tooling
 - Package management: `uv` (pyproject.toml, hatchling).

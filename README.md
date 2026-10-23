@@ -122,7 +122,8 @@ Layout:
 - `src/lagrangepointsimulator`: the simulation. It has no Qt dependency.
 - `src/lagrangepointinputs`: the presets and the expression evaluator for user input, shared by the GUI and the web
   page. It depends on the simulator and has no Qt dependency.
-- `src/lagrangepointgui`: the Qt desktop GUI.
+- `src/lagrangepointapi`: the form, simulation, plot data and presets as plain data, which the web page's Python side uses.
+- `src/lagrangepointgui`: the Qt Widgets desktop GUI.
 - `web`: the browser version, built by `scripts/build_web.py`. See [web/README.md](web/README.md).
 
 The code is licensed under the GPL-3.0, see `LICENSE`.
