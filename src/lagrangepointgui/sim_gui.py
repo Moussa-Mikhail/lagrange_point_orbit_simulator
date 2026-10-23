@@ -20,9 +20,9 @@ from PyQt6.QtWidgets import (
 )
 
 from lagrangepointgui.orbit_plotter import Plotter
-from lagrangepointgui.presets import read_presets as readPresets
-from lagrangepointgui.safe_eval import safe_eval as safeEval
 from lagrangepointsimulator import Simulator
+from lagrangepointsimulator.presets import read_presets as readPresets
+from lagrangepointsimulator.safe_eval import safe_eval as safeEval
 
 LAGRANGE_LABEL = "Lagrange label"
 

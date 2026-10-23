@@ -2,8 +2,8 @@
 
 from collections.abc import Iterable
 
-from lagrangepointgui.presets import read_presets
 from lagrangepointsimulator.constants import CONSTANTS
+from lagrangepointsimulator.presets import read_presets
 
 ALLOWED_CHARS = set("0123456789.+-*/()e")
 

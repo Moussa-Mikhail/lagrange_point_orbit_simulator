@@ -4,9 +4,6 @@ The parameter table and the plot preparation mirror src/lagrangepointgui/sim_gui
 be imported here because they depend on Qt.
 """
 
-import sys
-import types
-from importlib.util import find_spec
 from math import ceil
 
 import numpy as np
@@ -17,22 +14,8 @@ from pyodide.ffi import to_js
 from lagrangepointsimulator import Simulator
 from lagrangepointsimulator.constants import AU, HOURS, YEARS, G
 from lagrangepointsimulator.numba_funcs import transform_to_corotating
-
-
-def _import_gui_helpers() -> None:
-    # lagrangepointgui/__init__.py imports Qt. Register the package without running it so that the Qt-free
-    # presets and safe_eval submodules can still be imported.
-    spec = find_spec("lagrangepointgui")
-    assert spec
-    package = types.ModuleType("lagrangepointgui")
-    package.__path__ = list(spec.submodule_search_locations or [])
-    sys.modules["lagrangepointgui"] = package
-
-
-_import_gui_helpers()
-
-from lagrangepointgui.presets import read_presets
-from lagrangepointgui.safe_eval import safe_eval
+from lagrangepointsimulator.presets import read_presets
+from lagrangepointsimulator.safe_eval import safe_eval
 
 LAGRANGE_LABEL = "Lagrange label"
 

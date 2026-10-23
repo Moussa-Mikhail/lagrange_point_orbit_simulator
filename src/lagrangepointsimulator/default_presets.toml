@@ -26,4 +26,7 @@ earth_moon_dist = 0.00257
 "Weird Orbit" = { bases = ["Default"], "Lagrange label" = "L1", "perturbation size" = 0.1, "initial speed" = 0.9135 }
 "Weird Orbit 2" = { bases = ["Weird Orbit"], "perturbation size" = 0.05, "initial speed" = 0.96 }
 # To create your own presets simply create a file named user_presets.toml following the format shown above
-# and place it in the same directory as this file.
+# and place it in your user config directory:
+#   Linux:   ~/.config/lagrange-point-orbit-simulator/ (or $XDG_CONFIG_HOME)
+#   macOS:   ~/Library/Application Support/lagrange-point-orbit-simulator/
+#   Windows: %APPDATA%\lagrange-point-orbit-simulator\

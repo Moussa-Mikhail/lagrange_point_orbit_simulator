@@ -5,20 +5,12 @@ is_positive = value_check_factory(lambda x: x > 0, "positive")
 is_non_negative = value_check_factory(lambda x: x >= 0, "non-negative")
 
 
-def non_negative_int() -> ValidatedDescriptor[int]:
-    return ValidatedDescriptor[int](int, [is_non_negative])
-
-
 def non_negative_float() -> ValidatedDescriptor[float | int]:
     return ValidatedDescriptor[float | int](float | int, [is_non_negative])
 
 
 def positive_float() -> ValidatedDescriptor[float | int]:
     return ValidatedDescriptor[float | int](float | int, [is_positive])
-
-
-def bool_desc() -> ValidatedDescriptor[bool]:
-    return ValidatedDescriptor[bool](bool)
 
 
 def float_desc() -> ValidatedDescriptor[float | int]:
