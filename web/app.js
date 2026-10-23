@@ -34,7 +34,7 @@ const BUTTONS = {
 
 const COLORS = { star: "#ffff00", planet: "#0000ff", satellite: "#00ff00", lagrange: "#ffffff" };
 const COMPONENT_COLORS = ["#ff0000", "#00ff00", "#0000ff"];
-const ANIMATION_INTERVAL_MS = 33; // 30 fps
+const ANIMATION_STEPS_PER_SECOND = 30; // the animation advances this many times a second, each by animationRate steps
 
 let spec;
 const inputFields = {};
@@ -47,7 +47,8 @@ const PRESETS_STORAGE_KEY = "userPresets";
 let plotted = false;
 let calculating = false;
 let orbitData;
-let animationTimer = null;
+let animationFrameId = null;
+let animationLastTime = 0;
 let animationIndex = 0;
 
 function setStatus(text) {
@@ -471,8 +472,14 @@ const overlays = {
   corotating: new MarkerOverlay("corotating-plot", "corotating-overlay"),
 };
 
-function markersAt(bodies, i) {
-  return bodies.map((b, k) => ({ x: b.x[i], y: b.y[i], color: BODY_COLORS[k] }));
+// The bodies at position i in their points, between two points when i isn't a whole number
+function markersAt(bodies, position) {
+  return bodies.map((b, k) => {
+    const from = Math.min(Math.floor(position), b.n - 1);
+    const to = Math.min(from + 1, b.n - 1);
+    const along = position - from;
+    return { x: b.x[from] + (b.x[to] - b.x[from]) * along, y: b.y[from] + (b.y[to] - b.y[from]) * along, color: BODY_COLORS[k] };
+  });
 }
 
 function orbitTraces(bodies, extra = []) {
@@ -613,8 +620,8 @@ function plotConserved(data) {
 // Animation
 
 function stopAnimation() {
-  clearInterval(animationTimer);
-  animationTimer = null;
+  cancelAnimationFrame(animationFrameId);
+  animationFrameId = null;
 }
 
 function toggleAnimation() {
@@ -622,23 +629,29 @@ function toggleAnimation() {
     showError("No plots to animate.");
     return;
   }
-  if (animationTimer !== null) {
+  if (animationFrameId !== null) {
     stopAnimation();
     return;
   }
-  animationTimer = setInterval(animateFrame, ANIMATION_INTERVAL_MS);
+  animationLastTime = performance.now();
+  animationFrameId = requestAnimationFrame(animateFrame);
 }
 
-function animateFrame() {
-  // The orbits are decimated by `step` so the full-resolution index is scaled down.
+// Runs for every frame the browser draws, and moves the markers by the time since the last one, so the motion is smooth
+// at any refresh rate. The orbits are decimated by `step`, so a frame can move a marker by a fraction of a point, which
+// markersAt interpolates; without that the markers would stand still for several frames and then jump.
+function animateFrame(now) {
   const { numSteps, animationRate, step, inertial, corotating } = orbitData;
-  animationIndex += animationRate;
+  const elapsed = Math.min((now - animationLastTime) / 1000, 0.1);
+  animationLastTime = now;
+
+  animationIndex += animationRate * ANIMATION_STEPS_PER_SECOND * elapsed;
   if (animationIndex >= numSteps) animationIndex = 0;
 
   for (const [overlay, bodies] of [[overlays.inertial, inertial], [overlays.corotating, corotating]]) {
-    const i = Math.min(Math.floor(animationIndex / step), bodies[0].n - 1);
-    overlay.set(markersAt(bodies, i));
+    overlay.set(markersAt(bodies, animationIndex / step));
   }
+  animationFrameId = requestAnimationFrame(animateFrame);
 }
 
 // Actions
