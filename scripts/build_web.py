@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -19,6 +20,25 @@ WEB = ROOT / "web"
 
 def run(*args: str) -> None:
     subprocess.run(args, check=True)
+
+
+def version_label() -> str:
+    """The version of pyproject.toml and the commit the site is built from, like "0.2.0 (3a1f9c2)"."""
+    version = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]["version"]
+    commit = subprocess.run(
+        ["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=False
+    ).stdout.strip()
+    return f"{version} ({commit})" if commit else version
+
+
+def put_version_in_title(index: Path) -> None:
+    title = "<title>Orbits near Lagrange Points</title>"
+    html = index.read_text()
+    if title not in html:
+        msg = f"{index} doesn't have the title {title}"
+        raise RuntimeError(msg)
+
+    index.write_text(html.replace(title, f"<title>Orbits near Lagrange Points {version_label()}</title>", 1))
 
 
 def pinned_validateddescriptor() -> tuple[str, str]:
@@ -37,6 +57,7 @@ def main() -> None:
     if output.exists():
         shutil.rmtree(output)
     shutil.copytree(WEB, output, ignore=shutil.ignore_patterns("__pycache__"))
+    put_version_in_title(output / "index.html")
 
     wheels = output / "wheels"
     run("uv", "build", "--wheel", "--out-dir", str(wheels), str(ROOT))

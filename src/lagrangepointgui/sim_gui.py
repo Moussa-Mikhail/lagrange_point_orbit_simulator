@@ -47,7 +47,7 @@ from lagrangepointinputs.user_presets import (
     save_text,
     user_preset_names,
 )
-from lagrangepointsimulator import Simulator
+from lagrangepointsimulator import Simulator, app_version
 
 type Input = str | float | None
 
@@ -85,7 +85,7 @@ class _SimUi(QMainWindow):
         self.autoPlotConserved = QCheckBox("Auto Plot Conserved")
         self.statusLabel = QLabel()
 
-        self.setWindowTitle("Orbits near Lagrange Points")
+        self.setWindowTitle(f"Orbits near Lagrange Points {app_version()}")
 
         self._centralWidget = QWidget(self)
         self.setCentralWidget(self._centralWidget)
@@ -526,6 +526,10 @@ def _selfTest(view: _SimUi) -> None:
         msg = "no presets were loaded"
         raise RuntimeError(msg)
 
+    if app_version() == "unknown":
+        msg = "the version of the package isn't known, so its metadata is missing"
+        raise RuntimeError(msg)
+
     sim = Simulator()
     for attribute, value in _translateInputs(view.getInputs()).items():
         setattr(sim, attribute, value)
@@ -539,6 +543,10 @@ def _selfTest(view: _SimUi) -> None:
 
 
 def main() -> None:
+    if "--version" in sys.argv:
+        print(app_version())
+        sys.exit(0)
+
     # The flag is for builds without a console, so the result is only reported through the exit code.
     selfTesting = "--self-test" in sys.argv
     if selfTesting:
