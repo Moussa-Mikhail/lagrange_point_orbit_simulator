@@ -356,6 +356,7 @@ function matchTicks(plot, specs) {
 function setTicks(plot) {
   const update = {};
   let yLabels = [];
+  let xTitle = null;
   let yTitle = null;
   for (const key of ["xaxis", "yaxis"]) {
     const axis = plot._fullLayout[key];
@@ -363,6 +364,7 @@ function setTicks(plot) {
     if (!ticks) continue;
     if (key === "yaxis") yLabels = ticks.ticktext;
     const current = plot.layout[key] ?? {};
+    if (key === "xaxis") xTitle = ticks.title;
     if (key === "yaxis") yTitle = ticks.title;
     if (current.tickmode === "array" && current.ticktext?.join() === ticks.ticktext.join()) continue;
     Object.assign(update, {
@@ -378,6 +380,9 @@ function setTicks(plot) {
   const widest = Math.max(0, ...yLabels.map((text) => measureText(text)));
   const left = Math.max(MIN_LEFT_MARGIN, widest + LABEL_MARGIN);
   if (Math.abs(left - plot.layout.margin.l) > 0.05) update["margin.l"] = left;
+
+  // the title follows the prefix of the ticks, as in "Time (kyears)" for a thousand years
+  if (xTitle !== null && plot.layout.annotations[0].text !== xTitle) update["annotations[0].text"] = xTitle;
 
   if (yTitle !== null) {
     const { clientWidth: width, clientHeight: height } = plot;
