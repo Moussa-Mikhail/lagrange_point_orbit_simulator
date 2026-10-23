@@ -1,5 +1,5 @@
 // Main-thread UI. All simulation work happens in worker.js.
-const worker = new Worker("worker.js");
+const worker = window.simulatorWorker; // started by index.html
 
 const pending = new Map();
 let nextId = 0;

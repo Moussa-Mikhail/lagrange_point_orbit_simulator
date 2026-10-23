@@ -6,7 +6,19 @@ const PYODIDE_VERSION = "0.29.5";
 
 importScripts(`https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/pyodide.js`, "integrator.js");
 
+const PYODIDE_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`;
+
 let bridge;
+
+// Pyodide asks for numpy only once it has started. Fetching it now, beside Pyodide, leaves it in the HTTP cache by then.
+const numpyDownload = (async () => {
+  try {
+    const lock = await (await fetch(`${PYODIDE_URL}pyodide-lock.json`)).json();
+    await (await fetch(`${PYODIDE_URL}${lock.packages.numpy.file_name}`)).arrayBuffer();
+  } catch {
+    // loadPackage fetches it again and reports the failure
+  }
+})();
 
 function status(text) {
   self.postMessage({ type: "status", text });
@@ -23,6 +35,7 @@ async function init() {
   const pyodide = await loadPyodide();
 
   status("Loading numpy…");
+  await numpyDownload;
   await pyodide.loadPackage("numpy");
 
   status("Loading simulator…");
