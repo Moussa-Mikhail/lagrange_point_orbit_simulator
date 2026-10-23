@@ -93,9 +93,11 @@ jobs:
           cache-dependency-path: tests/e2e/package-lock.json
       - name: Install Playwright
         working-directory: tests/e2e
-        run: |
-          npm ci
-          npx playwright install --with-deps chromium
+        run: npm ci
+      # The runner image has Chrome, which saves downloading a browser and its apt packages (`playwright install
+      # --with-deps` took 8 minutes)
       - name: Test the page in a browser
         working-directory: tests/e2e
         run: npm test
+        env:
+          CHROMIUM_PATH: /usr/bin/google-chrome
