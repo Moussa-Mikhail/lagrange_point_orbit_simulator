@@ -1,0 +1,84 @@
+name: checks
+on:
+  # pushes to main are checked by deploy-web, which calls this workflow before deploying
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.1
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: uv sync --no-default-groups --group dev
+      - name: Ruff lint
+        run: uv run --no-sync ruff check .
+      - name: Ruff format
+        run: uv run --no-sync ruff format --check .
+      - name: Ty
+        run: uv run --no-sync ty check src
+      - name: Refurb
+        run: uv run --no-sync refurb src tests scripts
+      # free for public repositories, so no login is needed
+      - name: Sourcery
+        run: uv run --no-sync sourcery review --check --no-summary src scripts tests web
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.1
+        with:
+          python-version: "3.13"
+      # the project and pytest only, without Numba or Qt, so this also checks the core works without them
+      - name: Install
+        run: uv sync --no-default-groups --group test
+      - name: Pytest
+        run: uv run --no-sync pytest
+
+  requirements:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.1
+        with:
+          # uv sync would otherwise pick the newest Python on the runner, and numba doesn't support that yet
+          python-version: "3.13"
+      - name: Regenerate requirements
+        run: ./update-requirements.sh
+      - name: Check they are up to date
+        run: |
+          if ! git diff --exit-code -- 'requirements*.txt'; then
+            echo "::error::requirements*.txt are out of date. Run ./update-requirements.sh and commit the result."
+            exit 1
+          fi
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.1
+        with:
+          python-version: "3.13"
+      - name: Build the site
+        run: uv run --no-project scripts/build_web.py
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tests/e2e/package-lock.json
+      - name: Install Playwright
+        working-directory: tests/e2e
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Test the page in a browser
+        working-directory: tests/e2e
+        run: npm test
