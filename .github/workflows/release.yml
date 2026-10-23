@@ -121,6 +121,16 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v7
+        with:
+          # the history is needed to check the tag is on main and to list the commits in the release
+          fetch-depth: 0
+      -
+        name: Check the Tag is on main
+        run: |
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$GITHUB_REF_NAME isn't on main. Releases are made from main."
+            exit 1
+          fi
       -
         name: Check the Tag Matches the Package Version
         run: |
@@ -148,9 +158,15 @@ jobs:
         name: Write Checksums
         run: sha256sum SimGui.* > SHA256SUMS.txt
       -
+        name: Write the Release Notes
+        run: python3 scripts/release_notes.py "$GITHUB_REF_NAME" > RELEASE_NOTES.md
+      -
         name: Upload Files
         uses: softprops/action-gh-release@v3
         with:
+          body_path: RELEASE_NOTES.md
+          # a version like 0.3.0rc1 is a pre-release
+          prerelease: ${{ contains(github.ref_name, 'rc') }}
           files: |
             SimGui.${{ env.version_short }}-Windows.zip
             SimGui.${{ env.version_short }}-Linux.tar.gz
