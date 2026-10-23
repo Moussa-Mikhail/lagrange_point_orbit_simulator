@@ -15,7 +15,7 @@ import pytest
 
 from lagrangepointsimulator import Simulator
 from lagrangepointsimulator.constants import EARTH_MASS, G
-from lagrangepointsimulator.numba_funcs import integrate
+from lagrangepointsimulator.numba_funcs import HAS_NUMBA, integrate
 
 RUNNER = Path(__file__).parent / "run_js_integrator.js"
 
@@ -107,6 +107,21 @@ def test_matches_python(name: str, step: int) -> None:
 
     assert actual.shape == expected.shape
     assert max_relative_difference(expected, actual) < tolerance
+
+
+@pytest.mark.skipif(not HAS_NUMBA, reason="the desktop app's arithmetic is Numba's")
+@pytest.mark.parametrize("name", CASES)
+def test_identical_to_the_numba_integrator(name: str) -> None:
+    # The same results to the last bit, so that the conserved quantities, which are rounding error, are the same
+    # curves on the web page as in the desktop app. Math.pow(r, -3) breaks this within a few dozen steps.
+    params, _, _ = CASES[name]
+    sim = Simulator(**params)
+
+    sim.simulate()
+    expected = np.concatenate([getattr(sim, state_name) for state_name in STATE_NAMES], axis=1)
+    actual = run_js(sim, 1)
+
+    assert np.array_equal(expected, actual)
 
 
 def test_tolerances_catch_a_physics_change() -> None:

@@ -1,6 +1,13 @@
 // The simulator's integrator in plain JavaScript. The Python version in
-// src/lagrangepointsimulator/numba_funcs.py is the reference: keep the two in step.
+// src/lagrangepointsimulator/numba_funcs.py is the reference: keep the two in step, down to the order of operations,
+// because the results are meant to be the same to the last bit.
 // A drift-kick-drift (leapfrog) step of the star, planet and satellite, as in Python.
+
+// 1 / r^3 the way Numba compiles `r ** -3`, which the desktop app runs. Math.pow(r, -3) can differ from it in the last bit,
+// and the integration amplifies that: the conserved quantities then wander differently, though they are as small.
+function inverseCubed(r) {
+  return 1 / (r * r * r);
+}
 
 const STATE_SIZE = 18; // star pos, star vel, planet pos, planet vel, sat pos, sat vel: 3 numbers each
 
@@ -23,9 +30,9 @@ function integrate(timeStep, numSteps, gStar, gPlanet, state, step) {
     const bx = sx - tx, by = sy - ty, bz = sz - tz; // satellite to star
     const cx = px - tx, cy = py - ty, cz = pz - tz; // satellite to planet
 
-    const d1 = Math.pow(Math.sqrt(ax * ax + ay * ay + az * az), -3);
-    const d2 = Math.pow(Math.sqrt(bx * bx + by * by + bz * bz), -3);
-    const d3 = Math.pow(Math.sqrt(cx * cx + cy * cy + cz * cz), -3);
+    const d1 = inverseCubed(Math.sqrt(ax * ax + ay * ay + az * az));
+    const d2 = inverseCubed(Math.sqrt(bx * bx + by * by + bz * bz));
+    const d3 = inverseCubed(Math.sqrt(cx * cx + cy * cy + cz * cz));
 
     const starCoeff = -gPlanet * d1;
     const planetCoeff = gStar * d1;
