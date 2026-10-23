@@ -24,8 +24,10 @@
         <label><input type="checkbox" id="auto-plot-conserved"> Auto Plot Conserved</label>
       </div>
       <form id="inputs" autocomplete="off"></form>
-      <button id="toggle-conserved" disabled>Toggle Conserved Quantity Plots</button>
-      <p id="status" role="status">Starting…</p>
+      <div id="toggle-and-status">
+        <button id="toggle-conserved" disabled>Toggle Conserved Quantity Plots</button>
+        <p id="status" role="status">Starting…</p>
+      </div>
     </section>
     <section id="orbits">
       <div class="plot">
@@ -38,9 +40,9 @@
       </div>
     </section>
     <section id="conserved" hidden>
-      <div id="linear-momentum-plot" class="plot"></div>
-      <div id="angular-momentum-plot" class="plot"></div>
-      <div id="energy-plot" class="plot"></div>
+      <div class="plot"><div id="linear-momentum-plot" class="fill"></div></div>
+      <div class="plot"><div id="angular-momentum-plot" class="fill"></div></div>
+      <div class="plot"><div id="energy-plot" class="fill"></div></div>
     </section>
   </main>
   <dialog id="save-preset">

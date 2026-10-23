@@ -122,7 +122,7 @@ async function reload() {
 }
 
 async function savePresetAs(name) {
-  await page.click("text=Save as…");
+  await page.click("text=Save…");
   await page.fill("#preset-name", name);
   await page.keyboard.press("Enter");
   await page.waitForFunction((name) => [...document.querySelectorAll("#inputs select:first-of-type option")].some((o) => o.value === name), name);

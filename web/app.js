@@ -121,7 +121,7 @@ function buildPresetButtons() {
   row.id = "preset-buttons";
 
   const actions = {
-    save: ["Save as…", savePreset],
+    save: ["Save…", savePreset],
     delete: ["Delete", deletePreset],
     edit: ["Edit…", editPresets],
     export: ["Export", exportPresets],
@@ -260,23 +260,142 @@ function setButtons(enabled, { except } = {}) {
 
 // Plots
 
-const AXIS = { gridcolor: "#333", zerolinecolor: "#555", linecolor: "#777", tickcolor: "#777" };
+// the axes are drawn the way the desktop app draws them: a line and inward ticks, no grid
+const AXIS = { title: { font: { size: 17 } }, ticklabeloverflow: "allow", showgrid: false, zeroline: false, linecolor: "#999", tickcolor: "#999", ticks: "inside", ticklen: 7 };
 
-function layout(title, xTitle, yTitle, { locked = false } = {}) {
+// The space around the data in the desktop's plots, in pixels, measured from pyqtgraph: the left margin is the width of
+// the y axis, which is wider when its labels are, see setTicks
+const MARGIN = { l: 57.6, r: 0.5, t: 31, b: 42.1 };
+const MIN_LEFT_MARGIN = MARGIN.l;
+const LABEL_MARGIN = 27.4; // what the y axis needs beside its widest label: ticks, the axis title and spacing
+
+// The y title, which is also placed by hand, 10 px from the left. The desktop centres it on the data, a pixel above the
+// middle, except that its long titles, the ones about momentum, sit 32 px higher.
+function yTitleAnnotation(text, left, width, height) {
+  const dataHeight = height - MARGIN.t - MARGIN.b;
+  const centre = MARGIN.t + dataHeight / 2 - 0.5 - (measureText(text) > 300 ? 32 : 0);
   return {
-    title: { text: title, font: { size: 13 } },
+    text,
+    textangle: -90,
+    xref: "paper",
+    x: (9 - left) / (width - left - MARGIN.r),
+    xanchor: "center",
+    yref: "paper",
+    y: 1 - (centre - MARGIN.t) / dataHeight,
+    yanchor: "middle",
+    showarrow: false,
+    font: { size: 17, color: "#b3b3b3" },
+  };
+}
+
+function layout(title, xTitle, yTitle, plotId, { locked = false, yRange = null, xRange = null } = {}) {
+  const { clientWidth: width, clientHeight: height } = $(plotId);
+  const dataHeight = height - MARGIN.t - MARGIN.b;
+  return {
+    // centred over the data, 16 px from the top, as in the desktop
+    title: { text: title, font: { size: 15, color: "#b3b3b3" }, xref: "container", yref: "container", x: (MARGIN.l + (width - MARGIN.l - MARGIN.r) / 2) / width, xanchor: "center", y: 1 - 16 / height, yanchor: "middle" },
     paper_bgcolor: "#000",
     plot_bgcolor: "#000",
-    font: { color: "#ccc" },
-    margin: { l: 60, r: 15, t: 40, b: 45 },
-    xaxis: { ...AXIS, title: { text: xTitle } },
-    // automargin widens the left margin so wide tick labels like "-1.5e-14" don't run into the axis title
-    yaxis: { ...AXIS, title: { text: yTitle, standoff: 8 }, automargin: true, ...(locked ? { scaleanchor: "x", scaleratio: 1 } : {}) },
-    legend: { x: 1, xanchor: "right", y: 1, bgcolor: "rgba(0,0,0,0.4)" },
+    font: { family: "Arial, Liberation Sans, sans-serif", color: "#b3b3b3", size: 17 },
+    margin: { l: MARGIN.l, r: MARGIN.r, t: MARGIN.t, b: MARGIN.b },
+    xaxis: { ...AXIS, ticklabelstandoff: -6, title: { ...AXIS.title, text: "" }, ...(xRange ? { range: xRange, autorange: false } : {}) },
+    yaxis: { ...AXIS, title: { ...AXIS.title, text: "" }, ...(locked ? { scaleanchor: "x", scaleratio: 1 } : {}), ...(yRange ? { range: yRange, autorange: false } : {}) },
+    // The x title is placed by hand: the space under the data is as small as the desktop's, and too small for Plotly to
+    // put the title under the tick labels
+    annotations: [
+      { text: xTitle, xref: "x domain", x: 0.5, yref: "paper", y: -32 / dataHeight, yanchor: "middle", showarrow: false, font: { size: 17, color: "#b3b3b3" } },
+      yTitleAnnotation(yTitle, MARGIN.l, width, height),
+    ],
+    showlegend: false, // see setLegend
   };
 }
 
 const PLOT_CONFIG = { responsive: true, displaylogo: false };
+
+// Ticks the way the desktop app's pyqtgraph writes them: "1.0", "0.5", "0", "-0.5", spaced about 85 px apart on x and 45 px on y, with the
+// SI prefix of the largest value in the axis title, like "y (mAU)", or "(x1e-15)" when the axis has no unit.
+const SI_PREFIXES = { "-15": "f", "-12": "p", "-9": "n", "-6": "µ", "-3": "m", 0: "", 3: "k", 6: "M" };
+const MIN_TICK_PIXELS = { xaxis: 85, yaxis: 45 };
+
+function niceStep(minimum) {
+  const power = Math.floor(Math.log10(minimum));
+  return [1, 2, 5, 10].map((m) => m * 10 ** power).find((step) => step >= minimum);
+}
+
+// {tickvals, ticktext, title} for an axis spanning range over pixels, or null when it isn't drawn yet
+function pyqtgraphAxis(key, { name, unit, siPrefix = true }, [low, high], pixels) {
+  if (!pixels || !(high > low)) return null;
+
+  const largest = Math.max(Math.abs(low), Math.abs(high));
+  const exponent = siPrefix ? Math.min(6, Math.max(-15, 3 * Math.floor(Math.log10(largest) / 3))) : 0;
+  const scale = 10 ** exponent;
+  const step = niceStep((MIN_TICK_PIXELS[key] * (high - low)) / pixels / scale);
+  const decimals = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+
+  const tickvals = [];
+  const ticktext = [];
+  for (let i = Math.ceil(low / scale / step - 1e-9); i * step * scale <= high * (1 + 1e-12); i++) {
+    tickvals.push(i * step * scale);
+    ticktext.push(i === 0 ? "0" : (i * step).toFixed(decimals));
+  }
+
+  const prefix = unit ? SI_PREFIXES[exponent] + unit : exponent ? `x1e${exponent}` : "";
+  return { tickvals, ticktext, minorStep: (step * scale) / 10, title: prefix ? `${name} (${prefix})` : name };
+}
+
+// Plotly chooses its own ticks, so they are set after every draw, and again when the range changes by zooming.
+function matchTicks(plot, specs) {
+  plot._tickSpecs = specs;
+  if (!plot._ticksHooked) {
+    plot._ticksHooked = true;
+    plot.on("plotly_afterplot", () => setTicks(plot));
+  }
+  setTicks(plot); // the plot is already drawn
+}
+
+function setTicks(plot) {
+  const update = {};
+  let yLabels = [];
+  let yTitle = null;
+  for (const key of ["xaxis", "yaxis"]) {
+    const axis = plot._fullLayout[key];
+    const ticks = pyqtgraphAxis(key, plot._tickSpecs[key], axis.range, axis._length);
+    if (!ticks) continue;
+    if (key === "yaxis") yLabels = ticks.ticktext;
+    const current = plot.layout[key] ?? {};
+    if (key === "yaxis") yTitle = ticks.title;
+    if (current.tickmode === "array" && current.ticktext?.join() === ticks.ticktext.join()) continue;
+    Object.assign(update, {
+      [`${key}.tickmode`]: "array",
+      [`${key}.tickvals`]: ticks.tickvals,
+      [`${key}.ticktext`]: ticks.ticktext,
+      [`${key}.minor.ticks`]: "inside",
+      [`${key}.minor.ticklen`]: 4.5,
+      [`${key}.minor.dtick`]: ticks.minorStep,
+    });
+  }
+  // the y axis is as wide as its widest label needs, but not narrower than the desktop's
+  const widest = Math.max(0, ...yLabels.map((text) => measureText(text)));
+  const left = Math.max(MIN_LEFT_MARGIN, widest + LABEL_MARGIN);
+  if (Math.abs(left - plot.layout.margin.l) > 0.05) update["margin.l"] = left;
+
+  if (yTitle !== null) {
+    const { clientWidth: width, clientHeight: height } = plot;
+    const annotation = yTitleAnnotation(yTitle, left, width, height);
+    const current = plot.layout.annotations[1];
+    for (const [name, value] of Object.entries(annotation)) {
+      if (name !== "font" && current[name] !== value) update[`annotations[1].${name}`] = value;
+    }
+  }
+
+  if (Object.keys(update).length) Plotly.relayout(plot, update);
+}
+
+const textContext = document.createElement("canvas").getContext("2d");
+function measureText(text) {
+  textContext.font = "17px Arial, Liberation Sans, sans-serif";
+  return textContext.measureText(text).width;
+}
 
 function line(x, y, name, color) {
   return { type: "scattergl", mode: "lines", x, y, name, line: { color, width: 1 } };
@@ -293,6 +412,7 @@ class MarkerOverlay {
     this.plot = $(plotId);
     this.canvas = $(overlayId);
     this.markers = [];
+    this.top = []; // markers that stay put, drawn over the moving ones, like the desktop's Lagrange point
     this.attached = false;
   }
 
@@ -322,7 +442,7 @@ class MarkerOverlay {
     context.scale(ratio, ratio);
 
     const { xaxis, yaxis } = layout;
-    for (const { x, y, color } of this.markers) {
+    for (const { x, y, color } of [...this.markers, ...this.top]) {
       const px = xaxis._offset + xaxis.l2p(x);
       const py = yaxis._offset + yaxis.l2p(y);
       // skip bodies outside the visible plot area
@@ -352,16 +472,69 @@ function markersAt(bodies, i) {
 
 function orbitTraces(bodies, extra = []) {
   const lines = bodies.map((b, i) => ({ ...line(b.x, b.y, BODY_NAMES[i], BODY_COLORS[i]), showlegend: false }));
-  // Plots nothing. These only give the legend a marker for each body.
-  const legend = BODY_NAMES.map((name, i) => ({
-    type: "scatter",
-    mode: "markers",
-    x: [null],
-    y: [null],
-    name,
-    marker: { color: BODY_COLORS[i], size: 10 },
-  }));
-  return [...lines, ...legend, ...extra];
+  return [...lines, ...extra];
+}
+
+// The range of an axis with the space around it that the desktop's plots leave, as a fraction of the range on each side.
+// Plotly's own autorange leaves more.
+// measured from pyqtgraph's view ranges in the desktop's plots, as fractions of the data range on each side
+const ORBIT_PADDING = { x: 0.0652, y: 0.034 };
+const CONSERVED_PADDING = { x: 0.0441, y: 0.0515 };
+
+function paddedRange(bodies, axis, extra = [], padding = ORBIT_PADDING[axis]) {
+  let low = Infinity;
+  let high = -Infinity;
+  for (const body of bodies) {
+    const values = body[axis];
+    for (let i = 0; i < values.length; i++) {
+      if (values[i] < low) low = values[i];
+      if (values[i] > high) high = values[i];
+    }
+  }
+  for (const value of extra) {
+    low = Math.min(low, value);
+    high = Math.max(high, value);
+  }
+  const pad = padding * (high - low);
+  return [low - pad, high + pad];
+}
+
+// Ranges for x and y that show the padded ranges at the same scale, which Plotly would otherwise work out from the
+// size of the plot before its axes have taken their space. The data area is what the margins in layout() leave.
+function equalScaleRanges(plotId, xRange, yRange, xShift = 0) {
+  const width = $(plotId).clientWidth - MARGIN.l - MARGIN.r;
+  const height = $(plotId).clientHeight - MARGIN.t - MARGIN.b;
+  const scale = Math.min(width / (xRange[1] - xRange[0]), height / (yRange[1] - yRange[0]));
+  const around = ([low, high], pixels, shift = 0) => [(low + high) / 2 + shift - pixels / (2 * scale), (low + high) / 2 + shift + pixels / (2 * scale)];
+  return { xRange: around(xRange, width, xShift), yRange: around(yRange, height) };
+}
+
+// pyqtgraph centres the inertial plot a little to the right of its data: by this fraction of the data's width
+const INERTIAL_X_SHIFT = 0.00775;
+
+// Plotly's legend can't be put where, and spaced as, the desktop's is, so the legend is HTML over the plot.
+// entries: [{name, color, dot}], a dot for a body and a line for a component
+function setLegend(plotId, entries) {
+  const container = $(plotId).closest(".plot");
+  let legend = container.querySelector(".legend");
+  if (!legend) {
+    legend = document.createElement("div");
+    legend.className = "legend";
+    container.append(legend);
+  }
+  legend.replaceChildren(
+    ...entries.map(({ name, color, dot }) => {
+      const row = document.createElement("div");
+      const swatch = document.createElement("span");
+      swatch.className = dot ? "dot" : "swatch";
+      swatch.style.background = color;
+      const label = document.createElement("span");
+      label.className = "name";
+      label.textContent = name;
+      row.append(swatch, label);
+      return row;
+    }),
+  );
 }
 
 function plotOrbits(data) {
@@ -379,19 +552,27 @@ function plotOrbits(data) {
     marker: { color: COLORS.lagrange, size: 10 },
   };
 
+  const inertialX = paddedRange(inertial, "x");
+  const inertialWidth = (inertialX[1] - inertialX[0]) / (1 + 2 * ORBIT_PADDING.x); // of the data, without the padding
+  // no prefix such as "mAU", so that a difference of 1 on x and on y is the same length and reads the same
+  const orbitAxes = { xaxis: { name: "x", unit: "AU", siPrefix: false }, yaxis: { name: "y", unit: "AU", siPrefix: false } };
   Plotly.react(
     "inertial-plot",
     orbitTraces(inertial),
-    layout("Orbit in Inertial Coordinate System", "x (AU)", "y (AU)", { locked: true }),
+    layout("Orbit in Inertial Coordinate System", "x (AU)", "y (AU)", "inertial-plot", { locked: true, ...equalScaleRanges("inertial-plot", inertialX, paddedRange(inertial, "y"), INERTIAL_X_SHIFT * inertialWidth) }),
     PLOT_CONFIG,
-  );
+  ).then((plot) => matchTicks(plot, orbitAxes));
   Plotly.react(
     "corotating-plot",
     orbitTraces(corotating, [lagrangeTrace]),
-    layout("Orbit in Co-Rotating Coordinate System", "x (AU)", "y (AU)", { locked: true }),
+    layout("Orbit in Co-Rotating Coordinate System", "x (AU)", "y (AU)", "corotating-plot", { locked: true, ...equalScaleRanges("corotating-plot", paddedRange(corotating, "x", [lx]), paddedRange(corotating, "y", [ly])) }),
     PLOT_CONFIG,
-  );
+  ).then((plot) => matchTicks(plot, orbitAxes));
 
+  const bodyEntries = BODY_NAMES.map((name, i) => ({ name, color: BODY_COLORS[i], dot: true }));
+  setLegend("inertial-plot", bodyEntries);
+  setLegend("corotating-plot", [...bodyEntries, { name: data.lagrangeLabel, color: COLORS.lagrange, dot: true }]);
+  overlays.corotating.top = [{ x: lx, y: ly, color: COLORS.lagrange }];
   overlays.inertial.attach();
   overlays.corotating.attach();
   overlays.inertial.set(markersAt(inertial, 0));
@@ -411,10 +592,16 @@ function plotConserved(data) {
   $("conserved").hidden = false;
   for (const [id, name, traces] of quantities) {
     const yTitle = `Relative Change in ${name}`;
-    const plotLayout = layout(`${yTitle} vs Time`, "Time (years)", yTitle);
-    // tiny values would otherwise get SI prefixes like "10f"
-    plotLayout.yaxis.exponentformat = "e";
-    Plotly.react(id, traces, plotLayout, PLOT_CONFIG);
+    const span = data.times.at(-1) - data.times[0];
+    const plotLayout = layout(`${yTitle} vs Time`, "Time (years)", yTitle, id, {
+      xRange: [data.times[0] - CONSERVED_PADDING.x * span, data.times.at(-1) + CONSERVED_PADDING.x * span],
+      yRange: paddedRange(traces, "y", [], CONSERVED_PADDING.y),
+    });
+    // only the momenta have more than one line
+    if (traces.length > 1) setLegend(id, traces.map((trace) => ({ name: trace.name, color: trace.line.color })));
+    Plotly.react(id, traces, plotLayout, PLOT_CONFIG).then((plot) =>
+      matchTicks(plot, { xaxis: { name: "Time", unit: "years" }, yaxis: { name: yTitle, unit: "" } }),
+    );
   }
 }
 
