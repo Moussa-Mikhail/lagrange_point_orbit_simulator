@@ -1,6 +1,8 @@
 import sys
+import time
 import traceback
 from collections.abc import Callable
+from pathlib import Path
 from typing import cast
 
 import numpy as np
@@ -11,6 +13,7 @@ from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
     QErrorMessage,
+    QFileDialog,
     QFormLayout,
     QHBoxLayout,
     QInputDialog,
@@ -35,7 +38,15 @@ from lagrangepointinputs.parameters import (
 )
 from lagrangepointinputs.presets import read_presets as readPresets
 from lagrangepointinputs.safe_eval import safe_eval as safeEval
-from lagrangepointinputs.user_presets import PresetError, delete_preset, save_preset, user_preset_names
+from lagrangepointinputs.user_presets import (
+    EXAMPLE_TEXT,
+    PresetError,
+    delete_preset,
+    read_text,
+    save_preset,
+    save_text,
+    user_preset_names,
+)
 from lagrangepointsimulator import Simulator
 
 type Input = str | float | None
@@ -47,6 +58,12 @@ SAVE_PRESET = "Save…"
 DELETE_PRESET = "Delete"
 
 EDIT_PRESETS = "Edit…"
+
+EXPORT_PRESETS = "Export"
+
+IMPORT_PRESETS = "Import…"
+
+PRESETS_FILE_NAME = "user_presets.toml"
 
 TOGGLE_ANIMATION = "Toggle Animation"
 
@@ -66,6 +83,7 @@ class _SimUi(QMainWindow):
         self.textToButton: dict[str, QPushButton] = {}
         self.textToPresetButton: dict[str, QPushButton] = {}
         self.autoPlotConserved = QCheckBox("Auto Plot Conserved")
+        self.statusLabel = QLabel()
 
         self.setWindowTitle("Orbits near Lagrange Points")
 
@@ -123,7 +141,7 @@ class _SimUi(QMainWindow):
         self._inputsLayout.addRow("Presets", self.presetBox)
 
         presetButtonsLayout = QHBoxLayout()
-        for btnText in (SAVE_PRESET, DELETE_PRESET, EDIT_PRESETS):
+        for btnText in (SAVE_PRESET, DELETE_PRESET, EDIT_PRESETS, EXPORT_PRESETS, IMPORT_PRESETS):
             self.textToPresetButton[btnText] = QPushButton(btnText)
             presetButtonsLayout.addWidget(self.textToPresetButton[btnText])
 
@@ -169,7 +187,10 @@ class _SimUi(QMainWindow):
         conservedPlotsButton.setFixedSize(conservedPlotsButton.sizeHint())
         conservedPlotsButton.setContentsMargins(100, 100, 100, 100)
 
-        self._inputsAndConservedButtonLayout.addWidget(conservedPlotsButton)
+        buttonAndStatusLayout = QHBoxLayout()
+        buttonAndStatusLayout.addWidget(conservedPlotsButton)
+        buttonAndStatusLayout.addWidget(self.statusLabel, 1)
+        self._inputsAndConservedButtonLayout.addLayout(buttonAndStatusLayout)
 
         self.textToButton[TOGGLE_CONSERVED] = conservedPlotsButton
 
@@ -184,6 +205,9 @@ class _SimUi(QMainWindow):
 
         self.inputFields[LAGRANGE_LABEL] = field
         self._inputsLayout.addRow(LAGRANGE_LABEL, box)
+
+    def setStatus(self, text: str) -> None:
+        self.statusLabel.setText(text)
 
     def updateOrbitPlots(self) -> None:
         self._plotted = True
@@ -297,6 +321,8 @@ class _SimCtrl:
             SAVE_PRESET: self._savePreset,
             DELETE_PRESET: self._deletePreset,
             EDIT_PRESETS: self._editPresets,
+            EXPORT_PRESETS: self._exportPresets,
+            IMPORT_PRESETS: self._importPresets,
         }
 
         for buttonText, action in presetButtonTextToAction.items():
@@ -368,6 +394,38 @@ class _SimCtrl:
             self._view.refreshPresets()
             self._view.updateDeleteButton()
 
+    def _exportPresets(self) -> None:
+        fileName, _ = QFileDialog.getSaveFileName(
+            self._view, "Export presets", PRESETS_FILE_NAME, "TOML files (*.toml)"
+        )
+        if not fileName:
+            return
+
+        try:
+            Path(fileName).write_text(read_text() or EXAMPLE_TEXT, encoding="utf-8")
+        except OSError as e:
+            _displayErrorMessage(str(e))
+
+    def _importPresets(self) -> None:
+        fileName, _ = QFileDialog.getOpenFileName(
+            self._view, "Import presets", "", "TOML files (*.toml);;All files (*)"
+        )
+        if not fileName:
+            return
+
+        question = f"Replace your presets with the contents of {Path(fileName).name}?"
+        if QMessageBox.question(self._view, "Import presets", question) != QMessageBox.StandardButton.Yes:
+            return
+
+        try:
+            save_text(Path(fileName).read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, PresetError) as e:
+            _displayErrorMessage(str(e))
+            return
+
+        self._view.refreshPresets()
+        self._view.updateDeleteButton()
+
     def _addReturnPressed(self) -> None:
         for field in self._view.inputFields.values():
             field.returnPressed.connect(self._simulate)
@@ -403,12 +461,17 @@ class _SimCtrl:
             return
 
         self._view.stopAnimation()
-        onFinishFuncs: list[Callable[[], None]] = [self._view.updateOrbitPlots]
+        self._view.setStatus("Simulating…")
+        start = time.perf_counter()
+        onFinishFuncs: list[Callable[[], None]] = [self._view.updateOrbitPlots, lambda: self._reportSimulated(start)]
         if self._view.autoPlotConserved.isChecked():
             onFinishFuncs.append(self._plotConservedQuantities)
 
         self._disableButtons()
         self._runInThread(self._model.simulate, onFinishFuncs)
+
+    def _reportSimulated(self, start: float) -> None:
+        self._view.setStatus(f"Simulated {self._model.num_steps:,} steps in {time.perf_counter() - start:.2f} s")
 
     def _enableButtons(self) -> None:
         for btn in self._view.textToButton.values():
