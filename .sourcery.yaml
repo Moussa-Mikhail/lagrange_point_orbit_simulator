@@ -11,7 +11,12 @@ ignore:
 
 rule_settings:
   enable: [default]
-  disable: []
+  # These conflict with ruff rules (EM101/EM102, RET505) or are a matter of taste
+  disable:
+    - use-named-expression
+    - reintroduce-else
+    - swap-if-else-branches
+    - assign-if-exp
   rule_types:
     - refactoring
     - suggestion

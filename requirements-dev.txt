@@ -2,10 +2,20 @@
 #    uv export --no-hashes --no-emit-project --no-default-groups --group dev --output-file requirements-dev.txt
 ast-serialize==0.6.0
     # via mypy
+cfgv==3.5.0
+    # via pre-commit
 colorama==0.4.6
     # via
     #   pyqtgraph
     #   pytest
+distlib==0.4.4
+    # via virtualenv
+filelock==4.2.4
+    # via
+    #   python-discovery
+    #   virtualenv
+identify==2.6.20
+    # via pre-commit
 iniconfig==2.3.1
     # via pytest
 librt==0.13.0 ; platform_python_implementation != 'PyPy'
@@ -16,6 +26,8 @@ mypy==2.3.0
     # via refurb
 mypy-extensions==1.1.0
     # via mypy
+nodeenv==1.11.0
+    # via pre-commit
 numba==0.66.0
     # via lagrange-point-orbit-simulator
 numpy==2.4.6
@@ -23,12 +35,17 @@ numpy==2.4.6
     #   lagrange-point-orbit-simulator
     #   numba
     #   pyqtgraph
-packaging==26.2
-    # via pytest
+packaging==26.3
+    # via
+    #   pytest
+    #   virtualenv
 pathspec==1.1.1
     # via mypy
+platformdirs==4.13.5
+    # via virtualenv
 pluggy==1.7.0
     # via pytest
+pre-commit==4.7.0
 pygments==2.21.0
     # via pytest
 pyqt6==6.11.0
@@ -40,6 +57,10 @@ pyqt6-sip==13.11.1
 pyqtgraph==0.14.0
     # via lagrange-point-orbit-simulator
 pytest==9.1.1
+python-discovery==1.6.4
+    # via virtualenv
+pyyaml==6.0.3
+    # via pre-commit
 refurb==2.3.1
 ruff==0.16.0
 sourcery==1.44.0
@@ -48,3 +69,5 @@ typing-extensions==4.16.0
     # via mypy
 validateddescriptor @ git+https://github.com/Moussa-Mikhail/validated-descriptor.git@574aa1e8ba468be3d3c744eb8f36e0bb7e9a9624
     # via lagrange-point-orbit-simulator
+virtualenv==21.14.12
+    # via pre-commit

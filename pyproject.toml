@@ -52,6 +52,7 @@ test = [
 ]
 
 dev = [
+    "pre-commit>=4.0",
     "refurb>=2.3.0",
     "ruff>=0.15.5",
     "sourcery>=1.43.0",

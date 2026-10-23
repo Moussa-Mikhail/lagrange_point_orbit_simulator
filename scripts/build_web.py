@@ -25,7 +25,7 @@ def pinned_validateddescriptor() -> tuple[str, str]:
     requirements = (ROOT / "requirements.txt").read_text()
     match = re.search(r"^validateddescriptor @ git\+(\S+?)@([0-9a-f]{40})$", requirements, re.MULTILINE)
     if not match:
-        msg = "validateddescriptor pin not found in requirements.txt"
+        msg = "validateddescriptor pin not found in requirements.txt"  # sourcery skip: inline-variable
         raise RuntimeError(msg)
 
     return match[1], match[2]
