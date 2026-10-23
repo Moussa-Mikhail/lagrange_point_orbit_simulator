@@ -60,6 +60,23 @@ jobs:
             exit 1
           fi
 
+  # the desktop app, offscreen, which needs the Qt, Numba and PyQt6 of the gui extra
+  gui:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.1
+        with:
+          python-version: "3.13"
+      - name: Install the libraries Qt loads
+        run: sudo apt-get update && sudo apt-get install -y libegl1 libgl1 libxkbcommon0 libfontconfig1 libdbus-1-3
+      - name: Install
+        run: uv sync --no-default-groups --extra gui --group test
+      - name: Self-test
+        run: uv run --no-sync python -m lagrangepointgui.sim_gui --self-test
+        env:
+          QT_QPA_PLATFORM: offscreen
+
   web:
     runs-on: ubuntu-latest
     steps:
