@@ -10,13 +10,9 @@ There are three ways to use it:
 
 - **In the browser:** https://moussa-mikhail.github.io/lagrange_point_orbit_simulator/ runs the whole simulation on
   your machine, with nothing to install. See [web/README.md](web/README.md).
-- **Desktop app:** download the build for your system from the
-  [releases page](https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator/releases) and extract it. Run
-  `sim_gui` (`sim_gui.exe` on Windows). Each release lists a SHA256 checksum for every download. The builds are not code
-  signed, so Windows may block a downloaded zip until you unblock it (right-click, Properties, Unblock) before
-  extracting. On Linux the system needs `libEGL` (the `libegl1` package on Debian and Ubuntu), which desktop installs
-  normally have.
-- **Python library and source GUI:** see below.
+- **Desktop app and Python library:** run them from the source, see below. Builds to download aren't published,
+  because they are over 100 MB and do what the web page does. [v0.2.0](https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator/releases/tag/v0.2.0)
+  has the last ones.
 
 ## Installation of source code
 
@@ -115,7 +111,7 @@ The linters, type check and tests also run in CI on every push and pull request,
 let the hook) after changing `pyproject.toml` or `uv.lock`.
 
 To build the desktop app locally run `./build.sh` (`build.bat` on Windows). The result is in `dist/sim_gui`, and
-`dist/sim_gui/sim_gui --self-test` checks the build. Releases are made with `scripts/release.py`, see [docs/RELEASING.md](docs/RELEASING.md).
+`dist/sim_gui/sim_gui --self-test` checks the build. CI builds it on every push to check it still works, but the build isn't published. Releases are made with `scripts/release.py`, see [docs/RELEASING.md](docs/RELEASING.md).
 
 Layout:
 

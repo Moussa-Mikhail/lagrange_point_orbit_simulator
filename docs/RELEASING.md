@@ -4,8 +4,9 @@
 
 - **The web page** is deployed from `main` by every push that passes the checks. It has no releases of its own, and
   shows the version and commit it was built from in the title of its tab.
-- **The desktop app** is released as Linux, macOS and Windows builds when a version tag is pushed. Whether to keep
-  publishing binaries is undecided; this document describes what the workflow does today.
+- **The desktop app** is run from the source (`uv run`). Builds aren't published since they are over 100 MB and do what
+  the web page does, so a release has no files. The last ones are on v0.2.0. CI still builds the app on Linux and runs
+  `--self-test` on every push, so that publishing can start again when the app can do more than the page.
 - Nothing is published to PyPI.
 
 ## Version numbers
@@ -27,8 +28,8 @@ A release candidate is `X.Y.ZrcN` (`0.3.0rc1`) in `pyproject.toml` and in the ta
 
 ## When to release
 
-The web page is live already, so a change that only affects it doesn't need a release. Release when the desktop app
-has a fix or a feature that users would want, not on a schedule.
+A release is a milestone: a tag, and notes saying what changed since the last one. The web page is live already, so a
+release adds nothing to what users can run. Release when there is something worth pointing at, not on a schedule.
 
 ## How
 
@@ -39,8 +40,7 @@ uv run --no-project scripts/release.py 0.3.0
 
 The script refuses unless the work tree is clean, `HEAD` is `main` and the same as `origin/main`, the checks passed on
 it, and the tag is new. It then commits "build: bump version to 0.3.0", tags `v0.3.0` and pushes both. The release
-workflow builds the three apps, runs `--self-test` on each, checks that the tag is on `main` and matches `pyproject.toml`,
-and publishes the files with `SHA256SUMS.txt`. The release notes list the commits since the previous tag by type
+workflow checks that the tag is on `main` and matches `pyproject.toml`, and creates the release. The release notes list the commits since the previous tag by type
 (`feat`, `fix`, `perf`, and the rest). Edit the release afterwards to add a summary, and a warning for anything that
 breaks users' presets or scripts.
 
