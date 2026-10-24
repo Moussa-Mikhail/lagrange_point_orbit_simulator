@@ -114,7 +114,7 @@ def main() -> None:
 
     bump(version)
     run("git", "push", "--atomic", "origin", "main", f"v{version}")
-    print(f"Pushed v{version}. The release workflow builds it: gh run watch")
+    print(f"Pushed v{version}. The release workflow creates the release: gh run watch")
 
 
 if __name__ == "__main__":
