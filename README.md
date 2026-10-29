@@ -10,17 +10,28 @@ There are three ways to use it, for different purposes:
 
 - **In the browser** is for demonstrations, showing the orbits to others and trying parameters quickly:
   https://moussa-mikhail.github.io/lagrange_point_orbit_simulator/ runs the whole simulation on your machine, with
-  nothing to install. It plots at most 100,000 points of a run, however long, so it isn't for analysis. See
-  [web/README.md](web/README.md).
+  nothing to install. It plots at most 100,000 points of a run. See [web/README.md](web/README.md).
 - **The `Simulator` class** is for analysis and research. It keeps every step of a run as NumPy arrays, which can be
   used in a script or a notebook, see [Using the simulator from Python](#using-the-simulator-from-python).
 - **The desktop app** is a Qt front-end for the same simulator, run from the source, see below. Builds to download
-  aren't published, because they are over 100 MB and do what the web page does.
-  [v0.2.0](https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator/releases/tag/v0.2.0) has the last ones.
+  aren't published any more, the last ones are on
+  [v0.2.0](https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator/releases/tag/v0.2.0).
 
-## Installation of source code
+## Installation
 
-The project needs Python 3.13 or newer and uses [uv](https://docs.astral.sh/uv/).
+The project needs Python 3.13 or newer. To use the simulator as a library, install it with pip:
+
+```
+pip install "lagrange-point-orbit-simulator[numba] @ git+https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator.git" "validateddescriptor @ git+https://github.com/Moussa-Mikhail/validated-descriptor.git"
+```
+
+`[numba]` compiles the integrator, which is much faster. Leave it out to install the core only (NumPy and
+`validateddescriptor`), or use `[gui]` for the Qt desktop app too. With uv, `uv add git+https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator.git`
+does the same. `validateddescriptor` is listed separately for pip because it isn't on PyPI.
+
+### Installation of source code
+
+To work on the project or run the desktop app from the source, use [uv](https://docs.astral.sh/uv/).
 
 ```
 git clone https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator.git
@@ -41,14 +52,14 @@ Numba is optional. Without it the integrator runs as plain Python, which works b
 If you use pip instead, `requirements.txt` (core), `requirements-gui.txt` and `requirements-dev.txt` are generated from
 `uv.lock`.
 
-### Running the GUI from source
+#### Running the GUI from source
 
 ```
 ./start-gui-source.sh        # Linux and macOS
 start-gui-source.bat         # Windows
 ```
 
-### Using the simulator from Python
+## Using the simulator from Python
 
 ```python
 from lagrangepointsimulator import Simulator
@@ -65,8 +76,7 @@ sim.calc_conserved_quantities()
 
 Every step is kept, which takes 144 bytes of memory per step: a run of 10,000 years with a time step of 1 hour has about
 88 million steps and needs about 12.6 GB. Choose `time_step` and `num_years` to fit, or use the web page if only the
-overall shape of the orbit is wanted. The library isn't on PyPI, so install it from a clone as above, or with
-`uv add git+https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator`.
+overall shape of the orbit is wanted.
 
 ## Presets
 
