@@ -28,6 +28,7 @@ from PyQt6.QtWidgets import (
 
 from lagrangepointgui.orbit_plotter import Plotter
 from lagrangepointgui.preset_dialogs import PresetFileDialog
+from lagrangepointgui.report_dialog import ReportDialog
 from lagrangepointinputs.parameters import (
     DEFAULT_LAGRANGE_LABEL,
     LABEL_TO_ATTRIBUTE,
@@ -48,6 +49,7 @@ from lagrangepointinputs.user_presets import (
     user_preset_names,
 )
 from lagrangepointsimulator import Simulator, app_version
+from lagrangepointsimulator.analytics import RunSummary, summarize
 
 type Input = str | float | None
 
@@ -70,6 +72,8 @@ TOGGLE_ANIMATION = "Toggle Animation"
 PLOT_CONSERVED = "Plot Conserved Quantities"
 
 TOGGLE_CONSERVED = "Toggle Conserved Quantity Plots"
+
+REPORT = "Report…"
 
 
 class _SimUi(QMainWindow):
@@ -187,12 +191,17 @@ class _SimUi(QMainWindow):
         conservedPlotsButton.setFixedSize(conservedPlotsButton.sizeHint())
         conservedPlotsButton.setContentsMargins(100, 100, 100, 100)
 
+        reportButton = QPushButton(REPORT)
+        reportButton.setFixedSize(reportButton.sizeHint())
+
         buttonAndStatusLayout = QHBoxLayout()
         buttonAndStatusLayout.addWidget(conservedPlotsButton)
+        buttonAndStatusLayout.addWidget(reportButton)
         buttonAndStatusLayout.addWidget(self.statusLabel, 1)
         self._inputsAndConservedButtonLayout.addLayout(buttonAndStatusLayout)
 
         self.textToButton[TOGGLE_CONSERVED] = conservedPlotsButton
+        self.textToButton[REPORT] = reportButton
 
     def _addLagrangeLabel(self) -> None:
         field = QLineEdit()
@@ -222,6 +231,13 @@ class _SimUi(QMainWindow):
 
     def stopAnimation(self) -> None:
         self._plotter.stop_animation()
+
+    @property
+    def plotted(self) -> bool:
+        return self._plotted
+
+    def showReport(self, summary: RunSummary, lagrangeLabel: str) -> None:
+        ReportDialog(summary, lagrangeLabel, self).exec()
 
     def calcConservedQuantities(self) -> None:
         self._plotter.get_conserved_quantities()
@@ -300,6 +316,7 @@ class _SimCtrl:
         self._connectSignals()
         self._addReturnPressed()
         self._calculating = False
+        self._summary: RunSummary
 
     # noinspection PyUnresolvedReferences
     def _connectSignals(self) -> None:
@@ -308,6 +325,7 @@ class _SimCtrl:
             TOGGLE_ANIMATION: self._view.toggleAnimation,
             PLOT_CONSERVED: self._plotConservedQuantities,
             TOGGLE_CONSERVED: self._view.toggleConservationPlots,
+            REPORT: self._showReport,
         }
 
         for buttonText, action in buttonTextToAction.items():
@@ -488,6 +506,20 @@ class _SimCtrl:
 
             btn.setEnabled(False)
 
+    def _showReport(self) -> None:
+        if not self._view.plotted:
+            _displayErrorMessage("No simulation to report on.")
+            return
+
+        self._disableButtonsExceptToggleAnimation()
+        self._runInThread(self._summarize, [self._displayReport])
+
+    def _summarize(self) -> None:
+        self._summary = summarize(self._model)
+
+    def _displayReport(self) -> None:
+        self._view.showReport(self._summary, self._model.lagrange_label)
+
     def _plotConservedQuantities(self) -> None:
         self._disableButtonsExceptToggleAnimation()
         self._runInThread(self._view.calcConservedQuantities, [self._view.plotConservedQuantities])
@@ -540,6 +572,8 @@ def _selfTest(view: _SimUi) -> None:
     if not np.isfinite(sim.sat_pos).all():
         msg = "simulation produced non-finite positions"
         raise RuntimeError(msg)
+
+    summarize(sim)
 
 
 def main() -> None:
