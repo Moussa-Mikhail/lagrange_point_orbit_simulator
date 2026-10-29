@@ -2,12 +2,12 @@
 
 ## What is released
 
-- **The web page** is deployed from `main` by every push that passes the checks. It has no releases of its own, and
-  shows the version and commit it was built from in the title of its tab.
+- **The web page** is for demonstrations and quick iteration. It is deployed from `main` by every push that passes the
+  checks. It has no releases of its own, and shows the version and commit it was built from in the title of its tab.
 - **The desktop app** is run from the source (`uv run`). Builds aren't published since they are over 100 MB and do what
   the web page does, so a release has no files. The last ones are on v0.2.0. CI still builds the app on Linux and runs
   `--self-test` on every push, so that publishing can start again when the app can do more than the page.
-- Nothing is published to PyPI.
+- **The `Simulator` class** is for analysis, and is used from a clone of the repository. Nothing is published to PyPI.
 
 ## Version numbers
 

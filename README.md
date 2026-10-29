@@ -6,13 +6,17 @@ Python code used to simulate satellite orbits near Lagrange points. It is meant 
 points can be used. The initial position and velocity of the satellite can be specified by the user. Additionally, the
 masses of the star, planet, and the distance between them can also be specified.
 
-There are three ways to use it:
+There are three ways to use it, for different purposes:
 
-- **In the browser:** https://moussa-mikhail.github.io/lagrange_point_orbit_simulator/ runs the whole simulation on
-  your machine, with nothing to install. See [web/README.md](web/README.md).
-- **Desktop app and Python library:** run them from the source, see below. Builds to download aren't published,
-  because they are over 100 MB and do what the web page does. [v0.2.0](https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator/releases/tag/v0.2.0)
-  has the last ones.
+- **In the browser** is for demonstrations, showing the orbits to others and trying parameters quickly:
+  https://moussa-mikhail.github.io/lagrange_point_orbit_simulator/ runs the whole simulation on your machine, with
+  nothing to install. It plots at most 100,000 points of a run, however long, so it isn't for analysis. See
+  [web/README.md](web/README.md).
+- **The `Simulator` class** is for analysis and research. It keeps every step of a run as NumPy arrays, which can be
+  used in a script or a notebook, see [Using the simulator from Python](#using-the-simulator-from-python).
+- **The desktop app** is a Qt front-end for the same simulator, run from the source, see below. Builds to download
+  aren't published, because they are over 100 MB and do what the web page does.
+  [v0.2.0](https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator/releases/tag/v0.2.0) has the last ones.
 
 ## Installation of source code
 
@@ -58,6 +62,11 @@ sim.calc_conserved_quantities()
 
 `help(Simulator)` lists every parameter. The attributes of an instance can be changed after creation. The first call to
 `simulate` is slower with Numba because it compiles the integrator.
+
+Every step is kept, which takes 144 bytes of memory per step: a run of 10,000 years with a time step of 1 hour has about
+88 million steps and needs about 12.6 GB. Choose `time_step` and `num_years` to fit, or use the web page if only the
+overall shape of the orbit is wanted. The library isn't on PyPI, so install it from a clone as above, or with
+`uv add git+https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator`.
 
 ## Presets
 
