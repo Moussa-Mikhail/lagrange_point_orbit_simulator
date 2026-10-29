@@ -30,7 +30,6 @@ const BUTTONS = {
   toggleAnimation: $("toggle-animation"),
   plotConserved: $("plot-conserved"),
   toggleConserved: $("toggle-conserved"),
-  report: $("report"),
 };
 
 const COLORS = { star: "#ffff00", planet: "#0000ff", satellite: "#00ff00", lagrange: "#ffffff" };
@@ -688,6 +687,10 @@ async function simulate() {
   plotOrbits(result);
   plotted = true;
   animationIndex = 0;
+
+  const analytics = await run(() => request("report")).catch((error) => ({ error: error.message }));
+  if (analytics.error) showError(analytics.error);
+  else showAnalytics(analytics.rows);
   setStatus(`Simulated ${result.numSteps.toLocaleString()} steps in ${((performance.now() - start) / 1000).toFixed(2)} s`);
 
   if ($("auto-plot-conserved").checked) await plotConservedQuantities();
@@ -708,24 +711,17 @@ async function plotConservedQuantities() {
   plotConserved(result);
 }
 
-async function showReport() {
-  if (!plotted) {
-    showError("No simulation to report on.");
-    return;
-  }
-  const result = await run(() => request("report")).catch((error) => ({ error: error.message }));
-  if (result.error) {
-    showError(result.error);
-    return;
-  }
-  $("report-rows").replaceChildren(
-    ...result.rows.map(([name, value]) => {
-      const row = document.createElement("tr");
-      for (const text of [name, value]) row.appendChild(document.createElement("td")).textContent = text;
-      return row;
+function showAnalytics(rows) {
+  $("analytics-hint").hidden = true;
+  $("analytics-rows").replaceChildren(
+    ...rows.flatMap(([name, value]) => {
+      const term = document.createElement("dt");
+      const definition = document.createElement("dd");
+      term.textContent = name;
+      definition.textContent = value;
+      return [term, definition];
     }),
   );
-  $("report-dialog").showModal();
 }
 
 function toggleConservedPlots() {
@@ -742,7 +738,6 @@ BUTTONS.simulate.addEventListener("click", simulate);
 BUTTONS.toggleAnimation.addEventListener("click", toggleAnimation);
 BUTTONS.plotConserved.addEventListener("click", plotConservedQuantities);
 BUTTONS.toggleConserved.addEventListener("click", toggleConservedPlots);
-BUTTONS.report.addEventListener("click", showReport);
 
 try {
   spec = await request("init");

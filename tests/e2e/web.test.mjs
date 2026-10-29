@@ -99,23 +99,32 @@ test("the conserved quantity plots show", async () => {
   assert.ok((await plotTraces("energy-plot")) >= 1);
 });
 
-test("the report summarises the simulation", async () => {
+test("the analytics under the inputs summarise the simulation", async () => {
   await page.selectOption("#inputs select:first-of-type", "Default");
   await simulate();
-  await page.click("#report");
-  await page.waitForSelector("#report-dialog[open]");
 
-  const rows = await page.$$eval("#report-rows tr", (trs) => trs.map((tr) => [...tr.cells].map((cell) => cell.textContent)));
+  const rows = await page.$$eval("#analytics-rows dt", (terms) => terms.map((term) => [term.textContent, term.nextElementSibling.textContent]));
   const names = rows.map(([name]) => name);
 
+  assert.equal(await page.isVisible("#analytics-hint"), false);
   assert.equal(rows[0][0], "Orbital period of the planet");
   assert.ok(rows[0][1].startsWith("1.0000 years"));
   assert.ok(names.includes("Distance from L4 at the start"));
   assert.ok(names.includes("Instability (largest ÷ starting distance)"));
   assert.ok(rows.every(([, value]) => value.length > 0));
+});
 
-  await page.click("#report-dialog button");
-  assert.equal(await page.isVisible("#report-dialog"), false);
+test("the conserved plots sit to the right of the controls, under the orbits", async () => {
+  await page.click("#plot-conserved");
+  await page.waitForFunction(() => document.getElementById("energy-plot").data);
+
+  const [controls, orbits, conserved] = await page.evaluate(() =>
+    ["controls", "orbits", "conserved"].map((id) => document.getElementById(id).getBoundingClientRect().toJSON()),
+  );
+
+  assert.ok(conserved.left >= controls.right);
+  assert.ok(Math.abs(conserved.left - orbits.left) < 1);
+  assert.ok(conserved.top >= orbits.bottom);
 });
 
 test("hovering the plots does no work, since looking up a point among 10^5 blocks the page and the animation", async () => {

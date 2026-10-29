@@ -24,9 +24,13 @@
         <label><input type="checkbox" id="auto-plot-conserved"> Auto Plot Conserved</label>
       </div>
       <form id="inputs" autocomplete="off"></form>
+      <section id="analytics">
+        <h2>Analytics</h2>
+        <p id="analytics-hint">Simulate to see the analytics.</p>
+        <dl id="analytics-rows"></dl>
+      </section>
       <div id="toggle-and-status">
         <button id="toggle-conserved" disabled>Toggle Conserved Quantity Plots</button>
-        <button id="report" disabled>Report…</button>
         <p id="status" role="status">Starting…</p>
       </div>
     </section>
@@ -66,10 +70,6 @@
       <button type="button" id="presets-cancel">Cancel</button>
       <button type="button" id="presets-save">Save</button>
     </div>
-  </dialog>
-  <dialog id="report-dialog">
-    <table id="report-rows"></table>
-    <form method="dialog" class="dialog-buttons"><button>Close</button></form>
   </dialog>
   <dialog id="error">
     <p id="error-message"></p>
