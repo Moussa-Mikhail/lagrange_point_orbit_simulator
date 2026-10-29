@@ -99,6 +99,14 @@ test("the conserved quantity plots show", async () => {
   assert.ok((await plotTraces("energy-plot")) >= 1);
 });
 
+test("hovering the plots does no work, since looking up a point among 10^5 blocks the page and the animation", async () => {
+  const hovermodes = await page.evaluate(() =>
+    ["inertial-plot", "corotating-plot", "energy-plot"].map((id) => document.getElementById(id)._fullLayout.hovermode),
+  );
+
+  assert.deepEqual(hovermodes, [false, false, false]);
+});
+
 test("an invalid expression is reported without breaking the page", async () => {
   await page.fill("#field-star-mass", "not_a_constant");
   await page.click("#simulate");

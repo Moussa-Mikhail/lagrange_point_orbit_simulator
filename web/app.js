@@ -308,6 +308,7 @@ function layout(title, xTitle, yTitle, plotId, { locked = false, yRange = null, 
       yTitleAnnotation(yTitle, MARGIN.l, width, height),
     ],
     showlegend: false, // see setLegend
+    hovermode: false, // looking up the point under the mouse in 10^5 points blocks the page, and the animation with it
   };
 }
 
