@@ -7,6 +7,11 @@ uv run python scripts/build_web.py      # writes build/site: web/ plus the wheel
 python -m http.server -d build/site     # then open http://localhost:8000
 ```
 
+To try a change on another device without pushing it, `uv run --no-project scripts/serve_web.py --build --tunnel`
+builds the site and serves it at a public https address from [localhost.run](https://localhost.run) through `ssh`.
+Anyone with the address can open the page until you press Ctrl-C, and your machine has to stay on. Without `--tunnel` it
+only serves `http://localhost:8000`.
+
 - `index.html`, `style.css`, `app.js`: the page. Plots use Plotly, pinned to 2.35.2 with an integrity hash.
 - `worker.js`: loads Pyodide (pinned to 0.29.5 from jsdelivr) and the wheels, and answers requests from `app.js`.
 - `integrator.js`: the integrator in JavaScript, about 100x faster than Pyodide running the Python one. The Python
