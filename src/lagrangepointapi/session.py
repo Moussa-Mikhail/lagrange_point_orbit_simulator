@@ -192,7 +192,7 @@ class Session:
         sim = self.sim
         step = self.array_step()
 
-        times = sim.time_points()[::step]
+        times = sim.time_points(step)
         angular_speed = sim.angular_speed * np.sign(sim.time_step_in_seconds)
 
         def xy(arr: np.ndarray) -> dict[str, np.ndarray]:
@@ -223,7 +223,7 @@ class Session:
         sim = self.sim
         total_momentum, total_angular_momentum, total_energy = sim.calc_conserved_quantities()
 
-        times = np.ascontiguousarray(sim.time_points_in_years()[:: self.array_step()])
+        times = np.ascontiguousarray(sim.time_points_in_years(self.array_step()))
 
         # The total linear momentum is initially approx. 0, so any variation would seem like it isn't conserved. It's
         # normalized by the planet's initial momentum instead.

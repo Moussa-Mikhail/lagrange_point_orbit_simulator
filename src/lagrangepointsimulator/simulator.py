@@ -148,11 +148,24 @@ class Simulator:
     def num_steps(self) -> int:
         return 0 if self.time_step_in_seconds == 0 else ceil(abs(self.sim_time / self.time_step_in_seconds))
 
-    def time_points(self) -> Array1D:
-        return np.linspace(0, self.sim_time, self.num_steps + 1)
+    def time_points(self, step: int = 1) -> Array1D:
+        """The times of the steps, or of every step-th one. The same values as np.linspace(...)[::step], without
+        creating the whole array.
+        """
+        num_steps = self.num_steps
+        if num_steps == 0:
+            return np.zeros(1)
 
-    def time_points_in_years(self) -> Array1D:
-        return self.time_points() / YEARS
+        times = np.arange(0, num_steps + 1, step, dtype=np.double) * (self.sim_time / num_steps)
+
+        # like linspace, the last point is exactly the end time rather than a product that may be off by a rounding error
+        if num_steps % step == 0:
+            times[-1] = self.sim_time
+
+        return times
+
+    def time_points_in_years(self, step: int = 1) -> Array1D:
+        return self.time_points(step) / YEARS
 
     def calc_lagrange_point(self) -> Array1D:
         planet_distance_meters = self.planet_distance * AU

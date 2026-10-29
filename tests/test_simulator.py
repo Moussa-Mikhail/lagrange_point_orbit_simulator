@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from lagrangepointsimulator import Simulator
-from lagrangepointsimulator.constants import AU
+from lagrangepointsimulator.constants import AU, YEARS
 from lagrangepointsimulator.numba_funcs import HAS_NUMBA, _transform_to_corotating_numpy, transform_to_corotating
 
 
@@ -43,6 +43,19 @@ def test_num_steps_follows_time_step() -> None:
 
     assert sim.num_steps in (365, 366)
     assert len(sim.time_points()) == sim.num_steps + 1
+
+
+@pytest.mark.parametrize(
+    ("num_years", "time_step"), [(1.0, 24.0), (1.0, 7.0), (3.3, 1.0), (2.0, -5.0), (0.1, 24.0), (1.0, 0.0)]
+)
+@pytest.mark.parametrize("step", [1, 2, 3, 7, 10, 1000])
+def test_time_points_are_those_of_linspace(num_years: float, time_step: float, step: int) -> None:
+    sim = Simulator(num_years=num_years, time_step=time_step)
+
+    expected = np.linspace(0, sim.sim_time, sim.num_steps + 1)[::step]
+
+    np.testing.assert_array_equal(sim.time_points(step), expected)
+    np.testing.assert_array_equal(sim.time_points_in_years(step), expected / YEARS)
 
 
 def test_lagrange_points_are_where_expected() -> None:
