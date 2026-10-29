@@ -20,7 +20,7 @@ classifiers = [
 
 dependencies = [
     "numpy>=2.4.2",
-    "validateddescriptor",
+    "validateddescriptor @ git+https://github.com/Moussa-Mikhail/validated-descriptor.git",
 ]
 
 [project.urls]
@@ -40,6 +40,10 @@ gui = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.hatch.metadata]
+# validateddescriptor isn't on PyPI, so pip installs it from git
+allow-direct-references = true
+
 [tool.hatch.build.targets.wheel]
 packages = [
     "src/lagrangepointsimulator",
@@ -47,9 +51,6 @@ packages = [
     "src/lagrangepointapi",
     "src/lagrangepointgui",
 ]
-
-[tool.uv.sources]
-validateddescriptor = { git = "https://github.com/Moussa-Mikhail/validated-descriptor.git" }
 
 [dependency-groups]
 test = [
