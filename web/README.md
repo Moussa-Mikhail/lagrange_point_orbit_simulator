@@ -9,7 +9,9 @@ python -m http.server -d build/site     # then open http://localhost:8000
 
 To try a change on another device without pushing it, `uv run --no-project scripts/serve_web.py --build --tunnel`
 builds the site and serves it at a public https address from [localhost.run](https://localhost.run) through `ssh`.
-Anyone with the address can open the page until you press Ctrl-C, and your machine has to stay on. Without `--tunnel` it
+Anyone with the address can open the page until you press Ctrl-C, and your machine has to stay on. The free tunnels
+stop answering now and then, so the script fetches the page every 20 s and, if that fails twice, opens a new tunnel and
+prints its new address. Without `--tunnel` it
 only serves `http://localhost:8000`.
 
 - `index.html`, `style.css`, `app.js`: the page. Plots use Plotly, pinned to 2.35.2 with an integrity hash.
