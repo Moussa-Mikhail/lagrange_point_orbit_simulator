@@ -318,9 +318,10 @@ class Simulator:
             self.star_mass * star_pos_or_vel + self.planet_mass * planet_pos_or_vel + self.SAT_MASS * sat_pos_or_vel
         ) / (self.star_mass + self.planet_mass + self.SAT_MASS)
 
-    def transform_to_corotating(self, pos_trans: Array2D) -> Array2D:
+    def transform_to_corotating(self, pos_trans: Array2D, step: int = 1) -> Array2D:
+        """pos_trans holds every step-th row of a run, all of them by default."""
         angular_speed = self.angular_speed * np.sign(self.time_step_in_seconds)
-        return nb_transform_to_corotating(pos_trans, self.time_points(), angular_speed)
+        return nb_transform_to_corotating(pos_trans, self.time_points(step), angular_speed)
 
     def calc_conserved_quantities(self) -> tuple[Array2D, Array2D, Array1D]:
         total_momentum = self.calc_total_linear_momentum()
