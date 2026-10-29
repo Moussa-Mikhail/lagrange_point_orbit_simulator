@@ -22,12 +22,12 @@ There are three ways to use it, for different purposes:
 The project needs Python 3.13 or newer. To use the simulator as a library, install it with pip:
 
 ```
-pip install "lagrange-point-orbit-simulator[numba] @ git+https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator.git" "validateddescriptor @ git+https://github.com/Moussa-Mikhail/validated-descriptor.git"
+pip install "lagrange-point-orbit-simulator[numba] @ git+https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator.git"
 ```
 
 `[numba]` compiles the integrator, which is much faster. Leave it out to install the core only (NumPy and
-`validateddescriptor`), or use `[gui]` for the Qt desktop app too. With uv, `uv add git+https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator.git`
-does the same. `validateddescriptor` is listed separately for pip because it isn't on PyPI.
+`validateddescriptor`), or use `[gui]` for the Qt desktop app too. With uv, use
+`uv add git+https://github.com/Moussa-Mikhail/lagrange_point_orbit_simulator.git`.
 
 ### Installation of source code
 
