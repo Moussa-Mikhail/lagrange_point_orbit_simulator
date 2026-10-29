@@ -28,7 +28,6 @@ from PyQt6.QtWidgets import (
 
 from lagrangepointgui.orbit_plotter import Plotter
 from lagrangepointgui.preset_dialogs import PresetFileDialog
-from lagrangepointgui.report_dialog import ReportDialog
 from lagrangepointinputs.parameters import (
     DEFAULT_LAGRANGE_LABEL,
     LABEL_TO_ATTRIBUTE,
@@ -73,7 +72,9 @@ PLOT_CONSERVED = "Plot Conserved Quantities"
 
 TOGGLE_CONSERVED = "Toggle Conserved Quantity Plots"
 
-REPORT = "Report…"
+ANALYTICS = "Analytics"
+
+ANALYTICS_HINT = "Simulate to see the analytics."
 
 
 class _SimUi(QMainWindow):
@@ -94,30 +95,34 @@ class _SimUi(QMainWindow):
         self._centralWidget = QWidget(self)
         self.setCentralWidget(self._centralWidget)
 
-        self._mainLayout = QVBoxLayout()
+        self._mainLayout = QHBoxLayout()
         self._centralWidget.setLayout(self._mainLayout)
 
-        inputAndOrbitsLayout = QHBoxLayout()
-        self._mainLayout.addLayout(inputAndOrbitsLayout)
+        self._controlsLayout = QVBoxLayout()
+        self._mainLayout.addLayout(self._controlsLayout)
 
-        self._inputsAndConservedButtonLayout = QVBoxLayout()
-        inputAndOrbitsLayout.addLayout(self._inputsAndConservedButtonLayout)
+        plotsLayout = QVBoxLayout()
+        self._mainLayout.addLayout(plotsLayout, 1)
 
         self._inputsLayout = QFormLayout()
-        self._inputsAndConservedButtonLayout.addLayout(self._inputsLayout)
+        self._controlsLayout.addLayout(self._inputsLayout)
 
         self._addMainButtons()
         self._addPresetBox()
         self._addInputFields()
-        inputAndOrbitsLayout.addWidget(self._plotter.inertial_plot)
-        inputAndOrbitsLayout.addWidget(self._plotter.corotating_plot)
-
+        self._addAnalytics()
+        self._controlsLayout.addStretch(1)
         self._addToggleConservedPlotsButton()
+
+        orbitsLayout = QHBoxLayout()
+        plotsLayout.addLayout(orbitsLayout)
+        orbitsLayout.addWidget(self._plotter.inertial_plot)
+        orbitsLayout.addWidget(self._plotter.corotating_plot)
 
         self._conservedPlotsWidget = QWidget(self)
         conservedPlotsLayout = QHBoxLayout()
         self._conservedPlotsWidget.setLayout(conservedPlotsLayout)
-        self._mainLayout.addWidget(self._conservedPlotsWidget)
+        plotsLayout.addWidget(self._conservedPlotsWidget)
 
         conservedPlotsLayout.addWidget(self._plotter.linear_momentum_plot)
         conservedPlotsLayout.addWidget(self._plotter.angular_momentum_plot)
@@ -191,17 +196,32 @@ class _SimUi(QMainWindow):
         conservedPlotsButton.setFixedSize(conservedPlotsButton.sizeHint())
         conservedPlotsButton.setContentsMargins(100, 100, 100, 100)
 
-        reportButton = QPushButton(REPORT)
-        reportButton.setFixedSize(reportButton.sizeHint())
-
         buttonAndStatusLayout = QHBoxLayout()
         buttonAndStatusLayout.addWidget(conservedPlotsButton)
-        buttonAndStatusLayout.addWidget(reportButton)
         buttonAndStatusLayout.addWidget(self.statusLabel, 1)
-        self._inputsAndConservedButtonLayout.addLayout(buttonAndStatusLayout)
+        self._controlsLayout.addLayout(buttonAndStatusLayout)
 
         self.textToButton[TOGGLE_CONSERVED] = conservedPlotsButton
-        self.textToButton[REPORT] = reportButton
+
+    def _addAnalytics(self) -> None:
+        header = QLabel(ANALYTICS)
+        header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self._analyticsLayout = QFormLayout()
+        self._analyticsLayout.addRow(header)
+        self._controlsLayout.addLayout(self._analyticsLayout)
+
+        self._analyticsHint = QLabel(ANALYTICS_HINT)
+        self._analyticsLayout.addRow(self._analyticsHint)
+
+    def setAnalytics(self, summary: RunSummary, lagrangeLabel: str) -> None:
+        while self._analyticsLayout.rowCount() > 1:
+            self._analyticsLayout.removeRow(1)
+
+        for name, value in summary.rows(lagrangeLabel):
+            valueLabel = QLabel(value)
+            valueLabel.setWordWrap(True)
+            self._analyticsLayout.addRow(name, valueLabel)
 
     def _addLagrangeLabel(self) -> None:
         field = QLineEdit()
@@ -232,13 +252,6 @@ class _SimUi(QMainWindow):
     def stopAnimation(self) -> None:
         self._plotter.stop_animation()
 
-    @property
-    def plotted(self) -> bool:
-        return self._plotted
-
-    def showReport(self, summary: RunSummary, lagrangeLabel: str) -> None:
-        ReportDialog(summary, lagrangeLabel, self).exec()
-
     def calcConservedQuantities(self) -> None:
         self._plotter.get_conserved_quantities()
 
@@ -250,14 +263,18 @@ class _SimUi(QMainWindow):
         self._plotter.plot_conserved_quantities()
         self._showConservedPlots()
 
+    def _fitHeight(self) -> None:
+        """The conserved plots are under the orbit plots, so showing or hiding them only changes the height."""
+        self.resize(self.width(), self._mainLayout.sizeHint().height())
+
     def _showConservedPlots(self) -> None:
         self._conservedPlotsWidget.show()
-        self.resize(self._mainLayout.sizeHint())
+        self._fitHeight()
         self._conservedPlotsIsVisible = True
 
     def _hideConservedPlots(self) -> None:
         self._conservedPlotsWidget.hide()
-        self.resize(self._mainLayout.sizeHint())
+        self._fitHeight()
         self._conservedPlotsIsVisible = False
 
     def toggleConservationPlots(self) -> None:
@@ -325,7 +342,6 @@ class _SimCtrl:
             TOGGLE_ANIMATION: self._view.toggleAnimation,
             PLOT_CONSERVED: self._plotConservedQuantities,
             TOGGLE_CONSERVED: self._view.toggleConservationPlots,
-            REPORT: self._showReport,
         }
 
         for buttonText, action in buttonTextToAction.items():
@@ -481,12 +497,23 @@ class _SimCtrl:
         self._view.stopAnimation()
         self._view.setStatus("Simulating…")
         start = time.perf_counter()
-        onFinishFuncs: list[Callable[[], None]] = [self._view.updateOrbitPlots, lambda: self._reportSimulated(start)]
+        onFinishFuncs: list[Callable[[], None]] = [
+            self._view.updateOrbitPlots,
+            self._showAnalytics,
+            lambda: self._reportSimulated(start),
+        ]
         if self._view.autoPlotConserved.isChecked():
             onFinishFuncs.append(self._plotConservedQuantities)
 
         self._disableButtons()
-        self._runInThread(self._model.simulate, onFinishFuncs)
+        self._runInThread(self._simulateAndSummarize, onFinishFuncs)
+
+    def _simulateAndSummarize(self) -> None:
+        self._model.simulate()
+        self._summary = summarize(self._model)
+
+    def _showAnalytics(self) -> None:
+        self._view.setAnalytics(self._summary, self._model.lagrange_label)
 
     def _reportSimulated(self, start: float) -> None:
         self._view.setStatus(f"Simulated {self._model.num_steps:,} steps in {time.perf_counter() - start:.2f} s")
@@ -505,20 +532,6 @@ class _SimCtrl:
                 continue
 
             btn.setEnabled(False)
-
-    def _showReport(self) -> None:
-        if not self._view.plotted:
-            _displayErrorMessage("No simulation to report on.")
-            return
-
-        self._disableButtonsExceptToggleAnimation()
-        self._runInThread(self._summarize, [self._displayReport])
-
-    def _summarize(self) -> None:
-        self._summary = summarize(self._model)
-
-    def _displayReport(self) -> None:
-        self._view.showReport(self._summary, self._model.lagrange_label)
 
     def _plotConservedQuantities(self) -> None:
         self._disableButtonsExceptToggleAnimation()
