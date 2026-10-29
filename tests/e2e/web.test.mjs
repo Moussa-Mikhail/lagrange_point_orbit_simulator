@@ -99,6 +99,25 @@ test("the conserved quantity plots show", async () => {
   assert.ok((await plotTraces("energy-plot")) >= 1);
 });
 
+test("the report summarises the simulation", async () => {
+  await page.selectOption("#inputs select:first-of-type", "Default");
+  await simulate();
+  await page.click("#report");
+  await page.waitForSelector("#report-dialog[open]");
+
+  const rows = await page.$$eval("#report-rows tr", (trs) => trs.map((tr) => [...tr.cells].map((cell) => cell.textContent)));
+  const names = rows.map(([name]) => name);
+
+  assert.equal(rows[0][0], "Orbital period of the planet");
+  assert.ok(rows[0][1].startsWith("1.0000 years"));
+  assert.ok(names.includes("Distance from L4 at the start"));
+  assert.ok(names.includes("Instability (largest ÷ starting distance)"));
+  assert.ok(rows.every(([, value]) => value.length > 0));
+
+  await page.click("#report-dialog button");
+  assert.equal(await page.isVisible("#report-dialog"), false);
+});
+
 test("hovering the plots does no work, since looking up a point among 10^5 blocks the page and the animation", async () => {
   const hovermodes = await page.evaluate(() =>
     ["inertial-plot", "corotating-plot", "energy-plot"].map((id) => document.getElementById(id)._fullLayout.hovermode),

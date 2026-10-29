@@ -59,3 +59,7 @@ def finish(rows):
 
 def conserved():
     return _to_js(_session.conserved())
+
+
+def report():
+    return _to_js(_session.report())

@@ -5,6 +5,7 @@ import pytest
 
 from lagrangepointapi import session
 from lagrangepointinputs import presets
+from lagrangepointsimulator.analytics import summarize
 
 
 @pytest.fixture(autouse=True)
@@ -142,3 +143,24 @@ def test_a_zero_time_step_does_not_break_the_animation_rate() -> None:
 
     assert result["numSteps"] == 0
     assert result["animationRate"] == 1
+
+
+def test_report_is_made_of_the_kept_rows() -> None:
+    s = session.Session()
+    inputs = default_inputs()
+    inputs["simulation time"] = "100"
+    inputs["perturbation size"] = "0.02"
+
+    assert "error" not in s.simulate(inputs)
+    assert s.array_step() > 1
+
+    report = s.report()
+    rows = dict(report["rows"])
+
+    assert rows["Distance from L4 at the start"] == "0.02 AU"
+    assert rows["Instability (largest ÷ starting distance)"] != ""
+    assert report["rows"] == [list(row) for row in summarize(s.sim, s.array_step()).rows("L4")]
+
+
+def test_report_before_a_simulation_is_refused() -> None:
+    assert "error" in session.Session().report()

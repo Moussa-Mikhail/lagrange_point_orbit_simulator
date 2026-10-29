@@ -50,6 +50,7 @@ async function init() {
     prepare: pyodide.globals.get("prepare"),
     finish: pyodide.globals.get("finish"),
     conserved: pyodide.globals.get("conserved"),
+    report: pyodide.globals.get("report"),
     get_user_text: pyodide.globals.get("get_user_text"),
     set_user_text: pyodide.globals.get("set_user_text"),
     save_preset: pyodide.globals.get("save_preset"),
@@ -78,6 +79,7 @@ const handlers = {
     return bridge.finish(rows);
   },
   conserved: () => bridge.conserved(),
+  report: () => bridge.report(),
   // the user's presets, see bridge.py
   getPresetsText: () => bridge.get_user_text(),
   setPresetsText: (text) => bridge.set_user_text(text),

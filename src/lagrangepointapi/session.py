@@ -22,6 +22,7 @@ from lagrangepointinputs.parameters import (
 from lagrangepointinputs.presets import read_presets
 from lagrangepointinputs.safe_eval import safe_eval
 from lagrangepointsimulator import Simulator
+from lagrangepointsimulator.analytics import summarize
 from lagrangepointsimulator.constants import AU, HOURS, YEARS, G
 from lagrangepointsimulator.numba_funcs import transform_to_corotating
 
@@ -214,6 +215,17 @@ class Session:
             "numSteps": sim.num_steps,
             "animationRate": self.animation_rate(),
         }
+
+    def report(self) -> Result:
+        """The summary of the last simulation as the [name, value] rows of a report. It is made of the rows kept for
+        plotting, so a peak that falls between two of them is missed.
+        """
+        if not self._simulated:
+            return {"error": "No data to report on."}
+
+        sim = self.sim
+        summary = summarize(sim, self.array_step())
+        return {"rows": [list(row) for row in summary.rows(sim.lagrange_label)]}
 
     def conserved(self) -> Result:
         """Relative change in the conserved quantities of the last simulation."""

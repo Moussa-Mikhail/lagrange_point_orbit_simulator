@@ -30,6 +30,7 @@ const BUTTONS = {
   toggleAnimation: $("toggle-animation"),
   plotConserved: $("plot-conserved"),
   toggleConserved: $("toggle-conserved"),
+  report: $("report"),
 };
 
 const COLORS = { star: "#ffff00", planet: "#0000ff", satellite: "#00ff00", lagrange: "#ffffff" };
@@ -707,6 +708,26 @@ async function plotConservedQuantities() {
   plotConserved(result);
 }
 
+async function showReport() {
+  if (!plotted) {
+    showError("No simulation to report on.");
+    return;
+  }
+  const result = await run(() => request("report")).catch((error) => ({ error: error.message }));
+  if (result.error) {
+    showError(result.error);
+    return;
+  }
+  $("report-rows").replaceChildren(
+    ...result.rows.map(([name, value]) => {
+      const row = document.createElement("tr");
+      for (const text of [name, value]) row.appendChild(document.createElement("td")).textContent = text;
+      return row;
+    }),
+  );
+  $("report-dialog").showModal();
+}
+
 function toggleConservedPlots() {
   const section = $("conserved");
   section.hidden = !section.hidden;
@@ -721,6 +742,7 @@ BUTTONS.simulate.addEventListener("click", simulate);
 BUTTONS.toggleAnimation.addEventListener("click", toggleAnimation);
 BUTTONS.plotConserved.addEventListener("click", plotConservedQuantities);
 BUTTONS.toggleConserved.addEventListener("click", toggleConservedPlots);
+BUTTONS.report.addEventListener("click", showReport);
 
 try {
   spec = await request("init");
