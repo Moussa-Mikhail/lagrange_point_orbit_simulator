@@ -16,7 +16,10 @@ only serves `http://localhost:8000`.
 
 - `index.html`, `style.css`, `app.js`: the page. Plots use Plotly, pinned to 2.35.2 with an integrity hash.
 - `worker.js`: loads Pyodide (pinned to 0.29.5 from jsdelivr) and the wheels, and answers requests from `app.js`.
-- `integrator.js`: the integrator in JavaScript, about 100x faster than Pyodide running the Python one. The Python
+- `integrator.js`: the integrator in JavaScript. Integrating alone takes about 12 ms for 10 years and 36 ms for 100
+  years in Node, against about 1 s and 9.7 s for the Python one under Pyodide (`scripts/pyodide_bench`). The whole page
+  is slower than that, because plotting and the transfer between the worker and the page take time too: about 0.4 to
+  0.6 s for 10 years and 0.36 s for 100 years, against about 1 s and 11 s with the Python integrator. The Python
   version in `src/lagrangepointsimulator/numba_funcs.py` is the reference, so keep the two in step.
 - User presets: the text of the user's presets file is kept in `localStorage`. The file itself lives in Pyodide's
   in-memory file system, where the shared `lagrangepointinputs.user_presets` validates and writes it, and `app.js` sends
