@@ -1,3 +1,7 @@
+import os
+import subprocess
+import sys
+
 import numpy as np
 import pytest
 
@@ -91,3 +95,20 @@ def test_numpy_corotating_transform_matches_numba(l4_sim: Simulator) -> None:
     actual = _transform_to_corotating_numpy(l4_sim.sat_pos, times, l4_sim.angular_speed)
 
     assert actual == pytest.approx(expected, abs=1e-3)
+
+
+@pytest.mark.skipif(not HAS_NUMBA, reason="there is no compiled version to compare with")
+def test_integrator_without_numba_gives_the_same_bits(l4_sim: Simulator) -> None:
+    # An orbit is chaotic: a difference of one bit in the first step grows until the orbits differ, so the results of
+    # the interpreted and the compiled integrator must be identical, not just close.
+    code = (
+        "from lagrangepointsimulator import Simulator\n"
+        "sim = Simulator(num_years=10)\n"
+        "sim.simulate()\n"
+        "print(sim.sat_pos.tobytes().hex())"
+    )
+    env = os.environ | {"NUMBA_DISABLE_JIT": "1"}
+
+    result = subprocess.run([sys.executable, "-c", code], env=env, capture_output=True, text=True, check=True)
+
+    assert result.stdout.strip() == l4_sim.sat_pos.tobytes().hex()

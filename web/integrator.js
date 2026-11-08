@@ -3,8 +3,8 @@
 // because the results are meant to be the same to the last bit.
 // A drift-kick-drift (leapfrog) step of the star, planet and satellite, as in Python.
 
-// 1 / r^3 the way Numba compiles `r ** -3`, which the desktop app runs. Math.pow(r, -3) can differ from it in the last bit,
-// and the integration amplifies that: the conserved quantities then wander differently, though they are as small.
+// 1 / r^3 as numba_funcs.py computes it, as 1 / (r * r * r), which is the same bits in Python, in Numba and here. Math.pow(r, -3)
+// can differ from it in the last bit, and the integration amplifies that: the conserved quantities then wander differently, though they are as small.
 function inverseCubed(r) {
   return 1 / (r * r * r);
 }

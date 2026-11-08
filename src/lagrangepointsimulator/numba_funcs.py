@@ -35,7 +35,10 @@ def _advance(pos: Vec3, vel: Vec3, time: float) -> Vec3:
 
 @njit(inline="always")
 def inverse_norm_cubed(vector: Vec3) -> float:
-    return sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]) ** -3
+    distance = sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2])
+    # Not `distance ** -3`: Python rounds that differently from compiled code, so without Numba the orbit would drift away
+    # from the compiled one. web/integrator.js does the same.
+    return 1 / (distance * distance * distance)
 
 
 @njit(inline="always")
